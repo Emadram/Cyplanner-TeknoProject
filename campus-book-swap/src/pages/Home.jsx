@@ -1,17 +1,10 @@
-import { Outlet } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
-
-const MainLayout = () => {
+const Home = () => {
   return (
-    <div className="flex flex-col min-h-screen">
-      <Navbar />
-      <main className="flex-1 px-4 py-8 max-w-7xl mx-auto w-full">
-        <Outlet />
-      </main>
-      <Footer />
+    <div className="max-w-3xl mx-auto">
+      <h1 className="text-3xl font-bold mb-4">Welcome to YourApp</h1>
+      <p className="text-gray-700">This is the home page of your application.</p>
     </div>
   );
 };
 
-export default MainLayout;
+export default Home;
