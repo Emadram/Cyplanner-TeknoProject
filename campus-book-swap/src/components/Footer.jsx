@@ -1,8 +1,8 @@
 const Footer = () => {
   return (
-    <footer className="footer">
-      <div className="footer-content">
-        <p>&copy; {new Date().getFullYear()} YourApp. All rights reserved.</p>
+    <footer className="py-4 px-8 bg-gray-50 border-t border-gray-200 text-center">
+      <div>
+        <p className="text-gray-600">&copy; {new Date().getFullYear()} YourApp. All rights reserved.</p>
       </div>
     </footer>
   );
