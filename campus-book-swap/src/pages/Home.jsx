@@ -450,7 +450,7 @@ const Home = () => {
         {/* Sidebar */}
         <div className="books-of w-full md:w-64 flex-shrink-0 md:mr-6 mb-6 md:mb-0">
           <div className="week bg-white rounded-lg shadow-sm p-4 mb-6">
-            <div className="author-title font-medium mb-4">Author of the week</div>
+            <div className="author-title font-medium mb-4">Books of the week</div>
             {authorsOfWeek.map(author => (
               <div key={author.id} className="author flex items-center mb-3 cursor-pointer hover:bg-gray-50 p-2 rounded">
                 <img src={author.img} alt={author.name} className="author-img w-8 h-8 rounded-full object-cover mr-3" />
