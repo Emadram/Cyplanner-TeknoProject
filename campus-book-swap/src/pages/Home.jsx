@@ -121,6 +121,7 @@ const Home = () => {
       summary: 'Readers of all ages and walks of life have drawn inspiration and empowerment from Elizabeth Gilbert\'s books for years.',
       condition: 'Like New',
       exchange: 'Looking for: The Road',
+      subject: 'Fiction',
       likes: [
         { id: 1, img: 'https://randomuser.me/api/portraits/women/63.jpg', name: 'Samantha William' },
         { id: 2, img: 'https://pbs.twimg.com/profile_images/2452384114/noplz47r59v1uxvyg8ku.png', name: 'Tommy Adam' },
@@ -137,6 +138,7 @@ const Home = () => {
       summary: 'Readers of all ages and walks of life have drawn inspiration and empowerment from Elizabeth Gilbert\'s books for years.',
       condition: 'Good',
       exchange: '$10.50',
+      subject: 'Fiction',
       likes: [
         { id: 3, img: 'https://randomuser.me/api/portraits/women/63.jpg', name: 'Kimberly Jones' }
       ]
@@ -151,6 +153,7 @@ const Home = () => {
       summary: 'Readers of all ages and walks of life have drawn inspiration and empowerment from Elizabeth Gilbert\'s books for years.',
       condition: 'New',
       exchange: 'Looking for: Brave New World',
+      subject: 'Fiction',
       likes: [
         { id: 3, img: 'https://randomuser.me/api/portraits/women/63.jpg', name: 'Kimberly Jones' },
         { id: 2, img: 'https://pbs.twimg.com/profile_images/2452384114/noplz47r59v1uxvyg8ku.png', name: 'Adam' }
@@ -166,6 +169,7 @@ const Home = () => {
       summary: 'Readers of all ages and walks of life have drawn inspiration and empowerment from Elizabeth Gilbert\'s books for years.',
       condition: 'Good',
       exchange: 'For Borrowing (3 weeks)',
+      subject: 'Fiction',
       likes: [
         { id: 1, img: 'https://randomuser.me/api/portraits/women/63.jpg', name: 'Samantha William' },
         { id: 2, img: 'https://pbs.twimg.com/profile_images/2452384114/noplz47r59v1uxvyg8ku.png', name: 'Tommy Adam' },
@@ -271,15 +275,14 @@ const Home = () => {
         <div className="card-content ml-5 overflow-hidden">
           <h3 className="book-name font-medium text-gray-800 mb-1 truncate">{book.title}</h3>
           <p className="book-by text-gray-500 text-sm mb-3">{book.author}</p>
-          <div className="rate flex items-center mb-2">
-            <div className="flex">
-              {[1, 2, 3, 4, 5].map(star => (
-                <span key={star} className={star <= Math.floor(book.rating) ? "text-yellow-400" : "text-gray-300"}>★</span>
-              ))}
-            </div>
-            <span className="card-vote text-gray-500 text-xs ml-2">{book.voters} voters</span>
+          
+          {/* Added details */}
+          <div className="book-details space-y-1 mb-2">
+            <p className="text-sm"><span className="font-medium text-gray-700">Type:</span> <span className="text-gray-600">{book.subject || "Fiction"}</span></p>
+            <p className="text-sm"><span className="font-medium text-gray-700">Give:</span> <span className="text-gray-600">{book.title}</span></p>
+            <p className="text-sm"><span className="font-medium text-gray-700">Get:</span> <span className="text-gray-600">{book.exchange}</span></p>
+            <p className="text-sm"><span className="font-medium text-gray-700">Condition:</span> <span className="text-gray-600">{book.condition}</span></p>
           </div>
-          <p className="card-sum text-gray-600 text-sm line-clamp-2">{book.summary}</p>
         </div>
       </div>
       <div className="likes flex items-center p-3">
