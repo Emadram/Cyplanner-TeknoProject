@@ -17,7 +17,7 @@ const Home = () => {
   const featuredBooks = [
     {
       id: 1,
-      title: 'A COURT OF THORNS AND ROSES',
+      title: 'Sample',
       displayTitle: ['THORNS', 'ROSES'],
       author: 'Sarah J. Maas',
       color: 'bg-red-400',
@@ -36,7 +36,7 @@ const Home = () => {
     },
     {
       id: 2,
-      title: 'A COURT OF MIST AND FURY',
+      title: 'Sample2',
       displayTitle: ['MIST', 'FURY'],
       author: 'Sarah J. Maas',
       color: 'bg-blue-400',
@@ -54,7 +54,7 @@ const Home = () => {
     },
     {
       id: 3,
-      title: 'A COURT OF FROST AND STARLIGHT',
+      title: 'Sample3',
       displayTitle: ['FROST', 'STARLIGHT'],
       author: 'Sarah J. Maas',
       color: 'bg-purple-400',
@@ -73,7 +73,7 @@ const Home = () => {
     },
     {
       id: 4,
-      title: 'A COURT OF WINGS AND RUIN',
+      title: 'Sample4',
       displayTitle: ['WINGS', 'RUIN'],
       author: 'Sarah J. Maas',
       color: 'bg-yellow-400',
@@ -92,7 +92,7 @@ const Home = () => {
     },
     {
       id: 5,
-      title: 'AFTER YOU',
+      title: 'Sample5',
       displayTitle: ['AFTER', 'YOU'],
       author: 'Jojo Moyes',
       color: 'bg-pink-400',
@@ -113,7 +113,7 @@ const Home = () => {
   const popularBooks = [
     {
       id: 6,
-      title: 'Changes Are',
+      title: 'Sample6',
       author: 'Richard Russo',
       cover: 'https://imagesvc.meredithcorp.io/v3/mm/image?url=https%3A%2F%2Fstatic.onecms.io%2Fwp-content%2Fuploads%2Fsites%2F6%2F2019%2F07%2Fchances-are-1-2000.jpg&q=85',
       rating: 4.1,
@@ -130,7 +130,7 @@ const Home = () => {
     },
     {
       id: 7,
-      title: 'Dominicana',
+      title: 'Sample7',
       author: 'Angie Cruz',
       cover: 'https://images-na.ssl-images-amazon.com/images/I/7167iiDUeAL.jpg',
       rating: 3.9,
@@ -145,7 +145,7 @@ const Home = () => {
     },
     {
       id: 8,
-      title: 'The Travellers',
+      title: 'Sample8',
       author: 'Regina Porter',
       cover: 'https://assets.fontsinuse.com/static/use-media-items/95/94294/full-2000x3056/5d56c6b1/cg%201.jpeg?resolution=0',
       rating: 4.4,
@@ -161,7 +161,7 @@ const Home = () => {
     },
     {
       id: 9,
-      title: 'Afternoon Of A Faun',
+      title: 'ASample9',
       author: 'James Lasdun',
       cover: 'https://images-na.ssl-images-amazon.com/images/I/91M4E+SURUL.jpg',
       rating: 3.8,
