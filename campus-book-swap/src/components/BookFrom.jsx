@@ -30,20 +30,24 @@ const BookForm = ({ onSuccess, bookToEdit = null }) => {
     const fetchCategories = async () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/categories`);
-        console.log("Categories raw response:", response.data);
+        console.log("Raw categories response:", response.data);
         
-        // Process categories based on data structure
-        let processedCategories = [];
-        
-        if (response.data.data && Array.isArray(response.data.data)) {
-          processedCategories = response.data.data.map(category => ({
-            id: category.id,
-            name: category.attributes ? category.attributes.name : category.name
-          }));
+        if (response.data && response.data.data) {
+          // For Strapi v4 structure
+          const processedCategories = response.data.data.map(cat => {
+            console.log("Processing category:", cat);
+            return {
+              id: cat.id,
+              name: cat.attributes?.name || 'Unknown Category'
+            };
+          });
+          
+          console.log("Processed categories:", processedCategories);
+          setCategories(processedCategories);
+        } else {
+          console.error("Unexpected category data structure:", response.data);
+          setError("Failed to process categories data");
         }
-        
-        console.log("Processed categories:", processedCategories);
-        setCategories(processedCategories);
       } catch (err) {
         console.error('Error fetching categories:', err);
         setError('Failed to load categories');
@@ -96,19 +100,25 @@ const BookForm = ({ onSuccess, bookToEdit = null }) => {
       const token = localStorage.getItem('token');
       console.log("Token being used:", token ? `${token.substring(0, 15)}...` : 'No token');
       
-      // Super simplified request - just title and author to test
+      // Simplified book data
       const bookData = {
         data: {
           title: book.title,
-          author: book.author
+          author: book.author,
+          description: book.description,
+          condition: book.condition,
+          exchange: book.exchange || "",
+          subject: book.subject || "",
+          course: book.course || "",
+          price: parseFloat(book.price) || 0,
+          category: book.category || null
         }
       };
       
-      console.log("Simplified data for Strapi:", bookData);
+      console.log("Data for Strapi:", bookData);
       
       let bookResponse;
       
-      // Test with a very basic payload
       if (bookToEdit) {
         bookResponse = await authAxios.put(
           `${import.meta.env.VITE_API_URL}/api/books/${bookToEdit.id}`, 
@@ -126,6 +136,28 @@ const BookForm = ({ onSuccess, bookToEdit = null }) => {
       }
       
       console.log("Book response:", bookResponse.data);
+      
+      // If there's a cover image, upload it after book is created
+      if (coverImage && bookResponse.data.data.id) {
+        const formData = new FormData();
+        formData.append('files', coverImage);
+        formData.append('ref', 'api::book.book');
+        formData.append('refId', bookResponse.data.data.id);
+        formData.append('field', 'cover');
+        
+        console.log("Uploading cover image for book ID:", bookResponse.data.data.id);
+        
+        try {
+          const uploadResponse = await authAxios.post(
+            `${import.meta.env.VITE_API_URL}/api/upload`, 
+            formData
+          );
+          console.log("Image upload response:", uploadResponse.data);
+        } catch (uploadErr) {
+          console.error("Error uploading image:", uploadErr);
+          // Continue with success even if image upload fails
+        }
+      }
       
       setSuccess(bookToEdit ? 'Book updated successfully!' : 'Book listed successfully!');
       setBook(initialState);
@@ -228,11 +260,15 @@ const BookForm = ({ onSuccess, bookToEdit = null }) => {
               required
             >
               <option value="">Select a category</option>
-              {categories.map(category => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
+              {categories.length > 0 ? (
+                categories.map(category => (
+                  <option key={category.id} value={category.id}>
+                    {category.name || `Category ID: ${category.id}`}
+                  </option>
+                ))
+              ) : (
+                <option value="" disabled>Loading categories...</option>
+              )}
             </select>
           </div>
           
