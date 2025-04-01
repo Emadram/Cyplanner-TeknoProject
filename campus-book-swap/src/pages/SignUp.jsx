@@ -28,12 +28,18 @@ const SignUp = () => {
     setIsLoading(true);
     
     try {
+      // Log the URL being used for debugging
+      const apiUrl = `${import.meta.env.VITE_API_URL}/api/auth/local/register`;
+      console.log('Registration URL:', apiUrl);
+      
       // Register user with Strapi
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/local/register`, {
+      const response = await axios.post(apiUrl, {
         username: formData.username,
         email: formData.email,
         password: formData.password
       });
+      
+      console.log('Registration response:', response.data);
       
       // Extract user data and token
       const { user, jwt } = response.data;
@@ -52,12 +58,32 @@ const SignUp = () => {
       // Redirect to dashboard
       navigate('/dashboard');
     } catch (err) {
-      console.error('Registration error:', err);
-      setError(
-        err.response?.data?.error?.message || 
-        err.response?.data?.message || 
-        'Registration failed. Please try again.'
-      );
+      console.error('Registration error details:', err);
+      
+      // More detailed error handling
+      if (err.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.log('Error response data:', err.response.data);
+        console.log('Error response status:', err.response.status);
+        
+        if (err.response.status === 404) {
+          setError('API endpoint not found. Please check your API URL configuration.');
+        } else {
+          setError(
+            err.response?.data?.error?.message || 
+            err.response?.data?.message || 
+            'Registration failed. Please try again.'
+          );
+        }
+      } else if (err.request) {
+        // The request was made but no response was received
+        console.log('Error request:', err.request);
+        setError('No response received from server. Please check your internet connection.');
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        setError('An error occurred during registration. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -125,6 +151,15 @@ const SignUp = () => {
         <p className="text-gray-600">
           Already have an account? <Link to="/signin" className="text-blue-600 hover:underline">Sign In</Link>
         </p>
+      </div>
+      
+      <div className="mt-4 p-3 bg-yellow-50 text-yellow-800 rounded text-sm">
+        <p><strong>Troubleshooting:</strong> If you're seeing 404 errors, check:</p>
+        <ul className="list-disc pl-5 mt-1">
+          <li>VITE_API_URL in your .env file (should be complete base URL)</li>
+          <li>Strapi version (URL pattern might differ)</li>
+          <li>Strapi permissions (check Public role permissions)</li>
+        </ul>
       </div>
     </div>
   );
