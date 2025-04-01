@@ -1,7 +1,6 @@
 module.exports = ({ env }) => [
   "strapi::errors",
   "strapi::security",
-  "strapi::cors",
   {
     name: "strapi::cors",
     config: {
