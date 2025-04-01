@@ -1,18 +1,207 @@
 import { useState, useEffect } from 'react';
+import { bookAPI } from '../services/api';
 
 const Home = () => {
-  // State variables
+  // State variables for data
   const [activeCategory, setActiveCategory] = useState('All Genres');
   const [selectedBook, setSelectedBook] = useState(null);
   const [currentSlide, setCurrentSlide] = useState(0);
   
-  // These will be fetched from the backend
-  const categories = [];
-  const featuredBooks = [];
-  const popularBooks = [];
-  const booksOfWeek = [];
-  const booksOfYear = [];
+  // State for the API data
+  const [featuredBooks, setFeaturedBooks] = useState([]);
+  const [popularBooks, setPopularBooks] = useState([]);
+  const [booksOfWeek, setBooksOfWeek] = useState([]);
+  const [booksOfYear, setBooksOfYear] = useState([]);
+  const [categories, setCategories] = useState([]);
   
+  // Loading states
+  const [loading, setLoading] = useState({
+    featured: true,
+    popular: true,
+    booksOfWeek: true,
+    booksOfYear: true,
+    categories: true
+  });
+  
+  // Error states
+  const [error, setError] = useState({
+    featured: null,
+    popular: null,
+    booksOfWeek: null,
+    booksOfYear: null,
+    categories: null
+  });
+
+  // Fetch all necessary data on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch categories
+        setLoading(prev => ({ ...prev, categories: true }));
+        const categoriesData = await bookAPI.getCategories();
+        // Add "All Genres" option first
+        const processedCategories = [
+          { id: 'all', name: 'All Genres' },
+          ...categoriesData.data.map(cat => ({
+            id: cat.id,
+            name: cat.attributes.name
+          }))
+        ];
+        setCategories(processedCategories);
+        setLoading(prev => ({ ...prev, categories: false }));
+      } catch (err) {
+        console.error('Error fetching categories:', err);
+        setError(prev => ({ ...prev, categories: err.message }));
+        setLoading(prev => ({ ...prev, categories: false }));
+      }
+
+      try {
+        // Fetch featured books
+        setLoading(prev => ({ ...prev, featured: true }));
+        const featuredData = await bookAPI.getFeaturedBooks();
+        setFeaturedBooks(mapBooksData(featuredData.data));
+        setLoading(prev => ({ ...prev, featured: false }));
+      } catch (err) {
+        console.error('Error fetching featured books:', err);
+        setError(prev => ({ ...prev, featured: err.message }));
+        setLoading(prev => ({ ...prev, featured: false }));
+      }
+
+      try {
+        // Fetch popular books
+        setLoading(prev => ({ ...prev, popular: true }));
+        const popularData = await bookAPI.getPopularBooks();
+        setPopularBooks(mapBooksData(popularData.data));
+        setLoading(prev => ({ ...prev, popular: false }));
+      } catch (err) {
+        console.error('Error fetching popular books:', err);
+        setError(prev => ({ ...prev, popular: err.message }));
+        setLoading(prev => ({ ...prev, popular: false }));
+      }
+
+      try {
+        // Fetch books of the week
+        setLoading(prev => ({ ...prev, booksOfWeek: true }));
+        const weekBooksData = await bookAPI.getBooksOfWeek();
+        setBooksOfWeek(mapBooksData(weekBooksData.data));
+        setLoading(prev => ({ ...prev, booksOfWeek: false }));
+      } catch (err) {
+        console.error('Error fetching books of the week:', err);
+        setError(prev => ({ ...prev, booksOfWeek: err.message }));
+        setLoading(prev => ({ ...prev, booksOfWeek: false }));
+      }
+
+      try {
+        // Fetch books of the year
+        setLoading(prev => ({ ...prev, booksOfYear: true }));
+        const yearBooksData = await bookAPI.getBooksOfYear();
+        setBooksOfYear(mapBooksData(yearBooksData.data));
+        setLoading(prev => ({ ...prev, booksOfYear: false }));
+      } catch (err) {
+        console.error('Error fetching books of the year:', err);
+        setError(prev => ({ ...prev, booksOfYear: err.message }));
+        setLoading(prev => ({ ...prev, booksOfYear: false }));
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Fetch books when category changes
+  useEffect(() => {
+    const fetchBooksByCategory = async () => {
+      // Skip if "All Genres" is selected or categories aren't loaded yet
+      if (activeCategory === 'All Genres' || categories.length <= 1) {
+        return;
+      }
+
+      try {
+        setLoading(prev => ({ ...prev, popular: true }));
+        const categoryId = categories.find(cat => cat.name === activeCategory)?.id;
+        
+        if (categoryId && categoryId !== 'all') {
+          const booksData = await bookAPI.getBooksByCategory(categoryId);
+          setPopularBooks(mapBooksData(booksData.data));
+        } else {
+          // Fallback to popular books if category not found
+          const popularData = await bookAPI.getPopularBooks();
+          setPopularBooks(mapBooksData(popularData.data));
+        }
+        
+        setLoading(prev => ({ ...prev, popular: false }));
+      } catch (err) {
+        console.error('Error fetching books by category:', err);
+        setError(prev => ({ ...prev, popular: err.message }));
+        setLoading(prev => ({ ...prev, popular: false }));
+      }
+    };
+
+    fetchBooksByCategory();
+  }, [activeCategory, categories]);
+
+  // Helper function to map Strapi data structure to component data structure
+  const mapBooksData = (books) => {
+    return books.map(book => {
+      const { attributes } = book;
+      
+      // Map book data
+      const mappedBook = {
+        id: book.id,
+        title: attributes.title,
+        author: attributes.author,
+        summary: attributes.description,
+        rating: attributes.rating,
+        voters: attributes.votersCount || 0,
+        condition: attributes.condition,
+        exchange: attributes.exchange,
+        subject: attributes.subject,
+        course: attributes.course,
+        seller: attributes.seller,
+      };
+      
+      // Map cover image if available
+      if (attributes.cover?.data) {
+        mappedBook.cover = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${attributes.cover.data.attributes.url}`;
+      }
+      
+      // Map display title for featured books
+      if (attributes.displayTitle) {
+        try {
+          mappedBook.displayTitle = JSON.parse(attributes.displayTitle);
+        } catch (err) {
+          // Fallback if not JSON
+          mappedBook.displayTitle = attributes.displayTitle.split(' ');
+        }
+      }
+      
+      // Map color for featured books
+      mappedBook.color = attributes.color || 'bg-blue-400';
+      
+      // Map likes - assuming a relation to users
+      if (attributes.likes?.data) {
+        mappedBook.likes = attributes.likes.data.map(like => ({
+          id: like.id,
+          name: like.attributes.username || 'User',
+          img: like.attributes.avatar?.data 
+            ? `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${like.attributes.avatar.data.attributes.url}`
+            : 'https://via.placeholder.com/150'
+        }));
+      } else {
+        mappedBook.likes = [];
+      }
+      
+      // For books of year/week
+      if (attributes.title) {
+        mappedBook.name = attributes.title;
+        if (attributes.cover?.data) {
+          mappedBook.img = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${attributes.cover.data.attributes.url}`;
+        }
+      }
+      
+      return mappedBook;
+    });
+  };
+
   // Carousel functions
   const nextSlide = () => {
     if (featuredBooks.length === 0) return;
@@ -34,6 +223,8 @@ const Home = () => {
     return () => clearInterval(interval);
   }, [featuredBooks.length]);
   
+  // Rest of your component (BookSlide, BookCard, FeaturedBook, etc.) remains the same
+
   // Component for each book slide
   const BookSlide = ({ book }) => (
     <div className={`book-cell ${book.color} p-6 rounded-lg flex flex-col md:flex-row items-center md:items-start h-full relative overflow-hidden`}>
@@ -78,7 +269,13 @@ const Home = () => {
   const BookCard = ({ book }) => (
     <div className="book-card bg-white rounded-lg shadow-md overflow-hidden transform transition hover:shadow-lg cursor-pointer" onClick={() => setSelectedBook(book)}>
       <div className="content-wrapper flex p-5 border-b border-gray-100 relative">
-        <img src={book.cover} alt={book.title} className="book-card-img w-24 h-36 object-cover rounded shadow-md transition transform hover:scale-105" />
+        {book.cover ? (
+          <img src={book.cover} alt={book.title} className="book-card-img w-24 h-36 object-cover rounded shadow-md transition transform hover:scale-105" />
+        ) : (
+          <div className={`${book.color} w-24 h-36 rounded shadow-md flex items-center justify-center`}>
+            <span className="text-white font-bold">{book.title?.substring(0, 1)}</span>
+          </div>
+        )}
         <div className="card-content ml-5 overflow-hidden">
           <h3 className="book-name font-medium text-gray-800 mb-1 truncate">{book.title}</h3>
           <p className="book-by text-gray-500 text-sm mb-3">{book.author}</p>
@@ -112,7 +309,13 @@ const Home = () => {
   // Component for featured book
   const FeaturedBook = ({ book }) => (
     <div className="featured-book p-3 cursor-pointer" onClick={() => setSelectedBook(book)}>
-      <img src={book.img} alt={book.name} className="w-full h-40 object-cover rounded-lg shadow-md" />
+      {book.img ? (
+        <img src={book.img} alt={book.name} className="w-full h-40 object-cover rounded-lg shadow-md" />
+      ) : (
+        <div className={`${book.color} w-full h-40 rounded-lg shadow-md flex items-center justify-center`}>
+          <span className="text-white font-bold text-lg">{book.name?.substring(0, 1)}</span>
+        </div>
+      )}
       <div className="mt-2">
         <h3 className="text-sm font-medium line-clamp-1">{book.name}</h3>
         <p className="text-xs text-gray-500">{book.author}</p>
@@ -199,22 +402,38 @@ const Home = () => {
     </div>
   );
   
-  // Placeholder for empty states
-  const EmptyStatePlaceholder = ({ type }) => (
+  // Placeholder for loading states
+  const LoadingPlaceholder = ({ type }) => (
     <div className="flex flex-col items-center justify-center py-8 px-4">
-      <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center mb-4">
-        <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+      <div className="w-16 h-16 rounded-full bg-gray-200 animate-pulse"></div>
+      <p className="text-gray-500 mt-4">Loading {type}...</p>
+    </div>
+  );
+
+  // Placeholder for error states
+  const ErrorPlaceholder = ({ message, type }) => (
+    <div className="flex flex-col items-center justify-center py-8 px-4">
+      <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mb-4">
+        <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
       </div>
-      <p className="text-gray-500 text-center">Waiting for {type} to load from backend...</p>
+      <p className="text-red-500 text-center">{message || `Error loading ${type}`}</p>
     </div>
   );
   
   return (
     <div className="book-store bg-gray-50 min-h-screen">
       {/* Book Slide Section */}
-      {featuredBooks.length > 0 ? (
+      {loading.featured ? (
+        <div className="p-8">
+          <LoadingPlaceholder type="featured books" />
+        </div>
+      ) : error.featured ? (
+        <div className="p-8">
+          <ErrorPlaceholder message={error.featured} type="featured books" />
+        </div>
+      ) : featuredBooks.length > 0 ? (
         <div className="book-slide relative bg-white py-2">
           <div className="slider-container overflow-hidden">
             <div className="flex transition-transform duration-500 ease-in-out" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
@@ -246,8 +465,8 @@ const Home = () => {
           </button>
         </div>
       ) : (
-        <div className="p-8">
-          <EmptyStatePlaceholder type="featured books" />
+        <div className="p-8 bg-white text-center text-gray-500">
+          No featured books available
         </div>
       )}
       
@@ -255,28 +474,44 @@ const Home = () => {
       <div className="main-wrapper flex flex-col lg:flex-row max-w-7xl mx-auto px-4 py-6">
         {/* Sidebar */}
         <div className="books-of w-full lg:w-64 flex-shrink-0 lg:mr-6 mb-6 lg:mb-0">
-          {/* Featured Books Section (Previously Authors of Week) */}
+          {/* Featured Books Section */}
           <div className="week bg-white rounded-lg shadow-sm p-4 mb-6">
             <div className="featured-title font-medium mb-4">Featured Books</div>
-            {booksOfWeek.length > 0 ? (
+            {loading.booksOfWeek ? (
+              <LoadingPlaceholder type="featured books" />
+            ) : error.booksOfWeek ? (
+              <ErrorPlaceholder message={error.booksOfWeek} type="featured books" />
+            ) : booksOfWeek.length > 0 ? (
               <div className="grid grid-cols-2 gap-3">
                 {booksOfWeek.map(book => (
                   <FeaturedBook key={book.id} book={book} />
                 ))}
               </div>
             ) : (
-              <EmptyStatePlaceholder type="featured books" />
+              <div className="text-center text-gray-500 py-4">
+                No featured books available
+              </div>
             )}
           </div>
           
           {/* Books of the Year Section */}
           <div className="year bg-white rounded-lg shadow-sm p-4 relative">
             <div className="year-title font-medium mb-4">Books of the year</div>
-            {booksOfYear.length > 0 ? (
+            {loading.booksOfYear ? (
+              <LoadingPlaceholder type="books of the year" />
+            ) : error.booksOfYear ? (
+              <ErrorPlaceholder message={error.booksOfYear} type="books of the year" />
+            ) : booksOfYear.length > 0 ? (
               <div className="space-y-3 max-h-80 overflow-y-auto no-scrollbar">
                 {booksOfYear.map(book => (
-                  <div key={book.id} className="year-book flex items-center cursor-pointer hover:bg-gray-50 p-2 rounded">
-                    <img src={book.img} alt={book.name} className="year-book-img w-12 h-16 rounded shadow mr-3 object-cover" />
+                  <div key={book.id} className="year-book flex items-center cursor-pointer hover:bg-gray-50 p-2 rounded" onClick={() => setSelectedBook(book)}>
+                    {book.img ? (
+                      <img src={book.img} alt={book.name} className="year-book-img w-12 h-16 rounded shadow mr-3 object-cover" />
+                    ) : (
+                      <div className={`${book.color} w-12 h-16 rounded shadow mr-3 flex items-center justify-center`}>
+                        <span className="text-white font-bold">{book.name?.substring(0, 1)}</span>
+                      </div>
+                    )}
                     <div className="year-book-content">
                       <div className="year-book-name text-sm font-medium line-clamp-1">{book.name}</div>
                       <div className="year-book-author text-xs text-gray-500">{book.author}</div>
@@ -285,9 +520,13 @@ const Home = () => {
                 ))}
               </div>
             ) : (
-              <EmptyStatePlaceholder type="recommended books" />
+              <div className="text-center text-gray-500 py-4">
+                No books of the year available
+              </div>
             )}
-            <div className="overlay absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent"></div>
+            {booksOfYear.length > 4 && (
+              <div className="overlay absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent"></div>
+            )}
           </div>
         </div>
         
@@ -297,54 +536,99 @@ const Home = () => {
             <div className="genre font-medium mb-3 sm:mb-0">Popular by Genre</div>
             
             {/* Desktop Categories */}
-            <div className="book-types hidden md:flex space-x-6 overflow-x-auto no-scrollbar">
-              {categories.length > 0 ? (
-                categories.map(category => (
-                  <button
-                    key={category.id}
-                    className={`book-type text-sm relative whitespace-nowrap ${activeCategory === category.name ? 'font-medium text-blue-500' : 'text-gray-500'}`}
-                    onClick={() => setActiveCategory(category.name)}
-                  >
-                    {category.name}
-                    {activeCategory === category.name && (
-                      <span className="absolute bottom-[-17px] left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-blue-400 shadow-md"></span>
-                    )}
-                  </button>
-                ))
-              ) : (
-                <div className="text-sm text-gray-400">Loading categories...</div>
-              )}
-            </div>
-            
-            {/* Mobile Category Dropdown */}
-            <div className="md:hidden w-full sm:w-auto">
-              <select 
-                className="form-select w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={activeCategory}
-                onChange={(e) => setActiveCategory(e.target.value)}
-              >
+            {loading.categories ? (
+              <div className="hidden md:block">
+                <div className="animate-pulse h-6 w-36 bg-gray-200 rounded"></div>
+              </div>
+            ) : error.categories ? (
+              <div className="hidden md:block text-sm text-red-500">Error loading categories</div>
+            ) : (
+              <div className="book-types hidden md:flex space-x-6 overflow-x-auto no-scrollbar">
                 {categories.length > 0 ? (
                   categories.map(category => (
-                    <option key={category.id} value={category.name}>
+                    <button
+                      key={category.id}
+                      className={`book-type text-sm relative whitespace-nowrap ${activeCategory === category.name ? 'font-medium text-blue-500' : 'text-gray-500'}`}
+                      onClick={() => setActiveCategory(category.name)}
+                    >
                       {category.name}
-                    </option>
+                      {activeCategory === category.name && (
+                        <span className="absolute bottom-[-17px] left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-blue-400 shadow-md"></span>
+                      )}
+                    </button>
                   ))
                 ) : (
-                  <option>Loading categories...</option>
+                  <div className="text-sm text-gray-400">No categories available</div>
                 )}
-              </select>
-            </div>
+              </div>
+            )}
+            
+            {/* Mobile Category Dropdown */}
+            {loading.categories ? (
+              <div className="md:hidden w-full sm:w-auto">
+                <div className="animate-pulse h-10 w-full bg-gray-200 rounded"></div>
+              </div>
+            ) : error.categories ? (
+              <div className="md:hidden w-full sm:w-auto text-sm text-red-500">Error loading categories</div>
+            ) : (
+              <div className="md:hidden w-full sm:w-auto">
+                <select 
+                  className="form-select w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={activeCategory}
+                  onChange={(e) => setActiveCategory(e.target.value)}
+                >
+                  {categories.length > 0 ? (
+                    categories.map(category => (
+                      <option key={category.id} value={category.name}>
+                        {category.name}
+                      </option>
+                    ))
+                  ) : (
+                    <option>No categories available</option>
+                  )}
+                </select>
+              </div>
+            )}
           </div>
           
           {/* Book Cards */}
-          {popularBooks.length > 0 ? (
+          {loading.popular ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {[1, 2, 3, 4].map(i => (
+                <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden">
+                  <div className="p-5 border-b border-gray-100 flex">
+                    <div className="w-24 h-36 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="ml-5 flex-grow">
+                      <div className="h-4 bg-gray-200 rounded animate-pulse mb-2 w-3/4"></div>
+                      <div className="h-3 bg-gray-200 rounded animate-pulse mb-4 w-1/2"></div>
+                      <div className="space-y-2">
+                        <div className="h-3 bg-gray-200 rounded animate-pulse w-full"></div>
+                        <div className="h-3 bg-gray-200 rounded animate-pulse w-full"></div>
+                        <div className="h-3 bg-gray-200 rounded animate-pulse w-4/5"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-3">
+                    <div className="flex items-center">
+                      <div className="h-7 w-7 bg-gray-200 rounded-full animate-pulse"></div>
+                      <div className="h-3 bg-gray-200 rounded animate-pulse ml-3 w-24"></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : error.popular ? (
+            <ErrorPlaceholder message={error.popular} type="popular books" />
+          ) : popularBooks.length > 0 ? (
             <div className="book-cards grid grid-cols-1 sm:grid-cols-2 gap-6">
               {popularBooks.map(book => (
                 <BookCard key={book.id} book={book} />
               ))}
             </div>
           ) : (
-            <EmptyStatePlaceholder type="popular books" />
+            <div className="text-center text-gray-500 py-8">
+              No books available for this category
+            </div>
           )}
         </div>
       </div>
