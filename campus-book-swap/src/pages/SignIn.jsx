@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import axios from 'axios'; // Make sure to install axios: npm install axios
+import axios from 'axios';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -9,8 +9,15 @@ const SignIn = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,7 +26,7 @@ const SignIn = () => {
     
     try {
       // Connect to your Strapi backend
-      const response = await axios.post(`${import.meta.env.VITE_STRAPI_API_URL}/api/auth/local`, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/local`, {
         identifier: email,
         password: password
       });
@@ -31,7 +38,7 @@ const SignIn = () => {
       localStorage.setItem('token', jwt);
       
       // Update auth context with user info
-      login({ 
+      login({
         email: user.email,
         username: user.username,
         id: user.id,
@@ -43,7 +50,7 @@ const SignIn = () => {
     } catch (err) {
       console.error('Login error:', err);
       setError(
-        err.response?.data?.error?.message || 
+        err.response?.data?.error?.message ||
         'Invalid credentials. Please try again.'
       );
     } finally {
@@ -94,6 +101,12 @@ const SignIn = () => {
           {isLoading ? 'Signing in...' : 'Sign In'}
         </button>
       </form>
+
+      <div className="mt-4 text-center">
+        <p className="text-gray-600">
+          Don't have an account? <Link to="/signup" className="text-blue-600 hover:underline">Sign Up</Link>
+        </p>
+      </div>
     </div>
   );
 };
