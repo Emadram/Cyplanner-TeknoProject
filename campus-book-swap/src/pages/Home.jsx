@@ -169,18 +169,26 @@ const Home = () => {
         subject: bookData.subject,
         course: bookData.course,
         seller: bookData.seller,
-        color: bookData.color || 'bg-blue-400',
+        color: bookData.color || 'bg-cyan-400',
       };
       
       // Map cover image if available
-      if (bookData.cover) {
-        const coverData = bookData.cover.data || bookData.cover;
-        const coverAttributes = coverData.attributes || coverData;
-        
-        if (coverAttributes && coverAttributes.url) {
-          mappedBook.cover = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${coverAttributes.url}`;
-        }
-      }
+if (bookData.cover) {
+  console.log("Cover structure:", bookData.cover);
+  
+  // Direct access if cover is a simple object with url
+  if (bookData.cover.url) {
+    mappedBook.cover = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${bookData.cover.url}`;
+  } 
+  // Handle nested structure from Strapi v4
+  else if (bookData.cover.data && bookData.cover.data.attributes) {
+    mappedBook.cover = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${bookData.cover.data.attributes.url}`;
+  }
+  // Another possible format
+  else if (bookData.cover.data && bookData.cover.data.url) {
+    mappedBook.cover = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${bookData.cover.data.url}`;
+  }
+}
       
       // Map display title for featured books
       if (bookData.displayTitle) {
