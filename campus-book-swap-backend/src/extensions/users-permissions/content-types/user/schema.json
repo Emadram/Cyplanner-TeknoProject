@@ -68,6 +68,12 @@
     "UID": {
       "type": "uid",
       "targetField": "username"
+    },
+    "likedBooks": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::book.book",
+      "mappedBy": "likes"
     }
   }
 }
