@@ -1,0 +1,29 @@
+{
+  "kind": "collectionType",
+  "collectionName": "categories",
+  "info": {
+    "singularName": "category",
+    "pluralName": "categories",
+    "displayName": "Category",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "Type": {
+      "type": "string"
+    },
+    "Check": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    },
+    "Book": {
+      "type": "string"
+    },
+    "fieldName": {
+      "type": "string"
+    }
+  }
+}
