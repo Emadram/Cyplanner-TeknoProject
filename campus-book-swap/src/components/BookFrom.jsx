@@ -30,7 +30,20 @@ const BookForm = ({ onSuccess, bookToEdit = null }) => {
     const fetchCategories = async () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/categories`);
-        setCategories(response.data.data || []);
+        console.log("Categories raw response:", response.data);
+        
+        // Process categories based on data structure
+        let processedCategories = [];
+        
+        if (response.data.data && Array.isArray(response.data.data)) {
+          processedCategories = response.data.data.map(category => ({
+            id: category.id,
+            name: category.attributes ? category.attributes.name : category.name
+          }));
+        }
+        
+        console.log("Processed categories:", processedCategories);
+        setCategories(processedCategories);
       } catch (err) {
         console.error('Error fetching categories:', err);
         setError('Failed to load categories');
@@ -79,53 +92,40 @@ const BookForm = ({ onSuccess, bookToEdit = null }) => {
     setSuccess('');
     
     try {
-      // Create FormData object to handle file upload
-      const formData = new FormData();
+      // Show the token for debugging
+      const token = localStorage.getItem('token');
+      console.log("Token being used:", token ? `${token.substring(0, 15)}...` : 'No token');
       
-      // Add book data
+      // Super simplified request - just title and author to test
       const bookData = {
         data: {
           title: book.title,
-          author: book.author,
-          description: book.description,
-          condition: book.condition,
-          exchange: book.exchange,
-          subject: book.subject,
-          course: book.course,
-          price: parseFloat(book.price), // Ensure price is a number
-          category: book.category ? book.category : null,
-          // Don't set seller directly in request - Strapi will handle it
+          author: book.author
         }
       };
       
+      console.log("Simplified data for Strapi:", bookData);
+      
       let bookResponse;
       
+      // Test with a very basic payload
       if (bookToEdit) {
-        // Update existing book
         bookResponse = await authAxios.put(
           `${import.meta.env.VITE_API_URL}/api/books/${bookToEdit.id}`, 
           bookData
         );
       } else {
-        // Create new book
+        // Log the full request details
+        console.log("Making POST request to:", `${import.meta.env.VITE_API_URL}/api/books`);
+        console.log("With headers:", authAxios.defaults.headers);
+        
         bookResponse = await authAxios.post(
           `${import.meta.env.VITE_API_URL}/api/books`, 
           bookData
         );
       }
       
-      // If there's a new cover image, upload it
-      if (coverImage) {
-        formData.append('files', coverImage);
-        formData.append('ref', 'api::book.book');
-        formData.append('refId', bookResponse.data.data.id);
-        formData.append('field', 'cover');
-        
-        await authAxios.post(
-          `${import.meta.env.VITE_API_URL}/api/upload`, 
-          formData
-        );
-      }
+      console.log("Book response:", bookResponse.data);
       
       setSuccess(bookToEdit ? 'Book updated successfully!' : 'Book listed successfully!');
       setBook(initialState);
@@ -137,7 +137,24 @@ const BookForm = ({ onSuccess, bookToEdit = null }) => {
       }
     } catch (err) {
       console.error('Error submitting book:', err);
-      setError('Failed to submit book. Please try again.');
+      
+      // Detailed error reporting
+      if (err.response) {
+        console.log('Error status:', err.response.status);
+        console.log('Error headers:', err.response.headers);
+        console.log('Error data:', err.response.data);
+        
+        // Extract error message from Strapi
+        if (err.response.data && err.response.data.error) {
+          setError(`Server error: ${err.response.data.error.message || 'Unknown error'}`);
+        } else {
+          setError(`Error ${err.response.status}: Failed to submit book.`);
+        }
+      } else if (err.request) {
+        setError('Request was made but no response received. Check your network connection.');
+      } else {
+        setError(`Error: ${err.message}`);
+      }
     } finally {
       setLoading(false);
     }
@@ -213,7 +230,7 @@ const BookForm = ({ onSuccess, bookToEdit = null }) => {
               <option value="">Select a category</option>
               {categories.map(category => (
                 <option key={category.id} value={category.id}>
-                  {category.attributes ? category.attributes.name : category.name}
+                  {category.name}
                 </option>
               ))}
             </select>
