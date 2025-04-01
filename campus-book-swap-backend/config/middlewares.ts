@@ -1,8 +1,16 @@
-export default [
+module.exports = ({ env }) => [
+  "strapi::errors",
+  "strapi::security",
+  "strapi::cors",
+  {
+    name: "strapi::cors",
+    config: {
+      origin: ["http://localhost:5173"], // Allow Vite frontend
+      methods: ["GET", "POST", "PUT", "DELETE"],
+      headers: ["Content-Type", "Authorization"],
+    },
+  },
   'strapi::logger',
-  'strapi::errors',
-  'strapi::security',
-  'strapi::cors',
   'strapi::poweredBy',
   'strapi::query',
   'strapi::body',
