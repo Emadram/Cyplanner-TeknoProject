@@ -140,134 +140,109 @@ const Home = () => {
     fetchBooksByCategory();
   }, [activeCategory, categories]);
 
-  // Helper function to map Strapi data structure to component data structure
-  const mapBooksData = (books) => {
-    if (!books || !Array.isArray(books)) {
-      console.error('Invalid books data:', books);
-      return [];
+// Helper function to get image URL from Strapi
+const getStrapiImageUrl = (imageData) => {
+  // Base API URL with fallback
+  const baseUrl = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
+  
+  // Handle different image data formats
+  
+  // Case 1: Direct string URL
+  if (typeof imageData === 'string') {
+    // If it's already a full URL (starts with http)
+    if (imageData.startsWith('http')) {
+      return imageData;
+    }
+    // If it's a relative path
+    return `${baseUrl}${imageData}`;
+  }
+  
+  // Case 2: Simple object with URL
+  if (imageData && imageData.url) {
+    return `${baseUrl}${imageData.url}`;
+  }
+  
+  // Case 3: Strapi v4 format with data and attributes
+  if (imageData && imageData.data) {
+    const data = imageData.data;
+    
+    // Handle array of images (take the first one)
+    const imageInfo = Array.isArray(data) ? data[0] : data;
+    
+    if (imageInfo) {
+      // Check for Strapi v4 structure with attributes
+      if (imageInfo.attributes && imageInfo.attributes.url) {
+        return `${baseUrl}${imageInfo.attributes.url}`;
+      }
+      
+      // Simpler structure with direct url
+      if (imageInfo.url) {
+        return `${baseUrl}${imageInfo.url}`;
+      }
+    }
+  }
+  
+  // Case 4: Direct access to formats for responsive images
+  if (imageData && imageData.formats) {
+    // Try to get medium format or fallback to other available formats
+    const format = imageData.formats.medium || 
+                  imageData.formats.small || 
+                  imageData.formats.thumbnail;
+    
+    if (format && format.url) {
+      return `${baseUrl}${format.url}`;
+    }
+    
+    // Fallback to original if formats don't have URLs
+    if (imageData.url) {
+      return `${baseUrl}${imageData.url}`;
+    }
+  }
+  
+  // Return placeholder if no valid image found
+  return 'https://via.placeholder.com/150';
+};
+
+// How to use this helper in your mapBooksData function:
+const mapBooksData = (books) => {
+  if (!books || !Array.isArray(books)) {
+    console.error('Invalid books data:', books);
+    return [];
+  }
+
+  return books.map(book => {
+    if (!book) {
+      console.error('Invalid book data:', book);
+      return null;
     }
 
-    return books.map(book => {
-      if (!book) {
-        console.error('Invalid book data:', book);
-        return null;
-      }
-
-      // Handle both Strapi v4 format and flat structure
-      const bookData = book.attributes || book;
-      
-      // Map book data
-      const mappedBook = {
-        id: book.id,
-        title: bookData.title,
-        author: bookData.author,
-        summary: bookData.description,
-        rating: bookData.rating,
-        voters: bookData.votersCount || 0,
-        condition: bookData.condition,
-        exchange: bookData.exchange,
-        subject: bookData.subject,
-        course: bookData.course,
-        seller: bookData.seller,
-      };
-      
-      // Map cover image if available
-      if (bookData.cover) {
-        console.log("Cover structure:", bookData.cover);
-        
-        // Try all possible cover image formats
-        if (typeof bookData.cover === 'string') {
-          // Direct URL string
-          mappedBook.cover = bookData.cover;
-        } else if (bookData.cover.url) {
-          // Direct object with url
-          mappedBook.cover = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${bookData.cover.url}`;
-        } else if (typeof bookData.cover === 'object') {
-          if (bookData.cover.data) {
-            // Strapi v4 format with data property
-            const coverData = bookData.cover.data;
-            if (coverData.attributes && coverData.attributes.url) {
-              mappedBook.cover = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${coverData.attributes.url}`;
-            } else if (coverData.url) {
-              mappedBook.cover = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${coverData.url}`;
-            }
-          }
-        }
-      }
-      
-      // Map display title for featured books
-      if (bookData.displayTitle) {
-        try {
-          // Try parsing if stored as JSON string
-          mappedBook.displayTitle = JSON.parse(bookData.displayTitle);
-        } catch (err) {
-          // Fallback: split by space if not valid JSON
-          console.log('Display title parse error:', err);
-          const parts = bookData.displayTitle.split(' ');
-          // If we have multiple parts, use first two, otherwise duplicate
-          if (parts.length > 1) {
-            mappedBook.displayTitle = [parts[0], parts.slice(1).join(' ')];
-          } else {
-            mappedBook.displayTitle = [bookData.displayTitle, bookData.displayTitle];
-          }
-        }
-      } else {
-        // Fallback display title from book title
-        const titleParts = bookData.title.split(' ');
-        if (titleParts.length > 1) {
-          mappedBook.displayTitle = [titleParts[0], titleParts.slice(1).join(' ')];
-        } else {
-          mappedBook.displayTitle = [bookData.title, 'Book'];
-        }
-      }
-      
-      // Map likes - handling both formats
-      mappedBook.likes = [];
-      if (bookData.likes) {
-        const likesData = bookData.likes.data || bookData.likes;
-        if (Array.isArray(likesData)) {
-          mappedBook.likes = likesData.map(like => {
-            // Handle both formats
-            const likeData = like.attributes || like;
-            const avatar = likeData.avatar?.data || likeData.avatar;
-            const avatarUrl = avatar ? 
-              (avatar.attributes?.url || avatar.url || '') : '';
-              
-            return {
-              id: like.id,
-              name: likeData.username || 'User',
-              img: avatarUrl ? 
-                `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${avatarUrl}` : 
-                'https://via.placeholder.com/150'
-            };
-          });
-        }
-      }
-      
-      // For books of year/week - add name property for consistency
-      mappedBook.name = bookData.title;
-      
-      // Apply the same cover image handling for img property
-      if (bookData.cover) {
-        if (typeof bookData.cover === 'string') {
-          mappedBook.img = bookData.cover;
-        } else if (bookData.cover.url) {
-          mappedBook.img = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${bookData.cover.url}`;
-        } else if (typeof bookData.cover === 'object') {
-          if (bookData.cover.data) {
-            const coverData = bookData.cover.data;
-            if (coverData.attributes && coverData.attributes.url) {
-              mappedBook.img = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${coverData.attributes.url}`;
-            } else if (coverData.url) {
-              mappedBook.img = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${coverData.url}`;
-            }
-          }
-        }
-      }
-      
-      return mappedBook;
-    }).filter(Boolean); // Remove any null entries
-  };
+    // Handle both Strapi v4 format and flat structure
+    const bookData = book.attributes || book;
+    
+    // Map book data
+    const mappedBook = {
+      id: book.id,
+      title: bookData.title,
+      author: bookData.author,
+      summary: bookData.description,
+      rating: bookData.rating,
+      voters: bookData.votersCount || 0,
+      condition: bookData.condition,
+      exchange: bookData.exchange,
+      subject: bookData.subject,
+      course: bookData.course,
+      seller: bookData.seller,
+      // Use the helper function for cover image
+      cover: bookData.cover ? getStrapiImageUrl(bookData.cover) : null,
+      // Also use it for the img property
+      img: bookData.cover ? getStrapiImageUrl(bookData.cover) : null,
+    };
+    
+    // Other mapping logic...
+    
+    return mappedBook;
+  }).filter(Boolean); // Remove any null entries
+};
 
   // Carousel functions
   const nextSlide = () => {
