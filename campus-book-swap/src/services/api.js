@@ -35,10 +35,10 @@ export const fetchFromAPI = async (endpoint, options = {}) => {
  */
 export const bookAPI = {
   // Get featured books
-  getFeaturedBooks: async () => {
-    return fetchFromAPI('/api/books?populate=*&filters[featured][$eq]=true');
-  },
-
+// To this (simpler format):
+getFeaturedBooks: async () => {
+  return fetchFromAPI('/api/books?populate=*&filters[featured]=true');
+},
   // Get popular books
   getPopularBooks: async () => {
     return fetchFromAPI('/api/books?populate=*&sort[0]=views:desc');
