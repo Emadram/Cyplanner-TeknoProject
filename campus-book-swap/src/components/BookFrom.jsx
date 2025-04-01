@@ -85,8 +85,16 @@ const BookForm = ({ onSuccess, bookToEdit = null }) => {
       // Add book data
       const bookData = {
         data: {
-          ...book,
-          seller: user.id
+          title: book.title,
+          author: book.author,
+          description: book.description,
+          condition: book.condition,
+          exchange: book.exchange,
+          subject: book.subject,
+          course: book.course,
+          price: parseFloat(book.price), // Ensure price is a number
+          category: book.category ? book.category : null,
+          // Don't set seller directly in request - Strapi will handle it
         }
       };
       
