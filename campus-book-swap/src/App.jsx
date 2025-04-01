@@ -64,7 +64,7 @@ function App() {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    fetchStrapiData('posts').then(setData);
+    fetchStrapiData('books').then(setData);
   }, []);
 
   return (
