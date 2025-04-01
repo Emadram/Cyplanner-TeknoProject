@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { Link } from 'react-router-dom';
 import BookForm from '../components/BookFrom.jsx';
-import axios from 'axios';
 
 const Dashboard = () => {
   const { user, authAxios } = useAuth();
@@ -13,26 +13,39 @@ const Dashboard = () => {
   const [showBookForm, setShowBookForm] = useState(false);
 
   useEffect(() => {
-    fetchMyBooks();
+    if (user && user.id) {
+      fetchMyBooks();
+    }
   }, [user]);
 
   const fetchMyBooks = async () => {
-    if (!user) return;
+    if (!user || !user.id) return;
     
     setIsLoading(true);
     try {
+      // Get books where users_permissions_user matches current user ID
       const response = await authAxios.get(
-        `${import.meta.env.VITE_API_URL}/api/books?filters[seller]=${user.id}&populate=*`
+        `${import.meta.env.VITE_API_URL}/api/books?filters[users_permissions_user][id][$eq]=${user.id}&populate=*`
       );
       
-      setMyBooks(response.data.data.map(book => ({
+      console.log("My books response:", response.data);
+      
+      const books = response.data.data.map(book => ({
         id: book.id,
         ...book.attributes,
         cover: book.attributes.cover?.data ? 
           `${import.meta.env.VITE_API_URL}${book.attributes.cover.data.attributes.url}` : 
-          null
-      })));
+          null,
+        category: book.attributes.category?.data ? {
+          id: book.attributes.category.data.id,
+          name: book.attributes.category.data.attributes?.name || 
+                book.attributes.category.data.attributes?.Type || 
+                'Unknown Category'
+        } : null
+      }));
       
+      console.log("Processed books:", books);
+      setMyBooks(books);
       setError('');
     } catch (err) {
       console.error('Error fetching books:', err);
@@ -132,9 +145,9 @@ const Dashboard = () => {
                   <h3 className="font-medium text-lg">{book.title}</h3>
                   <p className="text-gray-500 text-sm">by {book.author}</p>
                   <div className="mt-2 text-sm">
-                    <p><span className="font-medium">Price:</span> ${book.price}</p>
                     <p><span className="font-medium">Condition:</span> {book.condition}</p>
                     {book.subject && <p><span className="font-medium">Subject:</span> {book.subject}</p>}
+                    {book.category && <p><span className="font-medium">Category:</span> {book.category.name}</p>}
                   </div>
                 </div>
               </div>
@@ -162,7 +175,12 @@ const Dashboard = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <Link to="/" className="text-blue-600 hover:text-blue-800">
+          Back to Home
+        </Link>
+      </div>
       
       {user && (
         <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
