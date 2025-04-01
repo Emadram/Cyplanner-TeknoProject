@@ -169,6 +169,7 @@ const Home = () => {
         subject: bookData.subject,
         course: bookData.course,
         seller: bookData.seller,
+        cover: bookData.cover,
       };
       
       // Map cover image if available
