@@ -32,6 +32,129 @@ const Home = () => {
     categories: null
   });
 
+  // Debug image loading function
+  const debugImageUrl = (label, imageData, processedUrl) => {
+    console.log(`[Image Debug] ${label}:`, {
+      originalData: imageData,
+      processedUrl: processedUrl,
+      dataType: typeof imageData
+    });
+    
+    // Test if the image actually loads
+    if (processedUrl) {
+      const img = new Image();
+      img.onload = () => console.log(`[Image Debug] ${label}: Image loaded successfully`);
+      img.onerror = (e) => console.log(`[Image Debug] ${label}: Failed to load image`, e);
+      img.src = processedUrl;
+    }
+  };
+  
+  // Helper function to get image URL from Strapi data
+  const getStrapiMediaUrl = (imageData) => {
+    if (!imageData) return null;
+    
+    // Base URL (ensure it doesn't end with a slash)
+    const baseUrl = (import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337').replace(/\/$/, '');
+    
+    try {
+      // Case 1: String URL
+      if (typeof imageData === 'string') {
+        // Check if it's already an absolute URL
+        if (imageData.startsWith('http')) return imageData;
+        // Make sure the path starts with a slash
+        const path = imageData.startsWith('/') ? imageData : `/${imageData}`;
+        return `${baseUrl}${path}`;
+      }
+      
+      // Case 2: Plain array - your specific case
+      if (Array.isArray(imageData) && imageData.length > 0) {
+        const firstImage = imageData[0];
+        // If the array item has a formats property
+        if (firstImage.formats) {
+          const format = firstImage.formats.medium || firstImage.formats.small || firstImage.formats.thumbnail;
+          if (format && format.url) {
+            const path = format.url.startsWith('/') ? format.url : `/${format.url}`;
+            return `${baseUrl}${path}`;
+          }
+        }
+        
+        // If the array item has a url property
+        if (firstImage.url) {
+          const path = firstImage.url.startsWith('/') ? firstImage.url : `/${firstImage.url}`;
+          return `${baseUrl}${path}`;
+        }
+        
+        // If it has a hash or provider property (newer Strapi versions)
+        if (firstImage.hash && firstImage.provider) {
+          // Construct URL from hash
+          return `${baseUrl}/uploads/${firstImage.hash}${firstImage.ext}`;
+        }
+      }
+      
+      // Case 3: Strapi v4 format with data.attributes
+      if (imageData.data && imageData.data.attributes) {
+        const { url } = imageData.data.attributes;
+        if (url) {
+          const path = url.startsWith('/') ? url : `/${url}`;
+          return `${baseUrl}${path}`;
+        }
+      }
+      
+      // Case 4: Direct object with formats
+      if (imageData.formats) {
+        const format = 
+          imageData.formats.medium || 
+          imageData.formats.small || 
+          imageData.formats.thumbnail;
+        if (format && format.url) {
+          const path = format.url.startsWith('/') ? format.url : `/${format.url}`;
+          return `${baseUrl}${path}`;
+        }
+        
+        // Fallback to main URL if formats don't have URLs
+        if (imageData.url) {
+          const path = imageData.url.startsWith('/') ? imageData.url : `/${imageData.url}`;
+          return `${baseUrl}${path}`;
+        }
+      }
+      
+      // Case 5: Direct URL property
+      if (imageData.url) {
+        const path = imageData.url.startsWith('/') ? imageData.url : `/${imageData.url}`;
+        return `${baseUrl}${path}`;
+      }
+      
+      // Case 6: Array in data
+      if (imageData.data) {
+        const data = Array.isArray(imageData.data) ? imageData.data[0] : imageData.data;
+        if (data) {
+          // With attributes (Strapi v4)
+          if (data.attributes && data.attributes.url) {
+            const path = data.attributes.url.startsWith('/') ? data.attributes.url : `/${data.attributes.url}`;
+            return `${baseUrl}${path}`;
+          }
+          // Direct URL
+          if (data.url) {
+            const path = data.url.startsWith('/') ? data.url : `/${data.url}`;
+            return `${baseUrl}${path}`;
+          }
+        }
+      }
+      
+      // Case 7: Handle direct hash/ext pattern
+      if (imageData.hash && imageData.ext) {
+        return `${baseUrl}/uploads/${imageData.hash}${imageData.ext}`;
+      }
+      
+      // Fallback
+      console.warn('Could not process image data:', imageData);
+      return null;
+    } catch (err) {
+      console.error('Error processing image URL:', err, imageData);
+      return null;
+    }
+  };
+
   // Fetch all necessary data on component mount
   useEffect(() => {
     const fetchData = async () => {
@@ -60,6 +183,18 @@ const Home = () => {
         // Fetch featured books
         setLoading(prev => ({ ...prev, featured: true }));
         const featuredData = await bookAPI.getFeaturedBooks();
+        
+        // Debug the first book's cover if available
+        if (featuredData.data && featuredData.data.length > 0) {
+          const firstBook = featuredData.data[0];
+          console.log("First featured book raw data:", firstBook);
+          const coverData = firstBook.attributes ? firstBook.attributes.cover : firstBook.cover;
+          if (coverData) {
+            const coverUrl = getStrapiMediaUrl(coverData);
+            debugImageUrl("First featured book cover", coverData, coverUrl);
+          }
+        }
+        
         setFeaturedBooks(mapBooksData(featuredData.data));
         setLoading(prev => ({ ...prev, featured: false }));
       } catch (err) {
@@ -106,6 +241,27 @@ const Home = () => {
     };
 
     fetchData();
+    
+    // Extra debugging - direct check of Strapi API response
+    const checkStrapiImage = async () => {
+      try {
+        // Replace with your actual API endpoint - adjust as needed
+        const apiUrl = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}/api/books?populate=*`;
+        console.log("Checking direct API response from:", apiUrl);
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        console.log('Raw Strapi API response:', data);
+        
+        // If there's a book with cover, examine it
+        if (data.data && data.data.length > 0 && data.data[0].attributes && data.data[0].attributes.cover) {
+          console.log('First book cover structure from direct API:', data.data[0].attributes.cover);
+        }
+      } catch (err) {
+        console.error('Error checking Strapi image directly:', err);
+      }
+    };
+    
+    checkStrapiImage();
   }, []);
 
   // Fetch books when category changes
@@ -140,109 +296,104 @@ const Home = () => {
     fetchBooksByCategory();
   }, [activeCategory, categories]);
 
-// Helper function to get image URL from Strapi
-const getStrapiImageUrl = (imageData) => {
-  // Base API URL with fallback
-  const baseUrl = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
-  
-  // Handle different image data formats
-  
-  // Case 1: Direct string URL
-  if (typeof imageData === 'string') {
-    // If it's already a full URL (starts with http)
-    if (imageData.startsWith('http')) {
-      return imageData;
+  // Helper function to map Strapi data structure to component data structure
+  const mapBooksData = (books) => {
+    if (!books || !Array.isArray(books)) {
+      console.error('Invalid books data:', books);
+      return [];
     }
-    // If it's a relative path
-    return `${baseUrl}${imageData}`;
-  }
-  
-  // Case 2: Simple object with URL
-  if (imageData && imageData.url) {
-    return `${baseUrl}${imageData.url}`;
-  }
-  
-  // Case 3: Strapi v4 format with data and attributes
-  if (imageData && imageData.data) {
-    const data = imageData.data;
-    
-    // Handle array of images (take the first one)
-    const imageInfo = Array.isArray(data) ? data[0] : data;
-    
-    if (imageInfo) {
-      // Check for Strapi v4 structure with attributes
-      if (imageInfo.attributes && imageInfo.attributes.url) {
-        return `${baseUrl}${imageInfo.attributes.url}`;
+
+    return books.map(book => {
+      if (!book) {
+        console.error('Invalid book data:', book);
+        return null;
+      }
+
+      // Handle both Strapi v4 format and flat structure
+      const bookData = book.attributes || book;
+      
+      // Process cover image with proper error handling
+      let coverUrl = null;
+      if (bookData.cover) {
+        coverUrl = getStrapiMediaUrl(bookData.cover);
+        // Debug cover URL for every book
+        debugImageUrl(`Book ${bookData.title} cover`, bookData.cover, coverUrl);
       }
       
-      // Simpler structure with direct url
-      if (imageInfo.url) {
-        return `${baseUrl}${imageInfo.url}`;
+      // Map book data
+      const mappedBook = {
+        id: book.id,
+        title: bookData.title,
+        author: bookData.author,
+        summary: bookData.description,
+        rating: bookData.rating,
+        voters: bookData.votersCount || 0,
+        condition: bookData.condition,
+        exchange: bookData.exchange,
+        subject: bookData.subject,
+        course: bookData.course,
+        seller: bookData.seller,
+        cover: coverUrl,
+        // Also use the same URL for img property
+        img: coverUrl,
+      };
+      
+      // Map display title for featured books
+      if (bookData.displayTitle) {
+        try {
+          // Try parsing if stored as JSON string
+          mappedBook.displayTitle = JSON.parse(bookData.displayTitle);
+        } catch (err) {
+          // Fallback: split by space if not valid JSON
+          console.log('Display title parse error:', err);
+          const parts = bookData.displayTitle.split(' ');
+          // If we have multiple parts, use first two, otherwise duplicate
+          if (parts.length > 1) {
+            mappedBook.displayTitle = [parts[0], parts.slice(1).join(' ')];
+          } else {
+            mappedBook.displayTitle = [bookData.displayTitle, bookData.displayTitle];
+          }
+        }
+      } else {
+        // Fallback display title from book title
+        const titleParts = bookData.title.split(' ');
+        if (titleParts.length > 1) {
+          mappedBook.displayTitle = [titleParts[0], titleParts.slice(1).join(' ')];
+        } else {
+          mappedBook.displayTitle = [bookData.title, 'Book'];
+        }
       }
-    }
-  }
-  
-  // Case 4: Direct access to formats for responsive images
-  if (imageData && imageData.formats) {
-    // Try to get medium format or fallback to other available formats
-    const format = imageData.formats.medium || 
-                  imageData.formats.small || 
-                  imageData.formats.thumbnail;
-    
-    if (format && format.url) {
-      return `${baseUrl}${format.url}`;
-    }
-    
-    // Fallback to original if formats don't have URLs
-    if (imageData.url) {
-      return `${baseUrl}${imageData.url}`;
-    }
-  }
-  
-  // Return placeholder if no valid image found
-  return 'https://via.placeholder.com/150';
-};
-
-// How to use this helper in your mapBooksData function:
-const mapBooksData = (books) => {
-  if (!books || !Array.isArray(books)) {
-    console.error('Invalid books data:', books);
-    return [];
-  }
-
-  return books.map(book => {
-    if (!book) {
-      console.error('Invalid book data:', book);
-      return null;
-    }
-
-    // Handle both Strapi v4 format and flat structure
-    const bookData = book.attributes || book;
-    
-    // Map book data
-    const mappedBook = {
-      id: book.id,
-      title: bookData.title,
-      author: bookData.author,
-      summary: bookData.description,
-      rating: bookData.rating,
-      voters: bookData.votersCount || 0,
-      condition: bookData.condition,
-      exchange: bookData.exchange,
-      subject: bookData.subject,
-      course: bookData.course,
-      seller: bookData.seller,
-      // Use the helper function for cover image
-      cover: bookData.cover ? getStrapiImageUrl(bookData.cover) : null,
-      // Also use it for the img property
-      img: bookData.cover ? getStrapiImageUrl(bookData.cover) : null,
-    };
-    
-    // Other mapping logic...
-    
-    return mappedBook;
-  }).filter(Boolean); // Remove any null entries
-};
+      
+      // Map likes - handling both formats
+      mappedBook.likes = [];
+      if (bookData.likes) {
+        const likesData = bookData.likes.data || bookData.likes;
+        if (Array.isArray(likesData)) {
+          mappedBook.likes = likesData.map(like => {
+            // Handle both formats
+            const likeData = like.attributes || like;
+            const avatar = likeData.avatar?.data || likeData.avatar;
+            let avatarUrl = '';
+            
+            if (avatar) {
+              avatarUrl = getStrapiMediaUrl(avatar);
+            }
+              
+            return {
+              id: like.id,
+              name: likeData.username || 'User',
+              img: avatarUrl || 'https://via.placeholder.com/150'
+            };
+          });
+        }
+      }
+      
+      // For books of year/week - add name property for consistency
+      mappedBook.name = bookData.title;
+      
+      return mappedBook;
+    }).filter(Boolean); // Remove any null entries
+  };
 
   // Carousel functions
   const nextSlide = () => {
@@ -264,6 +415,59 @@ const mapBooksData = (books) => {
     }, 5000);
     return () => clearInterval(interval);
   }, [featuredBooks.length]);
+  
+  // Image Debugger Component
+  const ImageDebugger = () => {
+    const [imageUrl, setImageUrl] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [loadStatus, setLoadStatus] = useState('');
+    
+    const testImageUrl = () => {
+      setIsLoading(true);
+      setLoadStatus('Testing...');
+      
+      const img = new Image();
+      img.onload = () => {
+        setLoadStatus('✅ Image loaded successfully!');
+        setIsLoading(false);
+      };
+      img.onerror = () => {
+        setLoadStatus('❌ Failed to load image');
+        setIsLoading(false);
+      };
+      img.src = imageUrl;
+    };
+    
+    return (
+      <div className="p-4 border rounded bg-gray-50">
+        <h3 className="font-medium">Image URL Debugger</h3>
+        <div className="mt-2">
+          <input
+            type="text"
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+            placeholder="Paste Strapi image URL to test"
+            className="w-full p-2 border rounded"
+          />
+          <button 
+            onClick={testImageUrl}
+            disabled={isLoading || !imageUrl}
+            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300"
+          >
+            Test URL
+          </button>
+          {loadStatus && (
+            <div className="mt-2">
+              <p>{loadStatus}</p>
+              {loadStatus.includes('successfully') && (
+                <img src={imageUrl} alt="Test" className="mt-2 max-h-40 object-contain" />
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
   
   // Component for each book slide
   const BookSlide = ({ book }) => (
@@ -310,7 +514,16 @@ const mapBooksData = (books) => {
     <div className="book-card bg-white rounded-lg shadow-md overflow-hidden transform transition hover:shadow-lg cursor-pointer" onClick={() => setSelectedBook(book)}>
       <div className="content-wrapper flex p-5 border-b border-gray-100 relative">
         {book.cover ? (
-          <img src={book.cover} alt={book.title} className="book-card-img w-24 h-36 object-cover rounded shadow-md transition transform hover:scale-105" />
+          <img 
+            src={book.cover} 
+            alt={book.title} 
+            className="book-card-img w-24 h-36 object-cover rounded shadow-md transition transform hover:scale-105" 
+            onError={(e) => {
+              console.error(`Failed to load image: ${book.cover}`);
+              e.target.onerror = null; // Prevent infinite loop
+              e.target.src = 'https://via.placeholder.com/150';
+            }}
+          />
         ) : (
           <div className="bg-cyan-400 w-24 h-36 rounded shadow-md flex items-center justify-center">
             <span className="text-white font-bold">{book.title?.substring(0, 1)}</span>
@@ -333,7 +546,15 @@ const mapBooksData = (books) => {
           <div className="flex -space-x-2">
             {book.likes.slice(0, 3).map(like => (
               <div key={like.id} className="like-profile">
-                <img src={like.img} alt={like.name} className="like-img w-7 h-7 rounded-full border-2 border-white object-cover" />
+                <img 
+                  src={like.img} 
+                  alt={like.name} 
+                  className="like-img w-7 h-7 rounded-full border-2 border-white object-cover"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'https://via.placeholder.com/150';
+                  }}
+                />
               </div>
             ))}
           </div>
@@ -350,7 +571,15 @@ const mapBooksData = (books) => {
   const FeaturedBook = ({ book }) => (
     <div className="featured-book p-3 cursor-pointer" onClick={() => setSelectedBook(book)}>
       {book.img ? (
-        <img src={book.img} alt={book.name} className="w-full h-40 object-cover rounded-lg shadow-md" />
+        <img 
+          src={book.img} 
+          alt={book.name} 
+          className="w-full h-40 object-cover rounded-lg shadow-md"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = 'https://via.placeholder.com/150';
+          }}
+        />
       ) : (
         <div className="bg-cyan-400 w-full h-40 rounded-lg shadow-md flex items-center justify-center">
           <span className="text-white font-bold text-lg">{book.name?.substring(0, 1)}</span>
@@ -380,7 +609,15 @@ const mapBooksData = (books) => {
         
         <div className="flex mb-4">
           {book.cover ? (
-            <img src={book.cover} alt={book.title} className="w-32 h-48 object-cover rounded shadow-md mr-4 flex-shrink-0" />
+            <img 
+              src={book.cover} 
+              alt={book.title} 
+              className="w-32 h-48 object-cover rounded shadow-md mr-4 flex-shrink-0"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = 'https://via.placeholder.com/150';
+              }}
+            />
           ) : (
             <div className="bg-cyan-400 rounded-lg shadow-md w-32 h-48 flex items-center justify-center mr-4 flex-shrink-0">
               <div className="text-white text-center font-serif px-2">
@@ -422,7 +659,15 @@ const mapBooksData = (books) => {
               <div className="flex -space-x-2">
                 {book.likes.map(like => (
                   <div key={like.id} className="like-profile">
-                    <img src={like.img} alt={like.name} className="like-img w-7 h-7 rounded-full border-2 border-white object-cover" />
+                    <img 
+                      src={like.img} 
+                      alt={like.name} 
+                      className="like-img w-7 h-7 rounded-full border-2 border-white object-cover"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://via.placeholder.com/150';
+                      }}
+                    />
                   </div>
                 ))}
               </div>
@@ -535,6 +780,11 @@ const mapBooksData = (books) => {
             {booksOfYear.length > 4 && (
               <div className="overlay absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent"></div>
             )}
+          </div>
+          
+          {/* Image Debugger - add this for troubleshooting */}
+          <div className="mb-6">
+            <ImageDebugger />
           </div>
         </div>
         
