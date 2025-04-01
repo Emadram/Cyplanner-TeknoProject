@@ -1,0 +1,89 @@
+{
+  "kind": "collectionType",
+  "collectionName": "books",
+  "info": {
+    "singularName": "book",
+    "pluralName": "books",
+    "displayName": "Book",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "author": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "rating": {
+      "type": "integer",
+      "default": 0,
+      "max": 5
+    },
+    "condition": {
+      "type": "enumeration",
+      "enum": [
+        "New",
+        "Like New",
+        "Good",
+        "Fair",
+        "Poor",
+        "Digital Copy"
+      ],
+      "required": true
+    },
+    "exchange": {
+      "type": "string"
+    },
+    "subject": {
+      "type": "string"
+    },
+    "course": {
+      "type": "string"
+    },
+    "seller": {
+      "type": "string"
+    },
+    "featured": {
+      "type": "boolean",
+      "default": false
+    },
+    "bookOfWeek": {
+      "type": "boolean",
+      "default": false
+    },
+    "bookOfYear": {
+      "type": "boolean",
+      "default": false
+    },
+    "displayTitle": {
+      "type": "string"
+    },
+    "cover": {
+      "type": "media",
+      "multiple": true,
+      "required": true,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "category": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::category.category"
+    },
+    "likes": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "likedBooks"
+    }
+  }
+}
