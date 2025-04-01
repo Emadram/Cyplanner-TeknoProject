@@ -11,6 +11,8 @@ const API_URL = import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337';
 export const fetchFromAPI = async (endpoint, options = {}) => {
   try {
     const url = `${API_URL}${endpoint}`;
+    console.log('Fetching from:', url);
+    
     const response = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
@@ -35,33 +37,33 @@ export const fetchFromAPI = async (endpoint, options = {}) => {
  */
 export const bookAPI = {
   // Get featured books
-// To this (simpler format):
-getFeaturedBooks: async () => {
-  return fetchFromAPI('/api/books?populate=*&filters[featured]=true');
-},
-  // Get popular books
+  getFeaturedBooks: async () => {
+    return fetchFromAPI('/api/books?populate=*&filters[featured]=true');
+  },
+
+  // Get popular books - just get all books for now and sort client-side if needed
   getPopularBooks: async () => {
-    return fetchFromAPI('/api/books?populate=*&sort[0]=views:desc');
+    return fetchFromAPI('/api/books?populate=*');
   },
 
   // Get books of the week
   getBooksOfWeek: async () => {
-    return fetchFromAPI('/api/books?populate=*&filters[bookOfWeek][$eq]=true');
+    return fetchFromAPI('/api/books?populate=*&filters[bookOfWeek]=true');
   },
 
   // Get books of the year
   getBooksOfYear: async () => {
-    return fetchFromAPI('/api/books?populate=*&filters[bookOfYear][$eq]=true');
+    return fetchFromAPI('/api/books?populate=*&filters[bookOfYear]=true');
   },
 
   // Get book categories
   getCategories: async () => {
-    return fetchFromAPI('/api/categories?populate=*');
+    return fetchFromAPI('/api/categories');
   },
 
-  // Get books by category
+  // Get books by category - simplified syntax
   getBooksByCategory: async (categoryId) => {
-    return fetchFromAPI(`/api/books?populate=*&filters[category][id][$eq]=${categoryId}`);
+    return fetchFromAPI(`/api/books?populate=*&filters[category]=${categoryId}`);
   },
 
   // Get a single book by ID
