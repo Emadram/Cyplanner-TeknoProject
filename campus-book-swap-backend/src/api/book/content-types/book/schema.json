@@ -84,6 +84,18 @@
       "relation": "manyToMany",
       "target": "plugin::users-permissions.user",
       "inversedBy": "likedBooks"
+    },
+    "users_permissions_user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "books"
+    },
+    "transactions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::transaction.transaction",
+      "mappedBy": "book"
     }
   }
 }
