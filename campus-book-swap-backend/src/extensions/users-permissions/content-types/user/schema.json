@@ -74,6 +74,18 @@
       "relation": "manyToMany",
       "target": "api::book.book",
       "mappedBy": "likes"
+    },
+    "books": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::book.book",
+      "mappedBy": "users_permissions_user"
+    },
+    "transactions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::transaction.transaction",
+      "mappedBy": "seller"
     }
   }
 }
