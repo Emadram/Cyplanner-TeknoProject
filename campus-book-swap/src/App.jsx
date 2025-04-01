@@ -45,21 +45,6 @@ const ProtectedRoute = ({ children }) => {
   return isAuthenticated ? children : <Navigate to="/signin" replace />;
 };
 
-// Home route handler - redirect to dashboard if authenticated
-const HomeRoute = () => {
-  const { isAuthenticated, isLoading } = useAuth();
-  
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-  
-  return isAuthenticated ? <Navigate to="/dashboard" replace /> : <Home />;
-};
-
 function App() {
   const [data, setData] = useState(null);
 
@@ -72,8 +57,8 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<MainLayout />}>
-            {/* Public Routes with Home Redirection */}
-            <Route index element={<HomeRoute />} />
+            {/* Public Routes - no redirection */}
+            <Route index element={<Home />} />
             <Route path="signup" element={<SignUp />} />
             <Route path="signin" element={<SignIn />} />
             
