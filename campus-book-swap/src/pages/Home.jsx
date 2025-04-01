@@ -471,9 +471,9 @@ const Home = () => {
   
   // Component for each book slide
   const BookSlide = ({ book }) => (
-    <div className="book-cell bg-sky-400 p-6 rounded-lg flex flex-col md:flex-row items-center md:items-start h-full relative overflow-hidden">
+    <div className="book-cell bg-zinc-800 p-6 rounded-lg flex flex-col md:flex-row items-center md:items-start h-full relative overflow-hidden">
       <div className="book-img relative z-10 mb-4 md:mb-0 transform transition hover:scale-105">
-        <div className="relative bg-sky-200 rounded-lg shadow-md h-56 w-40 md:h-64 md:w-48 flex items-center justify-center overflow-hidden">
+        <div className="relative bg-sky-500 rounded-lg shadow-md h-56 w-40 md:h-64 md:w-48 flex items-center justify-center overflow-hidden">
           <div className="text-white text-center font-serif z-10 px-2">
             <div className="text-sm tracking-wide">A COURT OF</div>
             <div className="text-xl md:text-2xl mt-1 mb-2 font-bold">{book.displayTitle?.[0]}</div>
