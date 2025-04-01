@@ -27,32 +27,78 @@ const BookForm = ({ onSuccess, bookToEdit = null }) => {
 
   // Fetch categories on component mount
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/categories`);
-        console.log("Raw categories response:", response.data);
+// Add this to your BookForm.jsx to debug categories
+
+const fetchCategories = async () => {
+  try {
+    // Log the API URL for debugging
+    const apiUrl = `${import.meta.env.VITE_API_URL}/api/categories`;
+    console.log("Fetching categories from:", apiUrl);
+    
+    const response = await axios.get(apiUrl);
+    console.log("Complete raw response:", response);
+    console.log("Category data structure:", response.data);
+    
+    // Check different possible data structures
+    if (response.data && response.data.data && Array.isArray(response.data.data)) {
+      // Strapi v4 structure
+      console.log("Found Strapi v4 data structure with", response.data.data.length, "categories");
+      
+      const processedCategories = response.data.data.map(cat => {
+        console.log("Raw category object:", cat);
         
-        if (response.data && response.data.data) {
-          // For Strapi v4 structure
-          const processedCategories = response.data.data.map(cat => {
-            console.log("Processing category:", cat);
-            return {
-              id: cat.id,
-              name: cat.attributes?.name || 'Unknown Category'
-            };
-          });
-          
-          console.log("Processed categories:", processedCategories);
-          setCategories(processedCategories);
+        // Attempt to extract name from various possible structures
+        let name = "Unknown";
+        
+        if (cat.attributes && cat.attributes.name) {
+          name = cat.attributes.name;
+          console.log("Found name in attributes:", name);
+        } else if (cat.name) {
+          name = cat.name;
+          console.log("Found direct name property:", name);
+        } else if (cat.attributes && cat.attributes.Type) {
+          name = cat.attributes.Type;
+          console.log("Found Type in attributes:", name);
+        } else if (cat.Type) {
+          name = cat.Type;
+          console.log("Found direct Type property:", name);
         } else {
-          console.error("Unexpected category data structure:", response.data);
-          setError("Failed to process categories data");
+          // Log all properties to see what's available
+          console.log("Could not find name, available properties:", Object.keys(cat));
+          if (cat.attributes) {
+            console.log("Available attribute properties:", Object.keys(cat.attributes));
+          }
         }
-      } catch (err) {
-        console.error('Error fetching categories:', err);
-        setError('Failed to load categories');
-      }
-    };
+        
+        return {
+          id: cat.id,
+          name: name
+        };
+      });
+      
+      console.log("Final processed categories:", processedCategories);
+      setCategories(processedCategories);
+    } else if (response.data && Array.isArray(response.data)) {
+      // Possible simple array structure
+      console.log("Found simple array structure with", response.data.length, "categories");
+      
+      const processedCategories = response.data.map(cat => ({
+        id: cat.id,
+        name: cat.name || cat.Type || `Category ${cat.id}`
+      }));
+      
+      console.log("Final processed categories:", processedCategories);
+      setCategories(processedCategories);
+    } else {
+      console.error("Unexpected category data structure. Cannot process categories.");
+      console.log("Response data type:", typeof response.data);
+      setError("Failed to process categories data. Unknown structure.");
+    }
+  } catch (err) {
+    console.error('Error fetching categories:', err);
+    setError('Failed to load categories');
+  }
+};
 
     fetchCategories();
     
