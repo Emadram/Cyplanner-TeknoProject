@@ -15,15 +15,18 @@ export const AuthProvider = ({ children }) => {
       
       if (token) {
         try {
+          console.log("Verifying token with Strapi...");
           // Verify token with Strapi
           const response = await axios.get(
-            `${import.meta.env.VITE_STRAPI_API_URL}/api/users/me`, 
+            `${import.meta.env.VITE_API_URL}/api/users/me`, 
             {
               headers: {
                 Authorization: `Bearer ${token}`
               }
             }
           );
+          
+          console.log("Token verified successfully, user data:", response.data);
           
           setUser({
             email: response.data.email,
@@ -37,6 +40,8 @@ export const AuthProvider = ({ children }) => {
           // Token is invalid or expired
           localStorage.removeItem('token');
         }
+      } else {
+        console.log("No token found in localStorage");
       }
       
       setIsLoading(false);
@@ -46,18 +51,20 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = (userData) => {
+    console.log("Login called with user data:", userData);
     setIsAuthenticated(true);
     setUser(userData);
   };
 
   const logout = () => {
+    console.log("Logout called");
     // Clear token from storage
     localStorage.removeItem('token');
     setIsAuthenticated(false);
     setUser(null);
   };
 
-  // Create an axios instance with the auth token
+  // Create a separate instance of axios that will always include the current token
   const authAxios = axios.create();
   
   // Add auth token to all requests
@@ -65,11 +72,19 @@ export const AuthProvider = ({ children }) => {
     (config) => {
       const token = localStorage.getItem('token');
       if (token) {
+        // Make sure headers object exists
+        config.headers = config.headers || {};
         config.headers.Authorization = `Bearer ${token}`;
+        console.log("Added token to request:", config.url);
+      } else {
+        console.log("No token available for request:", config.url);
       }
       return config;
     },
-    (error) => Promise.reject(error)
+    (error) => {
+      console.error("Request interceptor error:", error);
+      return Promise.reject(error);
+    }
   );
 
   return (
