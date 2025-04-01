@@ -44,7 +44,8 @@ const Home = () => {
           { id: 'all', name: 'All Genres' },
           ...categoriesData.data.map(cat => ({
             id: cat.id,
-            name: cat.attributes.name
+            // Support both old Strapi v4 format and new flat structure
+            name: cat.Type || (cat.attributes ? cat.attributes.name : cat.name)
           }))
         ];
         setCategories(processedCategories);
@@ -140,104 +141,111 @@ const Home = () => {
   }, [activeCategory, categories]);
 
   // Helper function to map Strapi data structure to component data structure
-// Helper function to map Strapi data structure to component data structure
-const mapBooksData = (books) => {
-  if (!books || !Array.isArray(books)) {
-    console.error('Invalid books data:', books);
-    return [];
-  }
-
-  return books.map(book => {
-    if (!book || !book.attributes) {
-      console.error('Invalid book data:', book);
-      return null;
+  const mapBooksData = (books) => {
+    if (!books || !Array.isArray(books)) {
+      console.error('Invalid books data:', books);
+      return [];
     }
 
-    const { attributes } = book;
-    
-    // Map book data
-    const mappedBook = {
-      id: book.id,
-      title: attributes.title,
-      author: attributes.author,
-      summary: attributes.description,
-      rating: attributes.rating,
-      voters: attributes.votersCount || 0,
-      condition: attributes.condition,
-      exchange: attributes.exchange,
-      subject: attributes.subject,
-      course: attributes.course,
-      seller: attributes.seller,
-      color: attributes.color || 'bg-blue-400',
-    };
-    
-    // Map cover image if available
-    if (attributes.cover?.data) {
-      // Handle different formats in Strapi v4
-      if (attributes.cover.data.attributes) {
-        mappedBook.cover = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${attributes.cover.data.attributes.url}`;
-      } else if (attributes.cover.data.url) {
-        mappedBook.cover = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${attributes.cover.data.url}`;
+    return books.map(book => {
+      if (!book) {
+        console.error('Invalid book data:', book);
+        return null;
       }
-    }
-    
-    // Map display title for featured books
-    if (attributes.displayTitle) {
-      try {
-        // Try parsing if stored as JSON string
-        mappedBook.displayTitle = JSON.parse(attributes.displayTitle);
-      } catch (err) {
-        // Fallback: split by space if not valid JSON
-        console.log('Display title parse error:', err);
-        const parts = attributes.displayTitle.split(' ');
-        // If we have multiple parts, use first two, otherwise duplicate
-        if (parts.length > 1) {
-          mappedBook.displayTitle = [parts[0], parts.slice(1).join(' ')];
-        } else {
-          mappedBook.displayTitle = [attributes.displayTitle, attributes.displayTitle];
+
+      // Handle both Strapi v4 format and flat structure
+      const bookData = book.attributes || book;
+      
+      // Map book data
+      const mappedBook = {
+        id: book.id,
+        title: bookData.title,
+        author: bookData.author,
+        summary: bookData.description,
+        rating: bookData.rating,
+        voters: bookData.votersCount || 0,
+        condition: bookData.condition,
+        exchange: bookData.exchange,
+        subject: bookData.subject,
+        course: bookData.course,
+        seller: bookData.seller,
+        color: bookData.color || 'bg-blue-400',
+      };
+      
+      // Map cover image if available
+      if (bookData.cover) {
+        const coverData = bookData.cover.data || bookData.cover;
+        const coverAttributes = coverData.attributes || coverData;
+        
+        if (coverAttributes && coverAttributes.url) {
+          mappedBook.cover = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${coverAttributes.url}`;
         }
       }
-    } else {
-      // Fallback display title from book title
-      const titleParts = attributes.title.split(' ');
-      if (titleParts.length > 1) {
-        mappedBook.displayTitle = [titleParts[0], titleParts.slice(1).join(' ')];
+      
+      // Map display title for featured books
+      if (bookData.displayTitle) {
+        try {
+          // Try parsing if stored as JSON string
+          mappedBook.displayTitle = JSON.parse(bookData.displayTitle);
+        } catch (err) {
+          // Fallback: split by space if not valid JSON
+          console.log('Display title parse error:', err);
+          const parts = bookData.displayTitle.split(' ');
+          // If we have multiple parts, use first two, otherwise duplicate
+          if (parts.length > 1) {
+            mappedBook.displayTitle = [parts[0], parts.slice(1).join(' ')];
+          } else {
+            mappedBook.displayTitle = [bookData.displayTitle, bookData.displayTitle];
+          }
+        }
       } else {
-        mappedBook.displayTitle = [attributes.title, 'Book'];
+        // Fallback display title from book title
+        const titleParts = bookData.title.split(' ');
+        if (titleParts.length > 1) {
+          mappedBook.displayTitle = [titleParts[0], titleParts.slice(1).join(' ')];
+        } else {
+          mappedBook.displayTitle = [bookData.title, 'Book'];
+        }
       }
-    }
-    
-    // Map likes - assuming a relation to users
-    if (attributes.likes?.data) {
-      mappedBook.likes = attributes.likes.data.map(like => {
-        // Handle Strapi v4 data format
-        const likeData = like.attributes || like;
-        return {
-          id: like.id,
-          name: likeData.username || 'User',
-          img: likeData.avatar?.data 
-            ? `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${likeData.avatar.data.attributes?.url || likeData.avatar.data.url || ''}`
-            : 'https://via.placeholder.com/150'
-        };
-      });
-    } else {
+      
+      // Map likes - handling both formats
       mappedBook.likes = [];
-    }
-    
-    // For books of year/week - add name property for consistency
-    mappedBook.name = attributes.title;
-    if (attributes.cover?.data) {
-      // Duplicate cover as img for FeaturedBook component
-      if (attributes.cover.data.attributes) {
-        mappedBook.img = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${attributes.cover.data.attributes.url}`;
-      } else if (attributes.cover.data.url) {
-        mappedBook.img = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${attributes.cover.data.url}`;
+      if (bookData.likes) {
+        const likesData = bookData.likes.data || bookData.likes;
+        if (Array.isArray(likesData)) {
+          mappedBook.likes = likesData.map(like => {
+            // Handle both formats
+            const likeData = like.attributes || like;
+            const avatar = likeData.avatar?.data || likeData.avatar;
+            const avatarUrl = avatar ? 
+              (avatar.attributes?.url || avatar.url || '') : '';
+              
+            return {
+              id: like.id,
+              name: likeData.username || 'User',
+              img: avatarUrl ? 
+                `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${avatarUrl}` : 
+                'https://via.placeholder.com/150'
+            };
+          });
+        }
       }
-    }
-    
-    return mappedBook;
-  }).filter(Boolean); // Remove any null entries
-};
+      
+      // For books of year/week - add name property for consistency
+      mappedBook.name = bookData.title;
+      if (bookData.cover) {
+        // Handle both formats for cover image
+        const coverData = bookData.cover.data || bookData.cover;
+        const coverAttributes = coverData.attributes || coverData;
+        
+        if (coverAttributes && coverAttributes.url) {
+          mappedBook.img = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${coverAttributes.url}`;
+        }
+      }
+      
+      return mappedBook;
+    }).filter(Boolean); // Remove any null entries
+  };
 
   // Carousel functions
   const nextSlide = () => {
@@ -260,8 +268,6 @@ const mapBooksData = (books) => {
     return () => clearInterval(interval);
   }, [featuredBooks.length]);
   
-  // Rest of your component (BookSlide, BookCard, FeaturedBook, etc.) remains the same
-
   // Component for each book slide
   const BookSlide = ({ book }) => (
     <div className={`book-cell ${book.color} p-6 rounded-lg flex flex-col md:flex-row items-center md:items-start h-full relative overflow-hidden`}>
