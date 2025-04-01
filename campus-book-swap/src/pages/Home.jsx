@@ -169,26 +169,31 @@ const Home = () => {
         subject: bookData.subject,
         course: bookData.course,
         seller: bookData.seller,
-        color: bookData.color || 'bg-cyan-400',
       };
       
       // Map cover image if available
-if (bookData.cover) {
-  console.log("Cover structure:", bookData.cover);
-  
-  // Direct access if cover is a simple object with url
-  if (bookData.cover.url) {
-    mappedBook.cover = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${bookData.cover.url}`;
-  } 
-  // Handle nested structure from Strapi v4
-  else if (bookData.cover.data && bookData.cover.data.attributes) {
-    mappedBook.cover = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${bookData.cover.data.attributes.url}`;
-  }
-  // Another possible format
-  else if (bookData.cover.data && bookData.cover.data.url) {
-    mappedBook.cover = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${bookData.cover.data.url}`;
-  }
-}
+      if (bookData.cover) {
+        console.log("Cover structure:", bookData.cover);
+        
+        // Try all possible cover image formats
+        if (typeof bookData.cover === 'string') {
+          // Direct URL string
+          mappedBook.cover = bookData.cover;
+        } else if (bookData.cover.url) {
+          // Direct object with url
+          mappedBook.cover = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${bookData.cover.url}`;
+        } else if (typeof bookData.cover === 'object') {
+          if (bookData.cover.data) {
+            // Strapi v4 format with data property
+            const coverData = bookData.cover.data;
+            if (coverData.attributes && coverData.attributes.url) {
+              mappedBook.cover = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${coverData.attributes.url}`;
+            } else if (coverData.url) {
+              mappedBook.cover = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${coverData.url}`;
+            }
+          }
+        }
+      }
       
       // Map display title for featured books
       if (bookData.displayTitle) {
@@ -241,13 +246,22 @@ if (bookData.cover) {
       
       // For books of year/week - add name property for consistency
       mappedBook.name = bookData.title;
+      
+      // Apply the same cover image handling for img property
       if (bookData.cover) {
-        // Handle both formats for cover image
-        const coverData = bookData.cover.data || bookData.cover;
-        const coverAttributes = coverData.attributes || coverData;
-        
-        if (coverAttributes && coverAttributes.url) {
-          mappedBook.img = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${coverAttributes.url}`;
+        if (typeof bookData.cover === 'string') {
+          mappedBook.img = bookData.cover;
+        } else if (bookData.cover.url) {
+          mappedBook.img = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${bookData.cover.url}`;
+        } else if (typeof bookData.cover === 'object') {
+          if (bookData.cover.data) {
+            const coverData = bookData.cover.data;
+            if (coverData.attributes && coverData.attributes.url) {
+              mappedBook.img = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${coverData.attributes.url}`;
+            } else if (coverData.url) {
+              mappedBook.img = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${coverData.url}`;
+            }
+          }
         }
       }
       
@@ -278,9 +292,9 @@ if (bookData.cover) {
   
   // Component for each book slide
   const BookSlide = ({ book }) => (
-    <div className={`book-cell ${book.color} p-6 rounded-lg flex flex-col md:flex-row items-center md:items-start h-full relative overflow-hidden`}>
+    <div className="book-cell bg-cyan-400 p-6 rounded-lg flex flex-col md:flex-row items-center md:items-start h-full relative overflow-hidden">
       <div className="book-img relative z-10 mb-4 md:mb-0 transform transition hover:scale-105">
-        <div className={`relative ${book.color} rounded-lg shadow-md h-56 w-40 md:h-64 md:w-48 flex items-center justify-center overflow-hidden`}>
+        <div className="relative bg-cyan-400 rounded-lg shadow-md h-56 w-40 md:h-64 md:w-48 flex items-center justify-center overflow-hidden">
           <div className="text-white text-center font-serif z-10 px-2">
             <div className="text-sm tracking-wide">A COURT OF</div>
             <div className="text-xl md:text-2xl mt-1 mb-2 font-bold">{book.displayTitle?.[0]}</div>
@@ -309,7 +323,7 @@ if (bookData.cover) {
         <div className="book-sum text-sm mb-6 line-clamp-3">
           {book.summary}
         </div>
-        <button onClick={() => setSelectedBook(book)} className="book-see bg-white text-center py-2 px-6 rounded-full font-medium text-sm inline-block hover:bg-opacity-90" style={{ color: book.color?.replace('bg-', 'text-').replace('400', '600') }}>
+        <button onClick={() => setSelectedBook(book)} className="book-see bg-white text-center py-2 px-6 rounded-full font-medium text-sm inline-block hover:bg-opacity-90" style={{ color: "#0891b2" }}>
           See The Book
         </button>
       </div>
@@ -323,7 +337,7 @@ if (bookData.cover) {
         {book.cover ? (
           <img src={book.cover} alt={book.title} className="book-card-img w-24 h-36 object-cover rounded shadow-md transition transform hover:scale-105" />
         ) : (
-          <div className={`${book.color} w-24 h-36 rounded shadow-md flex items-center justify-center`}>
+          <div className="bg-cyan-400 w-24 h-36 rounded shadow-md flex items-center justify-center">
             <span className="text-white font-bold">{book.title?.substring(0, 1)}</span>
           </div>
         )}
@@ -363,7 +377,7 @@ if (bookData.cover) {
       {book.img ? (
         <img src={book.img} alt={book.name} className="w-full h-40 object-cover rounded-lg shadow-md" />
       ) : (
-        <div className={`${book.color} w-full h-40 rounded-lg shadow-md flex items-center justify-center`}>
+        <div className="bg-cyan-400 w-full h-40 rounded-lg shadow-md flex items-center justify-center">
           <span className="text-white font-bold text-lg">{book.name?.substring(0, 1)}</span>
         </div>
       )}
@@ -393,7 +407,7 @@ if (bookData.cover) {
           {book.cover ? (
             <img src={book.cover} alt={book.title} className="w-32 h-48 object-cover rounded shadow-md mr-4 flex-shrink-0" />
           ) : (
-            <div className={`${book.color} rounded-lg shadow-md w-32 h-48 flex items-center justify-center mr-4 flex-shrink-0`}>
+            <div className="bg-cyan-400 rounded-lg shadow-md w-32 h-48 flex items-center justify-center mr-4 flex-shrink-0">
               <div className="text-white text-center font-serif px-2">
                 <div className="text-xs tracking-wide">A COURT OF</div>
                 <div className="text-lg font-bold my-1">{book.displayTitle?.[0]}</div>
@@ -536,38 +550,6 @@ if (bookData.cover) {
               <div className="grid grid-cols-2 gap-3">
                 {booksOfWeek.map(book => (
                   <FeaturedBook key={book.id} book={book} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center text-gray-500 py-4">
-                No featured books available
-              </div>
-            )}
-          </div>
-          
-          {/* Books of the Year Section */}
-          <div className="year bg-white rounded-lg shadow-sm p-4 relative">
-            <div className="year-title font-medium mb-4">Books of the year</div>
-            {loading.booksOfYear ? (
-              <LoadingPlaceholder type="books of the year" />
-            ) : error.booksOfYear ? (
-              <ErrorPlaceholder message={error.booksOfYear} type="books of the year" />
-            ) : booksOfYear.length > 0 ? (
-              <div className="space-y-3 max-h-80 overflow-y-auto no-scrollbar">
-                {booksOfYear.map(book => (
-                  <div key={book.id} className="year-book flex items-center cursor-pointer hover:bg-gray-50 p-2 rounded" onClick={() => setSelectedBook(book)}>
-                    {book.img ? (
-                      <img src={book.img} alt={book.name} className="year-book-img w-12 h-16 rounded shadow mr-3 object-cover" />
-                    ) : (
-                      <div className={`${book.color} w-12 h-16 rounded shadow mr-3 flex items-center justify-center`}>
-                        <span className="text-white font-bold">{book.name?.substring(0, 1)}</span>
-                      </div>
-                    )}
-                    <div className="year-book-content">
-                      <div className="year-book-name text-sm font-medium line-clamp-1">{book.name}</div>
-                      <div className="year-book-author text-xs text-gray-500">{book.author}</div>
-                    </div>
-                  </div>
                 ))}
               </div>
             ) : (
