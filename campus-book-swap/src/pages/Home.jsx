@@ -140,67 +140,104 @@ const Home = () => {
   }, [activeCategory, categories]);
 
   // Helper function to map Strapi data structure to component data structure
-  const mapBooksData = (books) => {
-    return books.map(book => {
-      const { attributes } = book;
-      
-      // Map book data
-      const mappedBook = {
-        id: book.id,
-        title: attributes.title,
-        author: attributes.author,
-        summary: attributes.description,
-        rating: attributes.rating,
-        voters: attributes.votersCount || 0,
-        condition: attributes.condition,
-        exchange: attributes.exchange,
-        subject: attributes.subject,
-        course: attributes.course,
-        seller: attributes.seller,
-      };
-      
-      // Map cover image if available
-      if (attributes.cover?.data) {
+// Helper function to map Strapi data structure to component data structure
+const mapBooksData = (books) => {
+  if (!books || !Array.isArray(books)) {
+    console.error('Invalid books data:', books);
+    return [];
+  }
+
+  return books.map(book => {
+    if (!book || !book.attributes) {
+      console.error('Invalid book data:', book);
+      return null;
+    }
+
+    const { attributes } = book;
+    
+    // Map book data
+    const mappedBook = {
+      id: book.id,
+      title: attributes.title,
+      author: attributes.author,
+      summary: attributes.description,
+      rating: attributes.rating,
+      voters: attributes.votersCount || 0,
+      condition: attributes.condition,
+      exchange: attributes.exchange,
+      subject: attributes.subject,
+      course: attributes.course,
+      seller: attributes.seller,
+      color: attributes.color || 'bg-blue-400',
+    };
+    
+    // Map cover image if available
+    if (attributes.cover?.data) {
+      // Handle different formats in Strapi v4
+      if (attributes.cover.data.attributes) {
         mappedBook.cover = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${attributes.cover.data.attributes.url}`;
+      } else if (attributes.cover.data.url) {
+        mappedBook.cover = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${attributes.cover.data.url}`;
       }
-      
-      // Map display title for featured books
-      if (attributes.displayTitle) {
-        try {
-          mappedBook.displayTitle = JSON.parse(attributes.displayTitle);
-        } catch (err) {
-          // Fallback if not JSON
-          mappedBook.displayTitle = attributes.displayTitle.split(' ');
+    }
+    
+    // Map display title for featured books
+    if (attributes.displayTitle) {
+      try {
+        // Try parsing if stored as JSON string
+        mappedBook.displayTitle = JSON.parse(attributes.displayTitle);
+      } catch (err) {
+        // Fallback: split by space if not valid JSON
+        console.log('Display title parse error:', err);
+        const parts = attributes.displayTitle.split(' ');
+        // If we have multiple parts, use first two, otherwise duplicate
+        if (parts.length > 1) {
+          mappedBook.displayTitle = [parts[0], parts.slice(1).join(' ')];
+        } else {
+          mappedBook.displayTitle = [attributes.displayTitle, attributes.displayTitle];
         }
       }
-      
-      // Map color for featured books
-      mappedBook.color = attributes.color || 'bg-blue-400';
-      
-      // Map likes - assuming a relation to users
-      if (attributes.likes?.data) {
-        mappedBook.likes = attributes.likes.data.map(like => ({
-          id: like.id,
-          name: like.attributes.username || 'User',
-          img: like.attributes.avatar?.data 
-            ? `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${like.attributes.avatar.data.attributes.url}`
-            : 'https://via.placeholder.com/150'
-        }));
+    } else {
+      // Fallback display title from book title
+      const titleParts = attributes.title.split(' ');
+      if (titleParts.length > 1) {
+        mappedBook.displayTitle = [titleParts[0], titleParts.slice(1).join(' ')];
       } else {
-        mappedBook.likes = [];
+        mappedBook.displayTitle = [attributes.title, 'Book'];
       }
-      
-      // For books of year/week
-      if (attributes.title) {
-        mappedBook.name = attributes.title;
-        if (attributes.cover?.data) {
-          mappedBook.img = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${attributes.cover.data.attributes.url}`;
-        }
+    }
+    
+    // Map likes - assuming a relation to users
+    if (attributes.likes?.data) {
+      mappedBook.likes = attributes.likes.data.map(like => {
+        // Handle Strapi v4 data format
+        const likeData = like.attributes || like;
+        return {
+          id: like.id,
+          name: likeData.username || 'User',
+          img: likeData.avatar?.data 
+            ? `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${likeData.avatar.data.attributes?.url || likeData.avatar.data.url || ''}`
+            : 'https://via.placeholder.com/150'
+        };
+      });
+    } else {
+      mappedBook.likes = [];
+    }
+    
+    // For books of year/week - add name property for consistency
+    mappedBook.name = attributes.title;
+    if (attributes.cover?.data) {
+      // Duplicate cover as img for FeaturedBook component
+      if (attributes.cover.data.attributes) {
+        mappedBook.img = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${attributes.cover.data.attributes.url}`;
+      } else if (attributes.cover.data.url) {
+        mappedBook.img = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}${attributes.cover.data.url}`;
       }
-      
-      return mappedBook;
-    });
-  };
+    }
+    
+    return mappedBook;
+  }).filter(Boolean); // Remove any null entries
+};
 
   // Carousel functions
   const nextSlide = () => {
