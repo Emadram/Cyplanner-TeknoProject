@@ -11,7 +11,11 @@ const BookForm = ({ onSuccess, bookToEdit = null }) => {
     exchange: '',
     subject: '',
     course: '',
-    price: '',
+    seller: '',
+    featured: false,
+    bookOfWeek: false,
+    bookOfYear: false,
+    displayTitle: '',
     category: ''
   };
 
@@ -27,78 +31,32 @@ const BookForm = ({ onSuccess, bookToEdit = null }) => {
 
   // Fetch categories on component mount
   useEffect(() => {
-// Add this to your BookForm.jsx to debug categories
-
-const fetchCategories = async () => {
-  try {
-    // Log the API URL for debugging
-    const apiUrl = `${import.meta.env.VITE_API_URL}/api/categories`;
-    console.log("Fetching categories from:", apiUrl);
-    
-    const response = await axios.get(apiUrl);
-    console.log("Complete raw response:", response);
-    console.log("Category data structure:", response.data);
-    
-    // Check different possible data structures
-    if (response.data && response.data.data && Array.isArray(response.data.data)) {
-      // Strapi v4 structure
-      console.log("Found Strapi v4 data structure with", response.data.data.length, "categories");
-      
-      const processedCategories = response.data.data.map(cat => {
-        console.log("Raw category object:", cat);
+    const fetchCategories = async () => {
+      try {
+        const apiUrl = `${import.meta.env.VITE_API_URL}/api/categories`;
+        console.log("Fetching categories from:", apiUrl);
         
-        // Attempt to extract name from various possible structures
-        let name = "Unknown";
+        const response = await axios.get(apiUrl);
+        console.log("Category response:", response.data);
         
-        if (cat.attributes && cat.attributes.name) {
-          name = cat.attributes.name;
-          console.log("Found name in attributes:", name);
-        } else if (cat.name) {
-          name = cat.name;
-          console.log("Found direct name property:", name);
-        } else if (cat.attributes && cat.attributes.Type) {
-          name = cat.attributes.Type;
-          console.log("Found Type in attributes:", name);
-        } else if (cat.Type) {
-          name = cat.Type;
-          console.log("Found direct Type property:", name);
-        } else {
-          // Log all properties to see what's available
-          console.log("Could not find name, available properties:", Object.keys(cat));
-          if (cat.attributes) {
-            console.log("Available attribute properties:", Object.keys(cat.attributes));
-          }
+        if (response.data && response.data.data) {
+          const processedCategories = response.data.data.map(cat => {
+            console.log("Category item:", cat);
+            return {
+              id: cat.id,
+              // Try different possible property names for the category name
+              name: cat.attributes?.Type || cat.attributes?.type || cat.attributes?.name || cat.Type || cat.type || cat.name || `Category ${cat.id}`
+            };
+          });
+          
+          console.log("Processed categories:", processedCategories);
+          setCategories(processedCategories);
         }
-        
-        return {
-          id: cat.id,
-          name: name
-        };
-      });
-      
-      console.log("Final processed categories:", processedCategories);
-      setCategories(processedCategories);
-    } else if (response.data && Array.isArray(response.data)) {
-      // Possible simple array structure
-      console.log("Found simple array structure with", response.data.length, "categories");
-      
-      const processedCategories = response.data.map(cat => ({
-        id: cat.id,
-        name: cat.name || cat.Type || `Category ${cat.id}`
-      }));
-      
-      console.log("Final processed categories:", processedCategories);
-      setCategories(processedCategories);
-    } else {
-      console.error("Unexpected category data structure. Cannot process categories.");
-      console.log("Response data type:", typeof response.data);
-      setError("Failed to process categories data. Unknown structure.");
-    }
-  } catch (err) {
-    console.error('Error fetching categories:', err);
-    setError('Failed to load categories');
-  }
-};
+      } catch (err) {
+        console.error('Error fetching categories:', err);
+        setError('Failed to load categories');
+      }
+    };
 
     fetchCategories();
     
@@ -112,19 +70,32 @@ const fetchCategories = async () => {
         exchange: bookToEdit.exchange || '',
         subject: bookToEdit.subject || '',
         course: bookToEdit.course || '',
-        price: bookToEdit.price || '',
+        seller: bookToEdit.seller || user?.username || '',
+        featured: bookToEdit.featured || false,
+        bookOfWeek: bookToEdit.bookOfWeek || false,
+        bookOfYear: bookToEdit.bookOfYear || false,
+        displayTitle: bookToEdit.displayTitle || '',
         category: bookToEdit.category?.id || ''
       });
       
       if (bookToEdit.cover) {
         setCoverPreview(bookToEdit.cover);
       }
+    } else {
+      // For new books, set seller to current user
+      setBook(prev => ({
+        ...prev,
+        seller: user?.username || ''
+      }));
     }
-  }, [bookToEdit]);
+  }, [bookToEdit, user]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setBook(prev => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setBook(prev => ({ 
+      ...prev, 
+      [name]: type === 'checkbox' ? checked : value 
+    }));
   };
 
   const handleImageChange = (e) => {
@@ -142,26 +113,29 @@ const fetchCategories = async () => {
     setSuccess('');
     
     try {
-      // Show the token for debugging
-      const token = localStorage.getItem('token');
-      console.log("Token being used:", token ? `${token.substring(0, 15)}...` : 'No token');
+      console.log("Submitting book data:", book);
       
-      // Simplified book data
+      // Create data object in the format Strapi expects
       const bookData = {
         data: {
           title: book.title,
           author: book.author,
           description: book.description,
           condition: book.condition,
-          exchange: book.exchange || "",
-          subject: book.subject || "",
-          course: book.course || "",
-          price: parseFloat(book.price) || 0,
-          category: book.category || null
+          exchange: book.exchange,
+          subject: book.subject,
+          course: book.course,
+          seller: book.seller,
+          featured: book.featured,
+          bookOfWeek: book.bookOfWeek,
+          bookOfYear: book.bookOfYear,
+          displayTitle: book.displayTitle,
+          category: book.category || null,
+          users_permissions_user: user?.id || null
         }
       };
       
-      console.log("Data for Strapi:", bookData);
+      console.log("Formatted data for Strapi:", bookData);
       
       let bookResponse;
       
@@ -171,10 +145,6 @@ const fetchCategories = async () => {
           bookData
         );
       } else {
-        // Log the full request details
-        console.log("Making POST request to:", `${import.meta.env.VITE_API_URL}/api/books`);
-        console.log("With headers:", authAxios.defaults.headers);
-        
         bookResponse = await authAxios.post(
           `${import.meta.env.VITE_API_URL}/api/books`, 
           bookData
@@ -183,26 +153,18 @@ const fetchCategories = async () => {
       
       console.log("Book response:", bookResponse.data);
       
-      // If there's a cover image, upload it after book is created
-      if (coverImage && bookResponse.data.data.id) {
+      // If there's a new cover image, upload it
+      if (coverImage) {
         const formData = new FormData();
         formData.append('files', coverImage);
         formData.append('ref', 'api::book.book');
         formData.append('refId', bookResponse.data.data.id);
         formData.append('field', 'cover');
         
-        console.log("Uploading cover image for book ID:", bookResponse.data.data.id);
-        
-        try {
-          const uploadResponse = await authAxios.post(
-            `${import.meta.env.VITE_API_URL}/api/upload`, 
-            formData
-          );
-          console.log("Image upload response:", uploadResponse.data);
-        } catch (uploadErr) {
-          console.error("Error uploading image:", uploadErr);
-          // Continue with success even if image upload fails
-        }
+        await authAxios.post(
+          `${import.meta.env.VITE_API_URL}/api/upload`, 
+          formData
+        );
       }
       
       setSuccess(bookToEdit ? 'Book updated successfully!' : 'Book listed successfully!');
@@ -216,20 +178,11 @@ const fetchCategories = async () => {
     } catch (err) {
       console.error('Error submitting book:', err);
       
-      // Detailed error reporting
       if (err.response) {
-        console.log('Error status:', err.response.status);
-        console.log('Error headers:', err.response.headers);
         console.log('Error data:', err.response.data);
-        
-        // Extract error message from Strapi
-        if (err.response.data && err.response.data.error) {
-          setError(`Server error: ${err.response.data.error.message || 'Unknown error'}`);
-        } else {
-          setError(`Error ${err.response.status}: Failed to submit book.`);
-        }
+        setError(`Server error: ${err.response.data?.error?.message || 'Failed to submit book'}`);
       } else if (err.request) {
-        setError('Request was made but no response received. Check your network connection.');
+        setError('No response from server. Check your connection.');
       } else {
         setError(`Error: ${err.message}`);
       }
@@ -309,7 +262,7 @@ const fetchCategories = async () => {
               {categories.length > 0 ? (
                 categories.map(category => (
                   <option key={category.id} value={category.id}>
-                    {category.name || `Category ID: ${category.id}`}
+                    {category.name}
                   </option>
                 ))
               ) : (
@@ -335,21 +288,6 @@ const fetchCategories = async () => {
               <option value="Acceptable">Acceptable</option>
               <option value="Poor">Poor</option>
             </select>
-          </div>
-          
-          <div>
-            <label htmlFor="price" className="block mb-1 font-medium">Price ($)</label>
-            <input
-              type="number"
-              id="price"
-              name="price"
-              value={book.price}
-              onChange={handleChange}
-              min="0"
-              step="0.01"
-              className="w-full p-2 border border-gray-300 rounded"
-              required
-            />
           </div>
           
           <div>
@@ -391,6 +329,32 @@ const fetchCategories = async () => {
             />
           </div>
           
+          <div>
+            <label htmlFor="seller" className="block mb-1 font-medium">Seller Name</label>
+            <input
+              type="text"
+              id="seller"
+              name="seller"
+              value={book.seller}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+              required
+            />
+          </div>
+          
+          <div>
+            <label htmlFor="displayTitle" className="block mb-1 font-medium">Display Title (optional)</label>
+            <input
+              type="text"
+              id="displayTitle"
+              name="displayTitle"
+              value={book.displayTitle}
+              onChange={handleChange}
+              placeholder="Alternative display title"
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+          </div>
+          
           <div className="md:col-span-2">
             <label htmlFor="cover" className="block mb-1 font-medium">Cover Image</label>
             <input
@@ -406,6 +370,44 @@ const fetchCategories = async () => {
                 <img src={coverPreview} alt="Cover preview" className="h-32 object-contain" />
               </div>
             )}
+          </div>
+          
+          <div className="flex space-x-4">
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="featured"
+                name="featured"
+                checked={book.featured}
+                onChange={handleChange}
+                className="h-4 w-4 text-blue-600"
+              />
+              <label htmlFor="featured" className="ml-2">Featured</label>
+            </div>
+            
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="bookOfWeek"
+                name="bookOfWeek"
+                checked={book.bookOfWeek}
+                onChange={handleChange}
+                className="h-4 w-4 text-blue-600"
+              />
+              <label htmlFor="bookOfWeek" className="ml-2">Book of the Week</label>
+            </div>
+            
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="bookOfYear"
+                name="bookOfYear"
+                checked={book.bookOfYear}
+                onChange={handleChange}
+                className="h-4 w-4 text-blue-600"
+              />
+              <label htmlFor="bookOfYear" className="ml-2">Book of the Year</label>
+            </div>
           </div>
         </div>
         
