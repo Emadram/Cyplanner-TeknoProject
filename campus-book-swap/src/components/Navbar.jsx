@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
-const Navbar = ({ isAuthenticated }) => {
-  const { logout } = useAuth();
+const Navbar = () => {
+  const { isAuthenticated, logout } = useAuth();
 
   return (
     <nav className="bg-white shadow-sm">
