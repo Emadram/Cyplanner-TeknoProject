@@ -374,169 +374,170 @@ const Home = () => {
   };
 
   // COMPONENT: Hero Section with Featured Book
-  const HeroSection = () => {
-    // Skip if no featured books or loading
-    if (loading.featured) {
-      return (
-        <div className="relative py-12 px-4 bg-gradient-to-br from-blue-600 to-indigo-800 text-white">
-          <div className="max-w-6xl mx-auto">
-            <div className="animate-pulse">
-              <div className="h-8 bg-white/30 rounded w-1/4 mb-6"></div>
-              <div className="h-4 bg-white/20 rounded w-3/4 mb-8"></div>
-              <div className="h-64 bg-white/10 rounded-xl"></div>
-            </div>
-          </div>
-        </div>
-      );
-    }
-    
-    if (error.featured) {
-      return (
-        <div className="relative py-12 px-4 bg-gradient-to-br from-red-600 to-red-800 text-white">
-          <div className="max-w-6xl mx-auto text-center">
-            <svg className="w-12 h-12 mx-auto mb-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            <h2 className="text-xl font-bold mb-2">Could not load featured books</h2>
-            <p className="text-white/80">{error.featured}</p>
-          </div>
-        </div>
-      );
-    }
-    
-    if (featuredBooks.length === 0) {
-      return (
-        <div className="relative py-12 px-4 bg-gradient-to-br from-blue-600 to-indigo-800 text-white">
-          <div className="max-w-6xl mx-auto text-center">
-            <h2 className="text-2xl font-bold mb-4">Discover Books to Exchange</h2>
-            <p className="mb-6">No featured books available. Check back soon for our top picks!</p>
-            <button className="px-6 py-3 bg-white text-blue-700 rounded-full font-medium hover:bg-blue-50">Browse All Books</button>
-          </div>
-        </div>
-      );
-    }
-    
-    const book = featuredBooks[currentSlide];
-    
-    const nextSlide = () => {
-      if (featuredBooks.length === 0) return;
-      setCurrentSlide(prev => (prev === featuredBooks.length - 1 ? 0 : prev + 1));
-    };
-    
-    const prevSlide = () => {
-      if (featuredBooks.length === 0) return;
-      setCurrentSlide(prev => (prev === 0 ? featuredBooks.length - 1 : prev - 1));
-    };
-    
+// COMPONENT: Hero Section with Featured Book
+const HeroSection = () => {
+  // Skip if no featured books or loading
+  if (loading.featured) {
     return (
-      <div className="relative py-12 px-4 bg-gradient-to-br from-blue-600 to-indigo-800 text-white overflow-hidden">
-        {/* Background decoration */}
-        <div className="absolute top-0 right-0 w-1/3 h-full opacity-10">
-          <svg viewBox="0 0 100 100" fill="white">
-            <path d="M96.4,0H0v100h100V3.6C100,1.6,98.4,0,96.4,0z" />
-          </svg>
-        </div>
-        
-        <div className="max-w-6xl mx-auto relative z-10">
-          <div className="flex flex-col md:flex-row items-center">
-            <div className="md:w-1/2 mb-8 md:mb-0">
-              <div className="inline-block px-3 py-1 rounded-full bg-blue-400 bg-opacity-30 text-blue-100 font-medium text-sm mb-4">
-                Featured Book
-              </div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-4">{book.title}</h1>
-              <p className="text-blue-100 mb-6 text-lg">by {book.author}</p>
-              <p className="text-blue-200 mb-6 line-clamp-3">{book.summary}</p>
-              
-              <div className="flex items-center mb-6">
-                <div className="flex mr-4">
-                  {[1, 2, 3, 4, 5].map(star => (
-                    <span key={star} className={star <= Math.floor(book.rating || 0) ? "text-yellow-300" : "text-blue-300"}>★</span>
-                  ))}
-                </div>
-                <span className="text-blue-200 text-sm">{book.voters || 0} reviews</span>
-              </div>
-              
-              <button 
-                onClick={() => setSelectedBook(book)} 
-                className="px-6 py-3 bg-white text-blue-700 rounded-full font-medium shadow-lg hover:bg-blue-50 transition-colors"
-              >
-                View Details
-              </button>
-            </div>
-            
-            <div className="md:w-1/2 flex justify-center">
-              <div className="relative">
-                {/* Book cover */}
-                <div className="transform rotate-[-6deg] transition-transform duration-500 hover:rotate-0">
-                  {book.cover ? (
-                    <img 
-                      src={book.cover} 
-                      alt={book.title} 
-                      className="w-56 h-80 object-cover rounded-lg shadow-2xl" 
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = 'https://via.placeholder.com/224x320';
-                      }}
-                    />
-                  ) : (
-                    <div className="w-56 h-80 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-lg shadow-2xl flex items-center justify-center">
-                      <div className="text-white text-center font-serif px-6">
-                        <div className="text-sm tracking-wide">A COURT OF</div>
-                        <div className="text-2xl mt-2 mb-3 font-bold">{book.displayTitle?.[0]}</div>
-                        <div className="text-sm tracking-wide">AND</div>
-                        <div className="text-2xl mt-2 mb-3 font-bold">{book.displayTitle?.[1]}</div>
-                        <div className="text-xs tracking-wider mt-4">{book.author?.toUpperCase()}</div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                
-                {/* Decorative element */}
-                <div className="absolute -bottom-4 -right-4 w-56 h-80 border-2 border-blue-300 rounded-lg"></div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Carousel Controls */}
-          <div className="flex justify-between items-center mt-8">
-            <div className="flex space-x-2">
-              {featuredBooks.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentSlide(index)}
-                  className={`w-2.5 h-2.5 rounded-full transition-colors ${
-                    currentSlide === index ? 'bg-white' : 'bg-blue-300 bg-opacity-50 hover:bg-opacity-75'
-                  }`}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
-            </div>
-            
-            <div className="flex space-x-2">
-              <button 
-                onClick={prevSlide} 
-                className="p-2 rounded-full border border-blue-300 hover:bg-blue-700 transition-colors"
-                aria-label="Previous slide"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <button 
-                onClick={nextSlide} 
-                className="p-2 rounded-full border border-blue-300 hover:bg-blue-700 transition-colors"
-                aria-label="Next slide"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
+      <div className="relative py-12 px-4 bg-gradient-to-br from-blue-600 to-indigo-800 text-white rounded-3xl mx-4 my-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="animate-pulse">
+            <div className="h-8 bg-white/30 rounded w-1/4 mb-6"></div>
+            <div className="h-4 bg-white/20 rounded w-3/4 mb-8"></div>
+            <div className="h-64 bg-white/10 rounded-xl"></div>
           </div>
         </div>
       </div>
     );
+  }
+  
+  if (error.featured) {
+    return (
+      <div className="relative py-12 px-4 bg-gradient-to-br from-red-600 to-red-800 text-white rounded-3xl mx-4 my-4">
+        <div className="max-w-6xl mx-auto text-center">
+          <svg className="w-12 h-12 mx-auto mb-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <h2 className="text-xl font-bold mb-2">Could not load featured books</h2>
+          <p className="text-white/80">{error.featured}</p>
+        </div>
+      </div>
+    );
+  }
+  
+  if (featuredBooks.length === 0) {
+    return (
+      <div className="relative py-12 px-4 bg-gradient-to-br from-blue-600 to-indigo-800 text-white rounded-3xl mx-4 my-4">
+        <div className="max-w-6xl mx-auto text-center">
+          <h2 className="text-2xl font-bold mb-4">Discover Books to Exchange</h2>
+          <p className="mb-6">No featured books available. Check back soon for our top picks!</p>
+          <button className="px-6 py-3 bg-white text-blue-700 rounded-full font-medium hover:bg-blue-50">Browse All Books</button>
+        </div>
+      </div>
+    );
+  }
+  
+  const book = featuredBooks[currentSlide];
+  
+  const nextSlide = () => {
+    if (featuredBooks.length === 0) return;
+    setCurrentSlide(prev => (prev === featuredBooks.length - 1 ? 0 : prev + 1));
   };
+  
+  const prevSlide = () => {
+    if (featuredBooks.length === 0) return;
+    setCurrentSlide(prev => (prev === 0 ? featuredBooks.length - 1 : prev - 1));
+  };
+  
+  return (
+    <div className="relative py-12 px-4 bg-gradient-to-br from-blue-600 to-indigo-800 text-white rounded-3xl mx-4 my-4 overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute top-0 right-0 w-1/3 h-full opacity-10">
+        <svg viewBox="0 0 100 100" fill="white">
+          <path d="M96.4,0H0v100h100V3.6C100,1.6,98.4,0,96.4,0z" />
+        </svg>
+      </div>
+      
+      {/* Navigation buttons - repositioned to sides */}
+      <button 
+        onClick={prevSlide} 
+        className="absolute left-4 top-1/2 transform -translate-y-1/2 p-2 rounded-full border border-blue-300 hover:bg-blue-700 transition-colors z-10"
+        aria-label="Previous slide"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+      
+      <button 
+        onClick={nextSlide} 
+        className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 rounded-full border border-blue-300 hover:bg-blue-700 transition-colors z-10"
+        aria-label="Next slide"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+      
+      <div className="max-w-6xl mx-auto relative z-10">
+        <div className="flex flex-col md:flex-row items-center animate-slideInRight">
+          <div className="md:w-1/2 mb-8 md:mb-0">
+            <div className="inline-block px-3 py-1 rounded-full bg-blue-400 bg-opacity-30 text-blue-100 font-medium text-sm mb-4">
+              Featured Book
+            </div>
+            <h1 className="text-3xl md:text-4xl font-bold mb-4">{book.title}</h1>
+            <p className="text-blue-100 mb-6 text-lg">by {book.author}</p>
+            <p className="text-blue-200 mb-6 line-clamp-3">{book.summary}</p>
+            
+            <div className="flex items-center mb-6">
+              <div className="flex mr-4">
+                {[1, 2, 3, 4, 5].map(star => (
+                  <span key={star} className={star <= Math.floor(book.rating || 0) ? "text-yellow-300" : "text-blue-300"}>★</span>
+                ))}
+              </div>
+              <span className="text-blue-200 text-sm">{book.voters || 0} reviews</span>
+            </div>
+            
+            <button 
+              onClick={() => setSelectedBook(book)} 
+              className="px-6 py-3 bg-white text-blue-700 rounded-full font-medium shadow-lg hover:bg-blue-50 transition-colors"
+            >
+              View Details
+            </button>
+          </div>
+          
+          <div className="md:w-1/2 flex justify-center">
+            <div className="relative">
+              {/* Book cover with increased roundness */}
+              <div className="transform rotate-[-6deg] transition-transform duration-500 hover:rotate-0">
+                {book.cover ? (
+                  <img 
+                    src={book.cover} 
+                    alt={book.title} 
+                    className="w-56 h-80 object-cover rounded-3xl shadow-2xl" 
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://via.placeholder.com/224x320';
+                    }}
+                  />
+                ) : (
+                  <div className="w-56 h-80 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-3xl shadow-2xl flex items-center justify-center">
+                    <div className="text-white text-center font-serif px-6">
+                      <div className="text-sm tracking-wide">A COURT OF</div>
+                      <div className="text-2xl mt-2 mb-3 font-bold">{book.displayTitle?.[0]}</div>
+                      <div className="text-sm tracking-wide">AND</div>
+                      <div className="text-2xl mt-2 mb-3 font-bold">{book.displayTitle?.[1]}</div>
+                      <div className="text-xs tracking-wider mt-4">{book.author?.toUpperCase()}</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              {/* Decorative element also rounded */}
+              <div className="absolute -bottom-4 -right-4 w-56 h-80 border-2 border-blue-300 rounded-3xl"></div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Indicator dots at bottom */}
+        <div className="flex justify-center mt-8">
+          <div className="flex space-x-2">
+            {featuredBooks.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index)}
+                className={`w-2.5 h-2.5 rounded-full transition-colors ${
+                  currentSlide === index ? 'bg-white' : 'bg-blue-300 bg-opacity-50 hover:bg-opacity-75'
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
   // COMPONENT: Featured Book component
   const FeaturedBook = ({ book }) => (
