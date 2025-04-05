@@ -502,7 +502,7 @@ const Home = () => {
         <div className="book-sum text-sm mb-6 line-clamp-3">
           {book.summary}
         </div>
-        <button onClick={() => setSelectedBook(book)} className="book-see bg-white text-center py-2 px-6 rounded-full font-medium text-sm inline-block hover:bg-opacity-90 text-cyan-600">
+        <button onClick={() => setSelectedBook(book)} className="book-see bg-white text-center py-2 px-6 rounded-full font-medium text-sm inline-block hover:bg-opacity-90 text-cyan-300">
           See The Book
         </button>
       </div>
