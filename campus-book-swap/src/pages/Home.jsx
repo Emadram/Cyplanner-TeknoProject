@@ -828,7 +828,7 @@ const Home = () => {
         major: "Computer Science",
         year: "Junior",
         text: "I saved over $300 last semester by swapping and borrowing textbooks on BookSwap. The platform is super easy to use and I've met some great people from my major!",
-        avatar: "https://randomuser.me/api/portraits/women/44.jpg"
+        avatar: ""
       },
       {
         id: 2,
