@@ -32,23 +32,6 @@ const Home = () => {
     categories: null
   });
 
-  // Debug image loading function
-  const debugImageUrl = (label, imageData, processedUrl) => {
-    console.log(`[Image Debug] ${label}:`, {
-      originalData: imageData,
-      processedUrl: processedUrl,
-      dataType: typeof imageData
-    });
-    
-    // Test if the image actually loads
-    if (processedUrl) {
-      const img = new Image();
-      img.onload = () => console.log(`[Image Debug] ${label}: Image loaded successfully`);
-      img.onerror = (e) => console.log(`[Image Debug] ${label}: Failed to load image`, e);
-      img.src = processedUrl;
-    }
-  };
-  
   // Helper function to get image URL from Strapi data
   const getStrapiMediaUrl = (imageData) => {
     if (!imageData) return null;
@@ -183,18 +166,6 @@ const Home = () => {
         // Fetch featured books
         setLoading(prev => ({ ...prev, featured: true }));
         const featuredData = await bookAPI.getFeaturedBooks();
-        
-        // Debug the first book's cover if available
-        if (featuredData.data && featuredData.data.length > 0) {
-          const firstBook = featuredData.data[0];
-          console.log("First featured book raw data:", firstBook);
-          const coverData = firstBook.attributes ? firstBook.attributes.cover : firstBook.cover;
-          if (coverData) {
-            const coverUrl = getStrapiMediaUrl(coverData);
-            debugImageUrl("First featured book cover", coverData, coverUrl);
-          }
-        }
-        
         setFeaturedBooks(mapBooksData(featuredData.data));
         setLoading(prev => ({ ...prev, featured: false }));
       } catch (err) {
@@ -241,27 +212,6 @@ const Home = () => {
     };
 
     fetchData();
-    
-    // Extra debugging - direct check of Strapi API response
-    const checkStrapiImage = async () => {
-      try {
-        // Replace with your actual API endpoint - adjust as needed
-        const apiUrl = `${import.meta.env.VITE_STRAPI_API_URL || 'http://localhost:1337'}/api/books?populate=*`;
-        console.log("Checking direct API response from:", apiUrl);
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        console.log('Raw Strapi API response:', data);
-        
-        // If there's a book with cover, examine it
-        if (data.data && data.data.length > 0 && data.data[0].attributes && data.data[0].attributes.cover) {
-          console.log('First book cover structure from direct API:', data.data[0].attributes.cover);
-        }
-      } catch (err) {
-        console.error('Error checking Strapi image directly:', err);
-      }
-    };
-    
-    checkStrapiImage();
   }, []);
 
   // Fetch books when category changes
@@ -316,8 +266,6 @@ const Home = () => {
       let coverUrl = null;
       if (bookData.cover) {
         coverUrl = getStrapiMediaUrl(bookData.cover);
-        // Debug cover URL for every book
-        debugImageUrl(`Book ${bookData.title} cover`, bookData.cover, coverUrl);
       }
       
       // Map book data
@@ -416,64 +364,11 @@ const Home = () => {
     return () => clearInterval(interval);
   }, [featuredBooks.length]);
   
-  // Image Debugger Component
-  const ImageDebugger = () => {
-    const [imageUrl, setImageUrl] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [loadStatus, setLoadStatus] = useState('');
-    
-    const testImageUrl = () => {
-      setIsLoading(true);
-      setLoadStatus('Testing...');
-      
-      const img = new Image();
-      img.onload = () => {
-        setLoadStatus('✅ Image loaded successfully!');
-        setIsLoading(false);
-      };
-      img.onerror = () => {
-        setLoadStatus('❌ Failed to load image');
-        setIsLoading(false);
-      };
-      img.src = imageUrl;
-    };
-    
-    return (
-      <div className="p-4 border rounded bg-gray-50">
-        <h3 className="font-medium">Image URL Debugger</h3>
-        <div className="mt-2">
-          <input
-            type="text"
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            placeholder="Paste Strapi image URL to test"
-            className="w-full p-2 border rounded"
-          />
-          <button 
-            onClick={testImageUrl}
-            disabled={isLoading || !imageUrl}
-            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300"
-          >
-            Test URL
-          </button>
-          {loadStatus && (
-            <div className="mt-2">
-              <p>{loadStatus}</p>
-              {loadStatus.includes('successfully') && (
-                <img src={imageUrl} alt="Test" className="mt-2 max-h-40 object-contain" />
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  };
-  
   // Component for each book slide
   const BookSlide = ({ book }) => (
-    <div className="book-cell bg-zinc-800 p-6 rounded-lg flex flex-col md:flex-row items-center md:items-start h-full relative overflow-hidden">
+    <div className="book-cell bg-gradient-to-r from-slate-800 to-slate-700 p-6 rounded-xl flex flex-col md:flex-row items-center md:items-start h-full relative overflow-hidden shadow-lg">
       <div className="book-img relative z-10 mb-4 md:mb-0 transform transition hover:scale-105">
-        <div className="relative bg-sky-500 rounded-lg shadow-md h-56 w-40 md:h-64 md:w-48 flex items-center justify-center overflow-hidden">
+        <div className="relative bg-sky-500 rounded-lg shadow-md h-64 w-48 flex items-center justify-center overflow-hidden">
           <div className="text-white text-center font-serif z-10 px-2">
             <div className="text-sm tracking-wide">A COURT OF</div>
             <div className="text-xl md:text-2xl mt-1 mb-2 font-bold">{book.displayTitle?.[0]}</div>
@@ -488,21 +383,21 @@ const Home = () => {
         </div>
       </div>
       
-      <div className="book-content ml-0 md:ml-6 text-white z-10 max-w-md">
-        <div className="book-title text-lg md:text-xl font-semibold mb-1">{book.title}</div>
-        <div className="book-author text-sm mb-3">{book.author}</div>
+      <div className="book-content ml-0 md:ml-8 text-white z-10 max-w-md">
+        <div className="book-title text-xl md:text-2xl font-semibold mb-2">{book.title}</div>
+        <div className="book-author text-sm mb-4">{book.author}</div>
         <div className="rate flex items-center mb-4">
           <div className="flex">
             {[1, 2, 3, 4, 5].map(star => (
-              <span key={star} className={star <= Math.floor(book.rating || 0) ? "text-yellow-300" : "text-gray-300"}>★</span>
+              <span key={star} className={star <= Math.floor(book.rating || 0) ? "text-yellow-300" : "text-gray-500"}>★</span>
             ))}
           </div>
           <span className="book-voters text-sm ml-2">{book.voters || 0} voters</span>
         </div>
-        <div className="book-sum text-sm mb-6 line-clamp-3">
+        <div className="book-sum text-gray-200 text-sm mb-6 line-clamp-3">
           {book.summary}
         </div>
-        <button onClick={() => setSelectedBook(book)} className="book-see bg-white text-center py-2 px-6 rounded-full font-medium text-sm inline-block hover:bg-opacity-90 text-cyan-300">
+        <button onClick={() => setSelectedBook(book)} className="book-see bg-white text-center py-2 px-6 rounded-full font-medium text-sm inline-block hover:bg-opacity-90 text-cyan-600 shadow-md transition-all hover:shadow-lg hover:scale-105">
           See The Book
         </button>
       </div>
@@ -511,7 +406,7 @@ const Home = () => {
   
   // Component for book card
   const BookCard = ({ book }) => (
-    <div className="book-card bg-white rounded-lg shadow-md overflow-hidden transform transition hover:shadow-lg cursor-pointer" onClick={() => setSelectedBook(book)}>
+    <div className="book-card bg-white rounded-lg shadow-md overflow-hidden transform transition hover:shadow-lg cursor-pointer hover:scale-102" onClick={() => setSelectedBook(book)}>
       <div className="content-wrapper flex p-5 border-b border-gray-100 relative">
         {book.cover ? (
           <img 
@@ -525,7 +420,7 @@ const Home = () => {
             }}
           />
         ) : (
-          <div className="bg-cyan-150 w-24 h-36 rounded shadow-md flex items-center justify-center">
+          <div className="bg-cyan-400 w-24 h-36 rounded shadow-md flex items-center justify-center">
             <span className="text-white font-bold">{book.title?.substring(0, 1)}</span>
           </div>
         )}
@@ -569,7 +464,7 @@ const Home = () => {
   
   // Component for featured book
   const FeaturedBook = ({ book }) => (
-    <div className="featured-book p-3 cursor-pointer" onClick={() => setSelectedBook(book)}>
+    <div className="featured-book p-3 cursor-pointer transform transition duration-300 hover:scale-105" onClick={() => setSelectedBook(book)}>
       {book.img ? (
         <img 
           src={book.img} 
@@ -581,7 +476,7 @@ const Home = () => {
           }}
         />
       ) : (
-        <div className="bg-Emerald-900 w-full h-40 rounded-lg shadow-md flex items-center justify-center">
+        <div className="bg-gradient-to-r from-blue-400 to-cyan-400 w-full h-40 rounded-lg shadow-md flex items-center justify-center">
           <span className="text-white font-bold text-lg">{book.name?.substring(0, 1)}</span>
         </div>
       )}
@@ -619,7 +514,7 @@ const Home = () => {
               }}
             />
           ) : (
-            <div className="bg-Orange-950 rounded-lg shadow-md w-32 h-48 flex items-center justify-center mr-4 flex-shrink-0">
+            <div className="bg-cyan-400 rounded-lg shadow-md w-32 h-48 flex items-center justify-center mr-4 flex-shrink-0">
               <div className="text-white text-center font-serif px-2">
                 <div className="text-xs tracking-wide">A COURT OF</div>
                 <div className="text-lg font-bold my-1">{book.displayTitle?.[0]}</div>
@@ -709,7 +604,7 @@ const Home = () => {
   
   return (
     <div className="book-store bg-gray-50 min-h-screen">
-      {/* Book Slide Section */}
+      {/* Hero Banner with Book Slide Section */}
       {loading.featured ? (
         <div className="p-8">
           <LoadingPlaceholder type="featured books" />
@@ -719,8 +614,8 @@ const Home = () => {
           <ErrorPlaceholder message={error.featured} type="featured books" />
         </div>
       ) : featuredBooks.length > 0 ? (
-        <div className="book-slide relative bg-white py-2">
-          <div className="slider-container overflow-hidden">
+        <div className="book-slide relative bg-gradient-to-b from-gray-100 to-white py-8 px-4">
+          <div className="slider-container overflow-hidden max-w-6xl mx-auto">
             <div className="flex transition-transform duration-500 ease-in-out" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
               {featuredBooks.map((book, index) => (
                 <div key={book.id} className="min-w-full">
@@ -748,6 +643,18 @@ const Home = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
+          
+          {/* Slide indicators */}
+          <div className="flex justify-center mt-6">
+            {featuredBooks.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index)}
+                className={`mx-1 w-2 h-2 rounded-full ${currentSlide === index ? 'bg-blue-500' : 'bg-gray-300'}`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
         </div>
       ) : (
         <div className="p-8 bg-white text-center text-gray-500">
@@ -755,99 +662,75 @@ const Home = () => {
         </div>
       )}
       
-      {/* Main Content */}
-      <div className="main-wrapper flex flex-col lg:flex-row max-w-7xl mx-auto px-4 py-6">
-        {/* Sidebar */}
-        <div className="books-of w-full lg:w-64 flex-shrink-0 lg:mr-6 mb-6 lg:mb-0">
-          {/* Featured Books Section */}
-          <div className="week bg-white rounded-lg shadow-sm p-4 mb-6">
-            <div className="featured-title font-medium mb-4">Featured Books</div>
-            {loading.booksOfWeek ? (
-              <LoadingPlaceholder type="featured books" />
-            ) : error.booksOfWeek ? (
-              <ErrorPlaceholder message={error.booksOfWeek} type="featured books" />
-            ) : booksOfWeek.length > 0 ? (
-              <div className="grid grid-cols-2 gap-3">
-                {booksOfWeek.map(book => (
-                  <FeaturedBook key={book.id} book={book} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center text-gray-500 py-4">
-                No books of the year available
-              </div>
-            )}
-            {booksOfYear.length > 4 && (
-              <div className="overlay absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent"></div>
-            )}
-          </div>
+      {/* Featured Books Row */}
+      <div className="featured-books-row bg-white py-8">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-xl font-bold mb-6 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+            </svg>
+            Featured Books of the Week
+          </h2>
           
-          {/* Image Debugger - add this for troubleshooting */}
-          <div className="mb-6">
-            <ImageDebugger />
-          </div>
+          {loading.booksOfWeek ? (
+            <LoadingPlaceholder type="featured books" />
+          ) : error.booksOfWeek ? (
+            <ErrorPlaceholder message={error.booksOfWeek} type="featured books" />
+          ) : booksOfWeek.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {booksOfWeek.map(book => (
+                <FeaturedBook key={book.id} book={book} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-500 py-4">
+              No books of the week available
+            </div>
+          )}
+        </div>
+      </div>
+      
+      {/* Main Content */}
+      <div className="main-wrapper max-w-6xl mx-auto px-4 py-8">
+        <h2 className="text-xl font-bold mb-6 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+          Books by Genre
+        </h2>
+        
+        {/* Categories Tabs */}
+        <div className="mb-6 bg-white rounded-lg shadow-sm p-4">
+          {loading.categories ? (
+            <div className="flex space-x-4 overflow-x-auto">
+              {[1, 2, 3, 4, 5].map(i => (
+                <div key={i} className="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex space-x-4 overflow-x-auto pb-2">
+              {categories.map(category => (
+                <button
+                  key={category.id}
+                  className={`px-4 py-2 rounded-full whitespace-nowrap transition-colors ${
+                    activeCategory === category.name
+                      ? 'bg-blue-100 text-blue-700 font-medium'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                  onClick={() => setActiveCategory(category.name)}
+                >
+                  {category.name}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         
-        {/* Popular Books */}
-        <div className="popular-books flex-grow bg-white rounded-lg shadow-sm p-6">
-          <div className="main-menu flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-gray-200 mb-6">
-            <div className="genre font-medium mb-3 sm:mb-0">Popular by Genre</div>
-            
-            {/* Desktop Categories */}
-            {loading.categories ? (
-              <div className="hidden md:block">
-                <div className="animate-pulse h-6 w-36 bg-gray-200 rounded"></div>
-              </div>
-            ) : error.categories ? (
-              <div className="hidden md:block text-sm text-red-500">Error loading categories</div>
-            ) : (
-              <div className="book-types hidden md:flex space-x-6 overflow-x-auto no-scrollbar">
-                {categories.length > 0 ? (
-                  categories.map(category => (
-                    <button
-                      key={category.id}
-                      className={`book-type text-sm relative whitespace-nowrap ${activeCategory === category.name ? 'font-medium text-blue-500' : 'text-gray-500'}`}
-                      onClick={() => setActiveCategory(category.name)}
-                    >
-                      {category.name}
-                      {activeCategory === category.name && (
-                        <span className="absolute bottom-[-17px] left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-blue-400 shadow-md"></span>
-                      )}
-                    </button>
-                  ))
-                ) : (
-                  <div className="text-sm text-gray-400">No categories available</div>
-                )}
-              </div>
-            )}
-            
-            {/* Mobile Category Dropdown */}
-            {loading.categories ? (
-              <div className="md:hidden w-full sm:w-auto">
-                <div className="animate-pulse h-10 w-full bg-gray-200 rounded"></div>
-              </div>
-            ) : error.categories ? (
-              <div className="md:hidden w-full sm:w-auto text-sm text-red-500">Error loading categories</div>
-            ) : (
-              <div className="md:hidden w-full sm:w-auto">
-                <select 
-                  className="form-select w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  value={activeCategory}
-                  onChange={(e) => setActiveCategory(e.target.value)}
-                >
-                  {categories.length > 0 ? (
-                    categories.map(category => (
-                      <option key={category.id} value={category.name}>
-                        {category.name}
-                      </option>
-                    ))
-                  ) : (
-                    <option>No categories available</option>
-                  )}
-                </select>
-              </div>
-            )}
-          </div>
+        {/* Popular Books Grid */}
+        <div className="popular-books bg-white rounded-lg shadow-sm p-6">
+          <h3 className="font-medium text-lg mb-6">
+            {activeCategory === 'All Genres' ? 'Popular Books' : `Popular in ${activeCategory}`}
+          </h3>
           
           {/* Book Cards */}
           {loading.popular ? (
@@ -864,12 +747,6 @@ const Home = () => {
                         <div className="h-3 bg-gray-200 rounded animate-pulse w-full"></div>
                         <div className="h-3 bg-gray-200 rounded animate-pulse w-4/5"></div>
                       </div>
-                    </div>
-                  </div>
-                  <div className="p-3">
-                    <div className="flex items-center">
-                      <div className="h-7 w-7 bg-gray-200 rounded-full animate-pulse"></div>
-                      <div className="h-3 bg-gray-200 rounded animate-pulse ml-3 w-24"></div>
                     </div>
                   </div>
                 </div>
