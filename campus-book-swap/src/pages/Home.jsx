@@ -844,7 +844,7 @@ const Home = () => {
         major: "Biology",
         year: "Sophomore",
         text: "The borrowing feature is perfect for those one-time courses. I borrowed three lab manuals last term and saved a ton of money on books I would have only used once.",
-        avatar: "https://randomuser.me/api/portraits/women/68.jpg"
+        avatar: ""
       }
     ];
     
