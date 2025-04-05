@@ -836,7 +836,7 @@ const Home = () => {
         major: "Business Administration",
         year: "Senior",
         text: "As a senior, I had a lot of books collecting dust. I've sold 12 books so far and made enough to cover my coffee budget for the entire semester!",
-        avatar: "https://randomuser.me/api/portraits/men/32.jpg"
+        avatar: ""
       },
       {
         id: 3,
