@@ -2,6 +2,169 @@ import { useState, useEffect } from 'react';
 import { bookAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 
+    const CampusStatsSection = () => {
+      return (
+        <div className="py-10 px-4 bg-blue-600 text-white">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-2xl font-bold mb-8 text-center">Campus BookSwap Stats</h2>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+              <div className="stat-card">
+                <div className="text-3xl md:text-4xl font-bold mb-2">1,200+</div>
+                <div className="text-blue-100">Active Books</div>
+              </div>
+              <div className="stat-card">
+                <div className="text-3xl md:text-4xl font-bold mb-2">$14,500</div>
+                <div className="text-blue-100">Student Savings</div>
+              </div>
+              <div className="stat-card">
+                <div className="text-3xl md:text-4xl font-bold mb-2">520</div>
+                <div className="text-blue-100">Completed Swaps</div>
+              </div>
+              <div className="stat-card">
+                <div className="text-3xl md:text-4xl font-bold mb-2">345</div>
+                <div className="text-blue-100">Active Borrowers</div>
+              </div>
+            </div>
+            
+            <div className="mt-10 text-center">
+              <p className="text-lg mb-6 max-w-xl mx-auto text-blue-100">
+                Join thousands of students saving money by swapping, borrowing, and buying books directly from other students.
+              </p>
+              <button className="px-6 py-3 bg-white text-blue-700 rounded-full font-medium hover:bg-blue-50 transition-colors shadow-md">
+                Join CampusBookSwap Today
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    const PopularCategoriesSection = () => {
+      const popularCategories = [
+        { name: 'Computer Science', icon: 'laptop-code', bookCount: 284, color: 'bg-blue-100 text-blue-600' },
+        { name: 'Business', icon: 'briefcase', bookCount: 205, color: 'bg-yellow-100 text-yellow-600' },
+        { name: 'Mathematics', icon: 'square-root-alt', bookCount: 176, color: 'bg-purple-100 text-purple-600' },
+        { name: 'Engineering', icon: 'tools', bookCount: 153, color: 'bg-red-100 text-red-600' },
+        { name: 'Biology', icon: 'dna', bookCount: 142, color: 'bg-green-100 text-green-600' },
+        { name: 'Psychology', icon: 'brain', bookCount: 124, color: 'bg-indigo-100 text-indigo-600' },
+        { name: 'Literature', icon: 'book-open', bookCount: 115, color: 'bg-pink-100 text-pink-600' },
+        { name: 'Chemistry', icon: 'flask', bookCount: 98, color: 'bg-teal-100 text-teal-600' }
+      ];
+      
+      // Helper function to render FA-like icons (simplified, you'd use real icons in production)
+      const renderIcon = (icon) => {
+        return (
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+        );
+      };
+      
+      return (
+        <div className="py-10 px-4 bg-gray-50">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-gray-800">Popular Course Categories</h2>
+              <a href="#" className="text-blue-600 text-sm font-medium hover:text-blue-800">
+                View All Categories →
+              </a>
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {popularCategories.map(category => (
+                <div key={category.name} className="category-card bg-white rounded-xl p-4 shadow-sm transition-all hover:shadow-md cursor-pointer">
+                  <div className="flex items-center mb-3">
+                    <div className={`rounded-full p-2 ${category.color}`}>
+                      {renderIcon(category.icon)}
+                    </div>
+                    <h3 className="font-medium ml-3 text-gray-800">{category.name}</h3>
+                  </div>
+                  <p className="text-sm text-gray-500">{category.bookCount} books available</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    };
+    const TestimonialsSection = () => {
+      const testimonials = [
+        {
+          id: 1,
+          name: "Sarah Johnson",
+          major: "Computer Science",
+          year: "Junior",
+          text: "I saved over $300 last semester by swapping and borrowing textbooks on CampusBookSwap. The platform is super easy to use and I've met some great people from my major!",
+          avatar: "https://randomuser.me/api/portraits/women/44.jpg"
+        },
+        {
+          id: 2,
+          name: "Michael Chen",
+          major: "Business Administration",
+          year: "Senior",
+          text: "As a senior, I had a lot of books collecting dust. I've sold 12 books so far and made enough to cover my coffee budget for the entire semester!",
+          avatar: "https://randomuser.me/api/portraits/men/32.jpg"
+        },
+        {
+          id: 3,
+          name: "Leila Patel",
+          major: "Biology",
+          year: "Sophomore",
+          text: "The borrowing feature is perfect for those one-time courses. I borrowed three lab manuals last term and saved a ton of money on books I would have only used once.",
+          avatar: "https://randomuser.me/api/portraits/women/68.jpg"
+        }
+      ];
+      
+      return (
+        <div className="py-12 px-4 bg-white">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-2xl font-bold mb-2 text-center text-gray-800">What Students Are Saying</h2>
+            <p className="text-gray-600 text-center mb-10 max-w-2xl mx-auto">
+              Join thousands of satisfied students who are saving money and helping each other succeed.
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {testimonials.map(testimonial => (
+                <div key={testimonial.id} className="bg-gray-50 rounded-xl p-6 shadow-sm relative">
+                  {/* Quote mark decorative element */}
+                  <div className="absolute top-4 right-4 text-5xl text-gray-200 font-serif">"</div>
+                  
+                  <p className="text-gray-700 mb-6 relative z-10">
+                    "{testimonial.text}"
+                  </p>
+                  
+                  <div className="flex items-center">
+                    <img 
+                      src={testimonial.avatar} 
+                      alt={testimonial.name}
+                      className="w-12 h-12 rounded-full mr-4 object-cover border-2 border-white shadow-sm"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://via.placeholder.com/150';
+                      }}
+                    />
+                    <div>
+                      <h4 className="font-medium text-gray-800">{testimonial.name}</h4>
+                      <p className="text-sm text-gray-500">{testimonial.major}, {testimonial.year}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div className="mt-10 text-center">
+              <button className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+                Share Your Experience
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    };
 const Home = () => {
   // Auth hook must be called at the top level of your function component
   const { isAuthenticated } = useAuth();
@@ -281,13 +444,13 @@ const Home = () => {
 
   // Auto slide effect for featured books
   useEffect(() => {
-    if (featuredBooks.length === 0) return;
+    if (featuredBooks.length === 0 || selectedBook) return;
     
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev === featuredBooks.length - 1 ? 0 : prev + 1));
     }, 5000);
     return () => clearInterval(interval);
-  }, [featuredBooks.length]);
+  }, [featuredBooks.length, selectedBook]);
 
   // Helper function to map Strapi data structure to component data structure
   const mapBooksData = (books) => {
@@ -622,7 +785,7 @@ const Home = () => {
     return (
       <div className="py-10 px-4 bg-blue-600 text-white">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl font-bold mb-8 text-center">Campus BookSwap Stats</h2>
+          <h2 className="text-2xl font-bold mb-8 text-center">CampusBookSwap Stats</h2>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div className="stat-card">
@@ -648,7 +811,7 @@ const Home = () => {
               Join thousands of students saving money by swapping, borrowing, and buying books directly from other students.
             </p>
             <button className="px-6 py-3 bg-white text-blue-700 rounded-full font-medium hover:bg-blue-50 transition-colors shadow-md">
-              Join BookSwap Today
+              Join CampusBookSwap Today
             </button>
           </div>
         </div>
@@ -1021,171 +1184,7 @@ const BookCard = ({ book }) => {
         primary: 'Borrow Now',
         secondary: 'Reserve'
       }
-    };
-    const CampusStatsSection = () => {
-      return (
-        <div className="py-10 px-4 bg-blue-600 text-white">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-2xl font-bold mb-8 text-center">Campus BookSwap Stats</h2>
-            
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-              <div className="stat-card">
-                <div className="text-3xl md:text-4xl font-bold mb-2">1,200+</div>
-                <div className="text-blue-100">Active Books</div>
-              </div>
-              <div className="stat-card">
-                <div className="text-3xl md:text-4xl font-bold mb-2">$14,500</div>
-                <div className="text-blue-100">Student Savings</div>
-              </div>
-              <div className="stat-card">
-                <div className="text-3xl md:text-4xl font-bold mb-2">520</div>
-                <div className="text-blue-100">Completed Swaps</div>
-              </div>
-              <div className="stat-card">
-                <div className="text-3xl md:text-4xl font-bold mb-2">345</div>
-                <div className="text-blue-100">Active Borrowers</div>
-              </div>
-            </div>
-            
-            <div className="mt-10 text-center">
-              <p className="text-lg mb-6 max-w-xl mx-auto text-blue-100">
-                Join thousands of students saving money by swapping, borrowing, and buying books directly from other students.
-              </p>
-              <button className="px-6 py-3 bg-white text-blue-700 rounded-full font-medium hover:bg-blue-50 transition-colors shadow-md">
-                Join BookSwap Today
-              </button>
-            </div>
-          </div>
-        </div>
-      );
-    };
-
-    const PopularCategoriesSection = () => {
-      const popularCategories = [
-        { name: 'Computer Science', icon: 'laptop-code', bookCount: 284, color: 'bg-blue-100 text-blue-600' },
-        { name: 'Business', icon: 'briefcase', bookCount: 205, color: 'bg-yellow-100 text-yellow-600' },
-        { name: 'Mathematics', icon: 'square-root-alt', bookCount: 176, color: 'bg-purple-100 text-purple-600' },
-        { name: 'Engineering', icon: 'tools', bookCount: 153, color: 'bg-red-100 text-red-600' },
-        { name: 'Biology', icon: 'dna', bookCount: 142, color: 'bg-green-100 text-green-600' },
-        { name: 'Psychology', icon: 'brain', bookCount: 124, color: 'bg-indigo-100 text-indigo-600' },
-        { name: 'Literature', icon: 'book-open', bookCount: 115, color: 'bg-pink-100 text-pink-600' },
-        { name: 'Chemistry', icon: 'flask', bookCount: 98, color: 'bg-teal-100 text-teal-600' }
-      ];
-      
-      // Helper function to render FA-like icons (simplified, you'd use real icons in production)
-      const renderIcon = (icon) => {
-        return (
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-          </svg>
-        );
-      };
-      
-      return (
-        <div className="py-10 px-4 bg-gray-50">
-          <div className="max-w-6xl mx-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-gray-800">Popular Course Categories</h2>
-              <a href="#" className="text-blue-600 text-sm font-medium hover:text-blue-800">
-                View All Categories →
-              </a>
-            </div>
-            
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {popularCategories.map(category => (
-                <div key={category.name} className="category-card bg-white rounded-xl p-4 shadow-sm transition-all hover:shadow-md cursor-pointer">
-                  <div className="flex items-center mb-3">
-                    <div className={`rounded-full p-2 ${category.color}`}>
-                      {renderIcon(category.icon)}
-                    </div>
-                    <h3 className="font-medium ml-3 text-gray-800">{category.name}</h3>
-                  </div>
-                  <p className="text-sm text-gray-500">{category.bookCount} books available</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      );
-    };
-    const TestimonialsSection = () => {
-      const testimonials = [
-        {
-          id: 1,
-          name: "Sarah Johnson",
-          major: "Computer Science",
-          year: "Junior",
-          text: "I saved over $300 last semester by swapping and borrowing textbooks on BookSwap. The platform is super easy to use and I've met some great people from my major!",
-          avatar: "https://randomuser.me/api/portraits/women/44.jpg"
-        },
-        {
-          id: 2,
-          name: "Michael Chen",
-          major: "Business Administration",
-          year: "Senior",
-          text: "As a senior, I had a lot of books collecting dust. I've sold 12 books so far and made enough to cover my coffee budget for the entire semester!",
-          avatar: "https://randomuser.me/api/portraits/men/32.jpg"
-        },
-        {
-          id: 3,
-          name: "Leila Patel",
-          major: "Biology",
-          year: "Sophomore",
-          text: "The borrowing feature is perfect for those one-time courses. I borrowed three lab manuals last term and saved a ton of money on books I would have only used once.",
-          avatar: "https://randomuser.me/api/portraits/women/68.jpg"
-        }
-      ];
-      
-      return (
-        <div className="py-12 px-4 bg-white">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-2xl font-bold mb-2 text-center text-gray-800">What Students Are Saying</h2>
-            <p className="text-gray-600 text-center mb-10 max-w-2xl mx-auto">
-              Join thousands of satisfied students who are saving money and helping each other succeed.
-            </p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {testimonials.map(testimonial => (
-                <div key={testimonial.id} className="bg-gray-50 rounded-xl p-6 shadow-sm relative">
-                  {/* Quote mark decorative element */}
-                  <div className="absolute top-4 right-4 text-5xl text-gray-200 font-serif">"</div>
-                  
-                  <p className="text-gray-700 mb-6 relative z-10">
-                    "{testimonial.text}"
-                  </p>
-                  
-                  <div className="flex items-center">
-                    <img 
-                      src={testimonial.avatar} 
-                      alt={testimonial.name}
-                      className="w-12 h-12 rounded-full mr-4 object-cover border-2 border-white shadow-sm"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = 'https://via.placeholder.com/150';
-                      }}
-                    />
-                    <div>
-                      <h4 className="font-medium text-gray-800">{testimonial.name}</h4>
-                      <p className="text-sm text-gray-500">{testimonial.major}, {testimonial.year}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            
-            <div className="mt-10 text-center">
-              <button className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                </svg>
-                Share Your Experience
-              </button>
-            </div>
-          </div>
-        </div>
-      );
-    };
-    
+    };    
     return (
       <div 
         className="fixed inset-0 bg-transparent backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all duration-300"
