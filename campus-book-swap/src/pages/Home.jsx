@@ -553,68 +553,209 @@ const Home = () => {
   };
 
   // Add this after the hero section in Home.jsx
-const ActionHeader = () => {
-  return (
-    <div className="bg-white shadow-md rounded-xl mx-4 -mt-6 relative z-20 mb-8">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="flex flex-col md:flex-row items-center justify-between py-4">
-          <div className="flex flex-wrap justify-center gap-4 w-full md:w-auto">
-            <div className="action-card p-4 bg-blue-50 rounded-lg flex items-center w-full sm:w-40 transition-all hover:bg-blue-100">
-              <div className="rounded-full bg-blue-100 p-3 mr-3">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                </svg>
+  const ActionHeader = () => {
+    return (
+      <div className="bg-white shadow-md rounded-xl mx-4 -mt-6 relative z-20 mb-8">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="flex flex-col md:flex-row items-center justify-between py-4">
+            <div className="flex flex-wrap justify-center gap-4 w-full md:w-auto">
+              <div className="action-card p-4 bg-blue-50 rounded-lg flex items-center w-full sm:w-40 transition-all hover:bg-blue-100">
+                <div className="rounded-full bg-blue-100 p-3 mr-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-800">Swap</h3>
+                  <p className="text-xs text-gray-500">Exchange books</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold text-gray-800">Swap</h3>
-                <p className="text-xs text-gray-500">Exchange books</p>
+              
+              <div className="action-card p-4 bg-green-50 rounded-lg flex items-center w-full sm:w-40 transition-all hover:bg-green-100">
+                <div className="rounded-full bg-green-100 p-3 mr-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-800">Sell</h3>
+                  <p className="text-xs text-gray-500">Sell your books</p>
+                </div>
+              </div>
+              
+              <div className="action-card p-4 bg-purple-50 rounded-lg flex items-center w-full sm:w-40 transition-all hover:bg-purple-100">
+                <div className="rounded-full bg-purple-100 p-3 mr-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-800">Borrow</h3>
+                  <p className="text-xs text-gray-500">Borrow books</p>
+                </div>
               </div>
             </div>
             
-            <div className="action-card p-4 bg-green-50 rounded-lg flex items-center w-full sm:w-40 transition-all hover:bg-green-100">
-              <div className="rounded-full bg-green-100 p-3 mr-3">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-800">Sell</h3>
-                <p className="text-xs text-gray-500">Sell your books</p>
-              </div>
-            </div>
-            
-            <div className="action-card p-4 bg-purple-50 rounded-lg flex items-center w-full sm:w-40 transition-all hover:bg-purple-100">
-              <div className="rounded-full bg-purple-100 p-3 mr-3">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
-                </svg>
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-800">Borrow</h3>
-                <p className="text-xs text-gray-500">Borrow books</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="mt-4 md:mt-0">
-            <div className="relative">
-              <input 
-                type="text" 
-                placeholder="Search by course, book title, or ISBN..." 
-                className="px-4 py-2 pl-10 pr-4 rounded-full bg-gray-100 border border-gray-200 w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              <div className="absolute left-3 top-2.5 text-gray-400">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
+            <div className="mt-4 md:mt-0">
+              <div className="relative">
+                <input 
+                  type="text" 
+                  placeholder="Search by course, book title, or ISBN..." 
+                  className="px-4 py-2 pl-10 pr-4 rounded-full bg-gray-100 border border-gray-200 w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <div className="absolute left-3 top-2.5 text-gray-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
+  
+  
+  // Campus Stats Component
+  const CampusStatsSection = () => {
+    return (
+      <div className="py-10 px-4 bg-blue-600 text-white">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-2xl font-bold mb-8 text-center">Campus BookSwap Stats</h2>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div className="stat-card">
+              <div className="text-3xl md:text-4xl font-bold mb-2">1,200+</div>
+              <div className="text-blue-100">Active Books</div>
+            </div>
+            <div className="stat-card">
+              <div className="text-3xl md:text-4xl font-bold mb-2">$14,500</div>
+              <div className="text-blue-100">Student Savings</div>
+            </div>
+            <div className="stat-card">
+              <div className="text-3xl md:text-4xl font-bold mb-2">520</div>
+              <div className="text-blue-100">Completed Swaps</div>
+            </div>
+            <div className="stat-card">
+              <div className="text-3xl md:text-4xl font-bold mb-2">345</div>
+              <div className="text-blue-100">Active Borrowers</div>
+            </div>
+          </div>
+          
+          <div className="mt-10 text-center">
+            <p className="text-lg mb-6 max-w-xl mx-auto text-blue-100">
+              Join thousands of students saving money by swapping, borrowing, and buying books directly from other students.
+            </p>
+            <button className="px-6 py-3 bg-white text-blue-700 rounded-full font-medium hover:bg-blue-50 transition-colors shadow-md">
+              Join BookSwap Today
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+  
+  // Testimonials Component
+  const TestimonialsSection = () => {
+    const testimonials = [
+      {
+        id: 1,
+        name: "Sarah Johnson",
+        major: "Computer Science",
+        year: "Junior",
+        text: "I saved over $300 last semester by swapping and borrowing textbooks on BookSwap. The platform is super easy to use and I've met some great people from my major!",
+        avatar: "https://randomuser.me/api/portraits/women/44.jpg"
+      },
+      {
+        id: 2,
+        name: "Michael Chen",
+        major: "Business Administration",
+        year: "Senior",
+        text: "As a senior, I had a lot of books collecting dust. I've sold 12 books so far and made enough to cover my coffee budget for the entire semester!",
+        avatar: "https://randomuser.me/api/portraits/men/32.jpg"
+      },
+      {
+        id: 3,
+        name: "Leila Patel",
+        major: "Biology",
+        year: "Sophomore",
+        text: "The borrowing feature is perfect for those one-time courses. I borrowed three lab manuals last term and saved a ton of money on books I would have only used once.",
+        avatar: "https://randomuser.me/api/portraits/women/68.jpg"
+      }
+    ];
+    
+    return (
+      <div className="py-12 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-2xl font-bold mb-2 text-center text-gray-800">What Students Are Saying</h2>
+          <p className="text-gray-600 text-center mb-10 max-w-2xl mx-auto">
+            Join thousands of satisfied students who are saving money and helping each other succeed.
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {testimonials.map(testimonial => (
+              <div key={testimonial.id} className="bg-gray-50 rounded-xl p-6 shadow-sm relative">
+                {/* Quote mark decorative element */}
+                <div className="absolute top-4 right-4 text-5xl text-gray-200 font-serif">"</div>
+                
+                <p className="text-gray-700 mb-6 relative z-10">
+                  "{testimonial.text}"
+                </p>
+                
+                <div className="flex items-center">
+                  <img 
+                    src={testimonial.avatar} 
+                    alt={testimonial.name}
+                    className="w-12 h-12 rounded-full mr-4 object-cover border-2 border-white shadow-sm"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://via.placeholder.com/150';
+                    }}
+                  />
+                  <div>
+                    <h4 className="font-medium text-gray-800">{testimonial.name}</h4>
+                    <p className="text-sm text-gray-500">{testimonial.major}, {testimonial.year}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <div className="mt-10 text-center">
+            <button className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+              Share Your Experience
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+  
+  // Helper function for time ago display
+  const getTimeAgo = (date) => {
+    const seconds = Math.floor((new Date() - date) / 1000);
+    
+    let interval = seconds / 31536000;
+    if (interval > 1) return Math.floor(interval) + " years ago";
+    
+    interval = seconds / 2592000;
+    if (interval > 1) return Math.floor(interval) + " months ago";
+    
+    interval = seconds / 86400;
+    if (interval > 1) return Math.floor(interval) + " days ago";
+    
+    interval = seconds / 3600;
+    if (interval > 1) return Math.floor(interval) + " hours ago";
+    
+    interval = seconds / 60;
+    if (interval > 1) return Math.floor(interval) + " minutes ago";
+    
+    return Math.floor(seconds) + " seconds ago";
+  };
 
   // COMPONENT: Featured Book component
   const FeaturedBook = ({ book }) => (
@@ -825,27 +966,6 @@ const BookCard = ({ book }) => {
   );
 };
 
-// Helper function to format dates as time ago
-const getTimeAgo = (date) => {
-  const seconds = Math.floor((new Date() - date) / 1000);
-  
-  let interval = seconds / 31536000;
-  if (interval > 1) return Math.floor(interval) + " years ago";
-  
-  interval = seconds / 2592000;
-  if (interval > 1) return Math.floor(interval) + " months ago";
-  
-  interval = seconds / 86400;
-  if (interval > 1) return Math.floor(interval) + " days ago";
-  
-  interval = seconds / 3600;
-  if (interval > 1) return Math.floor(interval) + " hours ago";
-  
-  interval = seconds / 60;
-  if (interval > 1) return Math.floor(interval) + " minutes ago";
-  
-  return Math.floor(seconds) + " seconds ago";
-};
 
   // COMPONENT: Book Detail Modal
   const BookDetails = ({ book, onClose }) => {
