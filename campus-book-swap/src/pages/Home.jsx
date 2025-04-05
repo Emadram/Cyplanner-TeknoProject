@@ -664,9 +664,9 @@ const Home = () => {
     </div>
   );
 
-  // COMPONENT: Book Detail Modal
-  const BookDetails = ({ book, onClose }) => (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm transition-all duration-300">
+// COMPONENT: Book Detail Modal
+const BookDetails = ({ book, onClose }) => (
+  <div className="fixed inset-0 bg-transparent backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all duration-300">
       <div className="bg-white rounded-xl max-w-lg w-full p-0 max-h-[90vh] overflow-hidden shadow-2xl animate-fadeIn">
         {/* Header with book title and close button */}
         <div className="p-6 border-b border-gray-100">
