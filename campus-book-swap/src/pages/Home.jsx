@@ -902,6 +902,43 @@ const getTimeAgo = (date) => {
         secondary: 'Reserve'
       }
     };
+    const CampusStatsSection = () => {
+      return (
+        <div className="py-10 px-4 bg-blue-600 text-white">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-2xl font-bold mb-8 text-center">Campus BookSwap Stats</h2>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+              <div className="stat-card">
+                <div className="text-3xl md:text-4xl font-bold mb-2">1,200+</div>
+                <div className="text-blue-100">Active Books</div>
+              </div>
+              <div className="stat-card">
+                <div className="text-3xl md:text-4xl font-bold mb-2">$14,500</div>
+                <div className="text-blue-100">Student Savings</div>
+              </div>
+              <div className="stat-card">
+                <div className="text-3xl md:text-4xl font-bold mb-2">520</div>
+                <div className="text-blue-100">Completed Swaps</div>
+              </div>
+              <div className="stat-card">
+                <div className="text-3xl md:text-4xl font-bold mb-2">345</div>
+                <div className="text-blue-100">Active Borrowers</div>
+              </div>
+            </div>
+            
+            <div className="mt-10 text-center">
+              <p className="text-lg mb-6 max-w-xl mx-auto text-blue-100">
+                Join thousands of students saving money by swapping, borrowing, and buying books directly from other students.
+              </p>
+              <button className="px-6 py-3 bg-white text-blue-700 rounded-full font-medium hover:bg-blue-50 transition-colors shadow-md">
+                Join BookSwap Today
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    };
     
     return (
       <div 
