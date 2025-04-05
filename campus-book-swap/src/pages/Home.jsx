@@ -525,7 +525,7 @@ const Home = () => {
             }}
           />
         ) : (
-          <div className="bg-cyan-400 w-24 h-36 rounded shadow-md flex items-center justify-center">
+          <div className="bg-cyan-150 w-24 h-36 rounded shadow-md flex items-center justify-center">
             <span className="text-white font-bold">{book.title?.substring(0, 1)}</span>
           </div>
         )}
