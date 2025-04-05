@@ -619,7 +619,7 @@ const Home = () => {
               }}
             />
           ) : (
-            <div className="bg-Amber-950 rounded-lg shadow-md w-32 h-48 flex items-center justify-center mr-4 flex-shrink-0">
+            <div className="bg-Orange-950 rounded-lg shadow-md w-32 h-48 flex items-center justify-center mr-4 flex-shrink-0">
               <div className="text-white text-center font-serif px-2">
                 <div className="text-xs tracking-wide">A COURT OF</div>
                 <div className="text-lg font-bold my-1">{book.displayTitle?.[0]}</div>
