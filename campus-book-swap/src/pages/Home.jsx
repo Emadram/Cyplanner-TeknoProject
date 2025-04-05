@@ -375,16 +375,17 @@ const Home = () => {
 
   // COMPONENT: Hero Section with Featured Book
 // COMPONENT: Hero Section with Featured Book
+// COMPONENT: Hero Section with Centered Information
 const HeroSection = () => {
   // Skip if no featured books or loading
   if (loading.featured) {
     return (
       <div className="relative py-12 px-4 bg-gradient-to-br from-blue-600 to-indigo-800 text-white rounded-3xl mx-4 my-4">
         <div className="max-w-6xl mx-auto">
-          <div className="animate-pulse">
-            <div className="h-8 bg-white/30 rounded w-1/4 mb-6"></div>
-            <div className="h-4 bg-white/20 rounded w-3/4 mb-8"></div>
-            <div className="h-64 bg-white/10 rounded-xl"></div>
+          <div className="animate-pulse text-center">
+            <div className="h-8 bg-white/30 rounded w-1/4 mb-6 mx-auto"></div>
+            <div className="h-4 bg-white/20 rounded w-3/4 mb-8 mx-auto"></div>
+            <div className="h-64 bg-white/10 rounded-xl max-w-md mx-auto"></div>
           </div>
         </div>
       </div>
@@ -460,16 +461,49 @@ const HeroSection = () => {
       </button>
       
       <div className="max-w-6xl mx-auto relative z-10">
-        <div className="flex flex-col md:flex-row items-center animate-slideInRight">
-          <div className="md:w-1/2 mb-8 md:mb-0">
-            <div className="inline-block px-3 py-1 rounded-full bg-blue-400 bg-opacity-30 text-blue-100 font-medium text-sm mb-4">
-              Featured Book
+        <div className="flex flex-col items-center text-center animate-slideInRight">
+          {/* Featured tag & title centered */}
+          <div className="inline-block px-3 py-1 rounded-full bg-blue-400 bg-opacity-30 text-blue-100 font-medium text-sm mb-4">
+            Featured Book
+          </div>
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">{book.title}</h1>
+          <p className="text-blue-100 mb-6 text-lg">by {book.author}</p>
+          
+          {/* Book cover with increased roundness - centered */}
+          <div className="relative mb-8">
+            <div className="transform rotate-[-6deg] transition-transform duration-500 hover:rotate-0">
+              {book.cover ? (
+                <img 
+                  src={book.cover} 
+                  alt={book.title} 
+                  className="w-56 h-80 object-cover rounded-3xl shadow-2xl" 
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'https://via.placeholder.com/224x320';
+                  }}
+                />
+              ) : (
+                <div className="w-56 h-80 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-3xl shadow-2xl flex items-center justify-center">
+                  <div className="text-white text-center font-serif px-6">
+                    <div className="text-sm tracking-wide">A COURT OF</div>
+                    <div className="text-2xl mt-2 mb-3 font-bold">{book.displayTitle?.[0]}</div>
+                    <div className="text-sm tracking-wide">AND</div>
+                    <div className="text-2xl mt-2 mb-3 font-bold">{book.displayTitle?.[1]}</div>
+                    <div className="text-xs tracking-wider mt-4">{book.author?.toUpperCase()}</div>
+                  </div>
+                </div>
+              )}
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">{book.title}</h1>
-            <p className="text-blue-100 mb-6 text-lg">by {book.author}</p>
+            
+            {/* Decorative element also rounded */}
+            <div className="absolute -bottom-4 -right-4 w-56 h-80 border-2 border-blue-300 rounded-3xl"></div>
+          </div>
+          
+          {/* Description and review stats */}
+          <div className="max-w-lg mx-auto">
             <p className="text-blue-200 mb-6 line-clamp-3">{book.summary}</p>
             
-            <div className="flex items-center mb-6">
+            <div className="flex items-center justify-center mb-6">
               <div className="flex mr-4">
                 {[1, 2, 3, 4, 5].map(star => (
                   <span key={star} className={star <= Math.floor(book.rating || 0) ? "text-yellow-300" : "text-blue-300"}>★</span>
@@ -484,38 +518,6 @@ const HeroSection = () => {
             >
               View Details
             </button>
-          </div>
-          
-          <div className="md:w-1/2 flex justify-center">
-            <div className="relative">
-              {/* Book cover with increased roundness */}
-              <div className="transform rotate-[-6deg] transition-transform duration-500 hover:rotate-0">
-                {book.cover ? (
-                  <img 
-                    src={book.cover} 
-                    alt={book.title} 
-                    className="w-56 h-80 object-cover rounded-3xl shadow-2xl" 
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = 'https://via.placeholder.com/224x320';
-                    }}
-                  />
-                ) : (
-                  <div className="w-56 h-80 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-3xl shadow-2xl flex items-center justify-center">
-                    <div className="text-white text-center font-serif px-6">
-                      <div className="text-sm tracking-wide">A COURT OF</div>
-                      <div className="text-2xl mt-2 mb-3 font-bold">{book.displayTitle?.[0]}</div>
-                      <div className="text-sm tracking-wide">AND</div>
-                      <div className="text-2xl mt-2 mb-3 font-bold">{book.displayTitle?.[1]}</div>
-                      <div className="text-xs tracking-wider mt-4">{book.author?.toUpperCase()}</div>
-                    </div>
-                  </div>
-                )}
-              </div>
-              
-              {/* Decorative element also rounded */}
-              <div className="absolute -bottom-4 -right-4 w-56 h-80 border-2 border-blue-300 rounded-3xl"></div>
-            </div>
           </div>
         </div>
         
