@@ -11,7 +11,7 @@ const Navbar = () => {
           {/* Logo and App Name */}
           <div className="flex items-center">
             <Link to="/" className="font-serif text-xl font-bold text-gray-800">
-              BookSwap
+              CampusBookSwap
             </Link>
           </div>
           
