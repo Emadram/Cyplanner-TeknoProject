@@ -1,6 +1,26 @@
 import { useState, useEffect } from 'react';
 import { bookAPI } from '../services/api';
 
+// Add scrollbar hiding and animations
+const scrollbarHideStyle = `
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .animate-fadeIn {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+`;
+
 const Home = () => {
   // State variables for data
   const [activeCategory, setActiveCategory] = useState('All Genres');
@@ -49,7 +69,7 @@ const Home = () => {
         return `${baseUrl}${path}`;
       }
       
-      // Case 2: Plain array - your specific case
+      // Case 2: Plain array 
       if (Array.isArray(imageData) && imageData.length > 0) {
         const firstImage = imageData[0];
         // If the array item has a formats property
@@ -246,6 +266,16 @@ const Home = () => {
     fetchBooksByCategory();
   }, [activeCategory, categories]);
 
+  // Auto slide effect for featured books
+  useEffect(() => {
+    if (featuredBooks.length === 0) return;
+    
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev === featuredBooks.length - 1 ? 0 : prev + 1));
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [featuredBooks.length]);
+
   // Helper function to map Strapi data structure to component data structure
   const mapBooksData = (books) => {
     if (!books || !Array.isArray(books)) {
@@ -343,108 +373,280 @@ const Home = () => {
     }).filter(Boolean); // Remove any null entries
   };
 
-  // Carousel functions
-  const nextSlide = () => {
-    if (featuredBooks.length === 0) return;
-    setCurrentSlide((prev) => (prev === featuredBooks.length - 1 ? 0 : prev + 1));
-  };
-  
-  const prevSlide = () => {
-    if (featuredBooks.length === 0) return;
-    setCurrentSlide((prev) => (prev === 0 ? featuredBooks.length - 1 : prev - 1));
-  };
-  
-  // Auto slide effect
-  useEffect(() => {
-    if (featuredBooks.length === 0) return;
+  // COMPONENT: Hero Section with Featured Book
+  const HeroSection = () => {
+    // Skip if no featured books or loading
+    if (loading.featured) {
+      return (
+        <div className="relative py-12 px-4 bg-gradient-to-br from-blue-600 to-indigo-800 text-white">
+          <div className="max-w-6xl mx-auto">
+            <div className="animate-pulse">
+              <div className="h-8 bg-white/30 rounded w-1/4 mb-6"></div>
+              <div className="h-4 bg-white/20 rounded w-3/4 mb-8"></div>
+              <div className="h-64 bg-white/10 rounded-xl"></div>
+            </div>
+          </div>
+        </div>
+      );
+    }
     
-    const interval = setInterval(() => {
-      nextSlide();
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [featuredBooks.length]);
-  
-  // Component for each book slide
-  const BookSlide = ({ book }) => (
-    <div className="book-cell bg-gradient-to-r from-slate-800 to-slate-700 p-6 rounded-xl flex flex-col md:flex-row items-center md:items-start h-full relative overflow-hidden shadow-lg">
-      <div className="book-img relative z-10 mb-4 md:mb-0 transform transition hover:scale-105">
-        <div className="relative bg-sky-500 rounded-lg shadow-md h-64 w-48 flex items-center justify-center overflow-hidden">
-          <div className="text-white text-center font-serif z-10 px-2">
-            <div className="text-sm tracking-wide">A COURT OF</div>
-            <div className="text-xl md:text-2xl mt-1 mb-2 font-bold">{book.displayTitle?.[0]}</div>
-            <div className="text-sm tracking-wide">AND</div>
-            <div className="text-xl md:text-2xl mt-1 mb-2 font-bold">{book.displayTitle?.[1]}</div>
-            <div className="text-xs tracking-wider mt-4">{book.author?.toUpperCase()}</div>
+    if (error.featured) {
+      return (
+        <div className="relative py-12 px-4 bg-gradient-to-br from-red-600 to-red-800 text-white">
+          <div className="max-w-6xl mx-auto text-center">
+            <svg className="w-12 h-12 mx-auto mb-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <h2 className="text-xl font-bold mb-2">Could not load featured books</h2>
+            <p className="text-white/80">{error.featured}</p>
+          </div>
+        </div>
+      );
+    }
+    
+    if (featuredBooks.length === 0) {
+      return (
+        <div className="relative py-12 px-4 bg-gradient-to-br from-blue-600 to-indigo-800 text-white">
+          <div className="max-w-6xl mx-auto text-center">
+            <h2 className="text-2xl font-bold mb-4">Discover Books to Exchange</h2>
+            <p className="mb-6">No featured books available. Check back soon for our top picks!</p>
+            <button className="px-6 py-3 bg-white text-blue-700 rounded-full font-medium hover:bg-blue-50">Browse All Books</button>
+          </div>
+        </div>
+      );
+    }
+    
+    const book = featuredBooks[currentSlide];
+    
+    const nextSlide = () => {
+      if (featuredBooks.length === 0) return;
+      setCurrentSlide(prev => (prev === featuredBooks.length - 1 ? 0 : prev + 1));
+    };
+    
+    const prevSlide = () => {
+      if (featuredBooks.length === 0) return;
+      setCurrentSlide(prev => (prev === 0 ? featuredBooks.length - 1 : prev - 1));
+    };
+    
+    return (
+      <div className="relative py-12 px-4 bg-gradient-to-br from-blue-600 to-indigo-800 text-white overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute top-0 right-0 w-1/3 h-full opacity-10">
+          <svg viewBox="0 0 100 100" fill="white">
+            <path d="M96.4,0H0v100h100V3.6C100,1.6,98.4,0,96.4,0z" />
+          </svg>
+        </div>
+        
+        <div className="max-w-6xl mx-auto relative z-10">
+          <div className="flex flex-col md:flex-row items-center">
+            <div className="md:w-1/2 mb-8 md:mb-0">
+              <div className="inline-block px-3 py-1 rounded-full bg-blue-400 bg-opacity-30 text-blue-100 font-medium text-sm mb-4">
+                Featured Book
+              </div>
+              <h1 className="text-3xl md:text-4xl font-bold mb-4">{book.title}</h1>
+              <p className="text-blue-100 mb-6 text-lg">by {book.author}</p>
+              <p className="text-blue-200 mb-6 line-clamp-3">{book.summary}</p>
+              
+              <div className="flex items-center mb-6">
+                <div className="flex mr-4">
+                  {[1, 2, 3, 4, 5].map(star => (
+                    <span key={star} className={star <= Math.floor(book.rating || 0) ? "text-yellow-300" : "text-blue-300"}>★</span>
+                  ))}
+                </div>
+                <span className="text-blue-200 text-sm">{book.voters || 0} reviews</span>
+              </div>
+              
+              <button 
+                onClick={() => setSelectedBook(book)} 
+                className="px-6 py-3 bg-white text-blue-700 rounded-full font-medium shadow-lg hover:bg-blue-50 transition-colors"
+              >
+                View Details
+              </button>
+            </div>
+            
+            <div className="md:w-1/2 flex justify-center">
+              <div className="relative">
+                {/* Book cover */}
+                <div className="transform rotate-[-6deg] transition-transform duration-500 hover:rotate-0">
+                  {book.cover ? (
+                    <img 
+                      src={book.cover} 
+                      alt={book.title} 
+                      className="w-56 h-80 object-cover rounded-lg shadow-2xl" 
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://via.placeholder.com/224x320';
+                      }}
+                    />
+                  ) : (
+                    <div className="w-56 h-80 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-lg shadow-2xl flex items-center justify-center">
+                      <div className="text-white text-center font-serif px-6">
+                        <div className="text-sm tracking-wide">A COURT OF</div>
+                        <div className="text-2xl mt-2 mb-3 font-bold">{book.displayTitle?.[0]}</div>
+                        <div className="text-sm tracking-wide">AND</div>
+                        <div className="text-2xl mt-2 mb-3 font-bold">{book.displayTitle?.[1]}</div>
+                        <div className="text-xs tracking-wider mt-4">{book.author?.toUpperCase()}</div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Decorative element */}
+                <div className="absolute -bottom-4 -right-4 w-56 h-80 border-2 border-blue-300 rounded-lg"></div>
+              </div>
+            </div>
           </div>
           
-          <div className="absolute bottom-0 left-0 right-0 h-6 bg-opacity-20 bg-black"></div>
-          <div className="absolute bottom-0 h-1 w-full bg-opacity-40 bg-black"></div>
-          <div className="absolute right-3 bottom-0 w-5 h-12 bg-yellow-200 rounded-t-sm"></div>
-        </div>
-      </div>
-      
-      <div className="book-content ml-0 md:ml-8 text-white z-10 max-w-md">
-        <div className="book-title text-xl md:text-2xl font-semibold mb-2">{book.title}</div>
-        <div className="book-author text-sm mb-4">{book.author}</div>
-        <div className="rate flex items-center mb-4">
-          <div className="flex">
-            {[1, 2, 3, 4, 5].map(star => (
-              <span key={star} className={star <= Math.floor(book.rating || 0) ? "text-yellow-300" : "text-gray-500"}>★</span>
-            ))}
+          {/* Carousel Controls */}
+          <div className="flex justify-between items-center mt-8">
+            <div className="flex space-x-2">
+              {featuredBooks.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentSlide(index)}
+                  className={`w-2.5 h-2.5 rounded-full transition-colors ${
+                    currentSlide === index ? 'bg-white' : 'bg-blue-300 bg-opacity-50 hover:bg-opacity-75'
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
+            
+            <div className="flex space-x-2">
+              <button 
+                onClick={prevSlide} 
+                className="p-2 rounded-full border border-blue-300 hover:bg-blue-700 transition-colors"
+                aria-label="Previous slide"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button 
+                onClick={nextSlide} 
+                className="p-2 rounded-full border border-blue-300 hover:bg-blue-700 transition-colors"
+                aria-label="Next slide"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
           </div>
-          <span className="book-voters text-sm ml-2">{book.voters || 0} voters</span>
         </div>
-        <div className="book-sum text-gray-200 text-sm mb-6 line-clamp-3">
-          {book.summary}
-        </div>
-        <button onClick={() => setSelectedBook(book)} className="book-see bg-white text-center py-2 px-6 rounded-full font-medium text-sm inline-block hover:bg-opacity-90 text-cyan-600 shadow-md transition-all hover:shadow-lg hover:scale-105">
-          See The Book
-        </button>
       </div>
-    </div>
-  );
-  
-  // Component for book card
-  const BookCard = ({ book }) => (
-    <div className="book-card bg-white rounded-lg shadow-md overflow-hidden transform transition hover:shadow-lg cursor-pointer hover:scale-102" onClick={() => setSelectedBook(book)}>
-      <div className="content-wrapper flex p-5 border-b border-gray-100 relative">
-        {book.cover ? (
+    );
+  };
+
+  // COMPONENT: Featured Book component
+  const FeaturedBook = ({ book }) => (
+    <div 
+      className="featured-book p-3 cursor-pointer group" 
+      onClick={() => setSelectedBook(book)}
+    >
+      <div className="relative overflow-hidden rounded-lg shadow-md mb-2">
+        {book.img ? (
           <img 
-            src={book.cover} 
-            alt={book.title} 
-            className="book-card-img w-24 h-36 object-cover rounded shadow-md transition transform hover:scale-105" 
+            src={book.img} 
+            alt={book.name} 
+            className="w-full h-40 object-cover transition duration-300 group-hover:scale-105"
             onError={(e) => {
-              console.error(`Failed to load image: ${book.cover}`);
-              e.target.onerror = null; // Prevent infinite loop
+              e.target.onerror = null;
               e.target.src = 'https://via.placeholder.com/150';
             }}
           />
         ) : (
-          <div className="bg-cyan-400 w-24 h-36 rounded shadow-md flex items-center justify-center">
-            <span className="text-white font-bold">{book.title?.substring(0, 1)}</span>
+          <div className="bg-gradient-to-br from-blue-500 to-cyan-400 w-full h-40 flex items-center justify-center transition duration-300 group-hover:scale-105">
+            <span className="text-white font-bold text-xl">{book.name?.substring(0, 1)}</span>
           </div>
         )}
-        <div className="card-content ml-5 overflow-hidden">
-          <h3 className="book-name font-medium text-gray-800 mb-1 truncate">{book.title}</h3>
-          <p className="book-by text-gray-500 text-sm mb-3">{book.author}</p>
+        
+        {/* Overlay with book info that appears on hover */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <h3 className="text-white font-semibold line-clamp-1 text-sm">{book.name}</h3>
+          <p className="text-gray-300 text-xs">{book.author}</p>
+        </div>
+        
+        {/* Rating badge */}
+        {book.rating && (
+          <div className="absolute top-2 right-2 bg-yellow-400 text-xs font-bold px-1.5 py-0.5 rounded text-gray-800 shadow-sm">
+            {book.rating.toFixed(1)}
+          </div>
+        )}
+      </div>
+      
+      <div className="mt-2">
+        <h3 className="text-sm font-medium line-clamp-1 group-hover:text-blue-600 transition-colors">{book.name}</h3>
+        <p className="text-xs text-gray-500">{book.author}</p>
+      </div>
+    </div>
+  );
+
+  // COMPONENT: Book Card for Popular Books
+  const BookCard = ({ book }) => (
+    <div 
+      className="book-card bg-white rounded-lg shadow-sm overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:translate-y-[-4px] cursor-pointer group" 
+      onClick={() => setSelectedBook(book)}
+    >
+      <div className="content-wrapper flex p-5 border-b border-gray-100 relative">
+        {/* Book cover/image with improved hover effects */}
+        <div className="relative overflow-hidden rounded shadow-md">
+          {book.cover ? (
+            <img 
+              src={book.cover} 
+              alt={book.title} 
+              className="book-card-img w-24 h-36 object-cover transition duration-300 group-hover:scale-110" 
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = 'https://via.placeholder.com/150';
+              }}
+            />
+          ) : (
+            <div className="bg-gradient-to-br from-blue-500 to-cyan-400 w-24 h-36 flex items-center justify-center transition duration-300 group-hover:scale-110">
+              <span className="text-white font-bold text-xl">{book.title?.substring(0, 1)}</span>
+            </div>
+          )}
+          {/* Add rating badge */}
+          {book.rating && (
+            <div className="absolute top-0 right-0 bg-yellow-400 text-xs font-bold px-1.5 py-0.5 rounded-bl text-gray-800">
+              {book.rating.toFixed(1)}
+            </div>
+          )}
+        </div>
+        
+        <div className="card-content ml-5 flex-grow overflow-hidden">
+          <h3 className="book-name font-medium text-gray-800 mb-1 truncate group-hover:text-blue-600 transition-colors">{book.title}</h3>
+          <p className="book-by text-gray-500 text-sm mb-2">by {book.author}</p>
           
+          {/* Rating stars with better spacing */}
+          <div className="flex items-center mb-3">
+            <div className="flex">
+              {[1, 2, 3, 4, 5].map(star => (
+                <span key={star} className={`text-sm ${star <= Math.floor(book.rating || 0) ? "text-yellow-400" : "text-gray-300"}`}>★</span>
+              ))}
+            </div>
+            <span className="text-gray-400 text-xs ml-2">{book.voters || 0} voters</span>
+          </div>
+          
+          {/* Book details with improved visual separation */}
           <div className="book-details space-y-1 mb-2">
             <p className="text-sm"><span className="font-medium text-gray-700">Type:</span> <span className="text-gray-600">{book.subject || "Fiction"}</span></p>
-            <p className="text-sm"><span className="font-medium text-gray-700">Give:</span> <span className="text-gray-600">{book.title}</span></p>
-            <p className="text-sm"><span className="font-medium text-gray-700">Get:</span> <span className="text-gray-600">{book.exchange}</span></p>
+            <p className="text-sm"><span className="font-medium text-gray-700">Exchange:</span> <span className="text-gray-600">{book.exchange || "Trade"}</span></p>
             <p className="text-sm"><span className="font-medium text-gray-700">Condition:</span> <span className="text-gray-600">{book.condition}</span></p>
           </div>
         </div>
       </div>
+      
+      {/* Likes section with improved appearance */}
       {book.likes?.length > 0 && (
-        <div className="likes flex items-center p-3">
+        <div className="likes flex items-center p-3 bg-gray-50 group-hover:bg-blue-50 transition-colors">
           <div className="flex -space-x-2">
             {book.likes.slice(0, 3).map(like => (
               <div key={like.id} className="like-profile">
                 <img 
                   src={like.img} 
                   alt={like.name} 
-                  className="like-img w-7 h-7 rounded-full border-2 border-white object-cover"
+                  className="like-img w-7 h-7 rounded-full border-2 border-white object-cover shadow-sm"
                   onError={(e) => {
                     e.target.onerror = null;
                     e.target.src = 'https://via.placeholder.com/150';
@@ -455,316 +657,338 @@ const Home = () => {
           </div>
           <div className="like-name text-gray-500 text-xs ml-3">
             <span className="font-semibold">{book.likes[0]?.name}</span>
-            {book.likes.length > 1 && <span> and <span className="font-semibold">{book.likes.length - 1} other {book.likes.length > 2 ? 'friends' : 'friend'}</span> like this</span>}
+            {book.likes.length > 1 && <span> and <span className="font-semibold">{book.likes.length - 1} other {book.likes.length > 2 ? 'people' : 'person'}</span> liked this</span>}
           </div>
         </div>
       )}
-    </div>
-  );
-  
-  // Component for featured book
-  const FeaturedBook = ({ book }) => (
-    <div className="featured-book p-3 cursor-pointer transform transition duration-300 hover:scale-105" onClick={() => setSelectedBook(book)}>
-      {book.img ? (
-        <img 
-          src={book.img} 
-          alt={book.name} 
-          className="w-full h-40 object-cover rounded-lg shadow-md"
-          onError={(e) => {
-            e.target.onerror = null;
-            e.target.src = 'https://via.placeholder.com/150';
-          }}
-        />
-      ) : (
-        <div className="bg-gradient-to-r from-blue-400 to-cyan-400 w-full h-40 rounded-lg shadow-md flex items-center justify-center">
-          <span className="text-white font-bold text-lg">{book.name?.substring(0, 1)}</span>
-        </div>
-      )}
-      <div className="mt-2">
-        <h3 className="text-sm font-medium line-clamp-1">{book.name}</h3>
-        <p className="text-xs text-gray-500">{book.author}</p>
-      </div>
-    </div>
-  );
-  
-  // Component for book details modal
-  const BookDetails = ({ book, onClose }) => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-start mb-4">
-          <h2 className="text-xl font-bold">{book.title}</h2>
-          <button 
-            onClick={onClose} 
-            className="text-gray-500 hover:text-gray-700 text-2xl font-bold"
-            aria-label="Close"
-          >
-            &times;
-          </button>
-        </div>
-        
-        <div className="flex mb-4">
-          {book.cover ? (
-            <img 
-              src={book.cover} 
-              alt={book.title} 
-              className="w-32 h-48 object-cover rounded shadow-md mr-4 flex-shrink-0"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = 'https://via.placeholder.com/150';
-              }}
-            />
-          ) : (
-            <div className="bg-cyan-400 rounded-lg shadow-md w-32 h-48 flex items-center justify-center mr-4 flex-shrink-0">
-              <div className="text-white text-center font-serif px-2">
-                <div className="text-xs tracking-wide">A COURT OF</div>
-                <div className="text-lg font-bold my-1">{book.displayTitle?.[0]}</div>
-                <div className="text-xs tracking-wide">AND</div>
-                <div className="text-lg font-bold my-1">{book.displayTitle?.[1]}</div>
-                <div className="text-xs mt-2">{book.author?.toUpperCase()}</div>
-              </div>
-            </div>
-          )}
-          
-          <div className="space-y-2">
-            <p className="text-gray-700"><span className="font-medium">Author:</span> {book.author}</p>
-            <p className="text-gray-700"><span className="font-medium">Seller:</span> {book.seller}</p>
-            <p className="text-gray-700"><span className="font-medium">Condition:</span> {book.condition}</p>
-            <p className="text-gray-700"><span className="font-medium">Exchange:</span> {book.exchange}</p>
-            {book.course && (
-              <p className="text-gray-700"><span className="font-medium">Course:</span> {book.course}</p>
-            )}
-            <p className="text-gray-700"><span className="font-medium">Subject:</span> {book.subject}</p>
-            <div className="flex items-center mt-2">
-              <div className="flex">
-                {[1, 2, 3, 4, 5].map(star => (
-                  <span key={star} className={star <= Math.floor(book.rating || 0) ? "text-yellow-400" : "text-gray-300"}>★</span>
-                ))}
-              </div>
-              <span className="text-gray-500 text-xs ml-2">{book.voters || 0} voters</span>
-            </div>
-          </div>
-        </div>
-        
-        <p className="text-gray-600 text-sm mb-4">{book.summary}</p>
-        
-        {book.likes?.length > 0 && (
-          <div className="border-t border-gray-200 pt-4 mt-2">
-            <h3 className="font-medium mb-2">Liked by:</h3>
-            <div className="flex items-center">
-              <div className="flex -space-x-2">
-                {book.likes.map(like => (
-                  <div key={like.id} className="like-profile">
-                    <img 
-                      src={like.img} 
-                      alt={like.name} 
-                      className="like-img w-7 h-7 rounded-full border-2 border-white object-cover"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = 'https://via.placeholder.com/150';
-                      }}
-                    />
-                  </div>
-                ))}
-              </div>
-              <div className="like-name text-gray-500 text-xs ml-3">
-                <span className="font-semibold">{book.likes[0]?.name}</span>
-                {book.likes.length > 1 && <span> and <span className="font-semibold">{book.likes.length - 1} other {book.likes.length > 2 ? 'friends' : 'friend'}</span></span>}
-              </div>
-            </div>
-          </div>
-        )}
-        
-        <div className="mt-6 flex justify-end space-x-2">
-          <button className="px-4 py-2 bg-gray-200 rounded-full hover:bg-gray-300 text-sm">Contact Seller</button>
-          <button className="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 text-sm">Request Exchange</button>
-        </div>
-      </div>
-    </div>
-  );
-  
-  // Placeholder for loading states
-  const LoadingPlaceholder = ({ type }) => (
-    <div className="flex flex-col items-center justify-center py-8 px-4">
-      <div className="w-16 h-16 rounded-full bg-gray-200 animate-pulse"></div>
-      <p className="text-gray-500 mt-4">Loading {type}...</p>
     </div>
   );
 
-  // Placeholder for error states
-  const ErrorPlaceholder = ({ message, type }) => (
-    <div className="flex flex-col items-center justify-center py-8 px-4">
-      <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mb-4">
-        <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-        </svg>
+  // COMPONENT: Book Detail Modal
+  const BookDetails = ({ book, onClose }) => (
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm transition-all duration-300">
+      <div className="bg-white rounded-xl max-w-lg w-full p-0 max-h-[90vh] overflow-hidden shadow-2xl animate-fadeIn">
+        {/* Header with book title and close button */}
+        <div className="p-6 border-b border-gray-100">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-bold text-gray-800">{book.title}</h2>
+            <button 
+              onClick={onClose} 
+              className="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none"
+              aria-label="Close"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <div className="p-6 max-h-[calc(90vh-120px)] overflow-y-auto">
+          {/* Book cover and key details */}
+          <div className="flex mb-6">
+            <div className="relative mr-6 flex-shrink-0">
+              {book.cover ? (
+                <img 
+                  src={book.cover} 
+                  alt={book.title} 
+                  className="w-32 h-48 object-cover rounded-lg shadow-md"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'https://via.placeholder.com/150';
+                  }}
+                />
+              ) : (
+                <div className="bg-gradient-to-br from-blue-500 to-cyan-400 rounded-lg shadow-md w-32 h-48 flex items-center justify-center">
+                  <div className="text-white text-center font-serif px-2">
+                    <div className="text-xs tracking-wide">A COURT OF</div>
+                    <div className="text-lg font-bold my-1">{book.displayTitle?.[0]}</div>
+                    <div className="text-xs tracking-wide">AND</div>
+                    <div className="text-lg font-bold my-1">{book.displayTitle?.[1]}</div>
+                    <div className="text-xs mt-2">{book.author?.toUpperCase()}</div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Rating badge */}
+              {book.rating && (
+                <div className="absolute -bottom-3 -right-3 bg-yellow-400 rounded-full h-10 w-10 flex items-center justify-center text-gray-800 font-bold text-sm shadow-md">
+                  {book.rating.toFixed(1)}
+                </div>
+              )}
+            </div>
+            
+            <div className="flex-grow">
+              <h3 className="text-lg font-medium text-gray-800 mb-1">{book.title}</h3>
+              <p className="text-gray-500 text-sm mb-3">by {book.author}</p>
+              
+              <div className="flex items-center mb-4">
+                <div className="flex">
+                  {[1, 2, 3, 4, 5].map(star => (
+                    <span key={star} className={star <= Math.floor(book.rating || 0) ? "text-yellow-400" : "text-gray-300"}>★</span>
+                  ))}
+                </div>
+                <span className="text-gray-500 text-xs ml-2">{book.voters || 0} voters</span>
+              </div>
+              
+              <div className="space-y-1 text-sm">
+                <p className="flex justify-between">
+                  <span className="font-medium text-gray-700">Seller:</span> 
+                  <span className="text-gray-600">{book.seller}</span>
+                </p>
+                <p className="flex justify-between">
+                  <span className="font-medium text-gray-700">Condition:</span> 
+                  <span className="text-gray-600">{book.condition}</span>
+                </p>
+                <p className="flex justify-between">
+                  <span className="font-medium text-gray-700">Exchange:</span> 
+                  <span className="text-gray-600">{book.exchange}</span>
+                </p>
+                {book.course && (
+                  <p className="flex justify-between">
+                    <span className="font-medium text-gray-700">Course:</span> 
+                    <span className="text-gray-600">{book.course}</span>
+                  </p>
+                )}
+                <p className="flex justify-between">
+                  <span className="font-medium text-gray-700">Subject:</span> 
+                  <span className="text-gray-600">{book.subject}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Book description with custom styling */}
+          <div className="mb-6">
+            <h4 className="font-medium text-gray-800 mb-2">Description</h4>
+            <p className="text-gray-600 text-sm leading-relaxed">{book.summary}</p>
+          </div>
+          
+          {/* Likes section with improved visual style */}
+          {book.likes?.length > 0 && (
+            <div className="border-t border-gray-200 pt-4">
+              <h4 className="font-medium text-gray-800 mb-3">Liked by</h4>
+              <div className="flex items-center">
+                <div className="flex -space-x-2">
+                  {book.likes.map(like => (
+                    <div key={like.id} className="like-profile">
+                      <img 
+                        src={like.img} 
+                        alt={like.name} 
+                        className="like-img w-8 h-8 rounded-full border-2 border-white object-cover shadow-sm"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = 'https://via.placeholder.com/150';
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className="like-name text-gray-600 text-sm ml-3">
+                  <span className="font-semibold">{book.likes[0]?.name}</span>
+                  {book.likes.length > 1 && <span> and <span className="font-semibold">{book.likes.length - 1} other {book.likes.length > 2 ? 'people' : 'person'}</span></span>}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+        
+        {/* Action buttons with improved style */}
+        <div className="border-t border-gray-200 p-4 bg-gray-50 flex justify-end space-x-3">
+          <button className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors text-sm font-medium">
+            Contact Seller
+          </button>
+          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+            Request Exchange
+          </button>
+        </div>
       </div>
-      <p className="text-red-500 text-center">{message || `Error loading ${type}`}</p>
     </div>
   );
-  
-  return (
-    <div className="book-store bg-gray-50 min-h-screen">
-      {/* Hero Banner with Book Slide Section */}
-      {loading.featured ? (
-        <div className="p-8">
-          <LoadingPlaceholder type="featured books" />
-        </div>
-      ) : error.featured ? (
-        <div className="p-8">
-          <ErrorPlaceholder message={error.featured} type="featured books" />
-        </div>
-      ) : featuredBooks.length > 0 ? (
-        <div className="book-slide relative bg-gradient-to-b from-gray-100 to-white py-8 px-4">
-          <div className="slider-container overflow-hidden max-w-6xl mx-auto">
-            <div className="flex transition-transform duration-500 ease-in-out" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
-              {featuredBooks.map((book, index) => (
-                <div key={book.id} className="min-w-full">
-                  <BookSlide book={book} />
+
+  // COMPONENT: Featured Books Row
+  const FeaturedBooksRow = ({ books, title, icon, loading: isLoading, error: rowError }) => {
+    if (isLoading) {
+      return (
+        <div className="py-8 px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center mb-6 animate-pulse">
+              <div className="w-6 h-6 bg-gray-200 rounded-full mr-2"></div>
+              <div className="h-6 bg-gray-200 rounded w-1/4"></div>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {[1, 2, 3, 4, 5].map(i => (
+                <div key={i} className="animate-pulse">
+                  <div className="bg-gray-200 h-40 rounded-lg mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-1"></div>
+                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
                 </div>
               ))}
             </div>
           </div>
+        </div>
+      );
+    }
+    
+    if (rowError) {
+      return (
+        <div className="py-8 px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="bg-red-50 text-red-700 p-4 rounded-lg">
+              <h3 className="font-medium mb-2">{title}</h3>
+              <p className="text-sm">{rowError}</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
+    if (books.length === 0) {
+      return (
+        <div className="py-8 px-4">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-xl font-bold mb-6 flex items-center text-gray-700">
+              {icon}
+              {title}
+            </h2>
+            <div className="text-center py-8 bg-gray-50 rounded-lg">
+              <p className="text-gray-500">No books available in this category</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
+    return (
+      <div className="py-8 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-xl font-bold mb-6 flex items-center text-gray-800">
+            {icon}
+            {title}
+          </h2>
           
-          <button 
-            onClick={prevSlide} 
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 rounded-full bg-white w-10 h-10 flex items-center justify-center shadow-md z-10"
-            aria-label="Previous slide"
-          >
-            <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <button 
-            onClick={nextSlide} 
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 rounded-full bg-white w-10 h-10 flex items-center justify-center shadow-md z-10"
-            aria-label="Next slide"
-          >
-            <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-          
-          {/* Slide indicators */}
-          <div className="flex justify-center mt-6">
-            {featuredBooks.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentSlide(index)}
-                className={`mx-1 w-2 h-2 rounded-full ${currentSlide === index ? 'bg-blue-500' : 'bg-gray-300'}`}
-                aria-label={`Go to slide ${index + 1}`}
-              />
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {books.map(book => (
+              <FeaturedBook key={book.id} book={book} />
             ))}
           </div>
         </div>
-      ) : (
-        <div className="p-8 bg-white text-center text-gray-500">
-          No featured books available
+      </div>
+    );
+  };
+
+  // COMPONENT: Category Tabs
+  const CategoryTabs = () => {
+    if (loading.categories) {
+      return (
+        <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+          <div className="flex space-x-4 overflow-x-auto animate-pulse">
+            {[1, 2, 3, 4, 5].map(i => (
+              <div key={i} className="h-8 w-24 bg-gray-200 rounded-full"></div>
+            ))}
+          </div>
         </div>
-      )}
-      
-      {/* Featured Books Row */}
-      <div className="featured-books-row bg-white py-8">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-xl font-bold mb-6 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-            </svg>
-            Featured Books of the Week
-          </h2>
-          
-          {loading.booksOfWeek ? (
-            <LoadingPlaceholder type="featured books" />
-          ) : error.booksOfWeek ? (
-            <ErrorPlaceholder message={error.booksOfWeek} type="featured books" />
-          ) : booksOfWeek.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-              {booksOfWeek.map(book => (
-                <FeaturedBook key={book.id} book={book} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center text-gray-500 py-4">
-              No books of the week available
-            </div>
-          )}
+      );
+    }
+    
+    return (
+      <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+        <div className="flex space-x-3 overflow-x-auto pb-2 scrollbar-hide">
+          {categories.map(category => (
+            <button
+              key={category.id}
+              className={`px-4 py-2 rounded-full whitespace-nowrap transition-all duration-200 ${
+                activeCategory === category.name
+                  ? 'bg-blue-600 text-white font-medium shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+              onClick={() => setActiveCategory(category.name)}
+            >
+              {category.name}
+            </button>
+          ))}
         </div>
       </div>
+    );
+  };
+
+  // MAIN RENDER
+  return (
+    <div className="book-store bg-gray-100 min-h-screen">
+      {/* Add custom style for scrollbar hiding and animations */}
+      <style dangerouslySetInnerHTML={{ __html: scrollbarHideStyle }} />
+
+      {/* Hero Section with Featured Book */}
+      <HeroSection />
       
-      {/* Main Content */}
-      <div className="main-wrapper max-w-6xl mx-auto px-4 py-8">
-        <h2 className="text-xl font-bold mb-6 flex items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+      {/* Featured Books Row (Books of the Week) */}
+      <FeaturedBooksRow 
+        books={booksOfWeek}
+        title="Books of the Week"
+        icon={
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
           </svg>
-          Books by Genre
-        </h2>
-        
-        {/* Categories Tabs */}
-        <div className="mb-6 bg-white rounded-lg shadow-sm p-4">
-          {loading.categories ? (
-            <div className="flex space-x-4 overflow-x-auto">
-              {[1, 2, 3, 4, 5].map(i => (
-                <div key={i} className="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
-              ))}
-            </div>
-          ) : (
-            <div className="flex space-x-4 overflow-x-auto pb-2">
-              {categories.map(category => (
-                <button
-                  key={category.id}
-                  className={`px-4 py-2 rounded-full whitespace-nowrap transition-colors ${
-                    activeCategory === category.name
-                      ? 'bg-blue-100 text-blue-700 font-medium'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                  onClick={() => setActiveCategory(category.name)}
-                >
-                  {category.name}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-        
-        {/* Popular Books Grid */}
-        <div className="popular-books bg-white rounded-lg shadow-sm p-6">
-          <h3 className="font-medium text-lg mb-6">
-            {activeCategory === 'All Genres' ? 'Popular Books' : `Popular in ${activeCategory}`}
-          </h3>
+        }
+        loading={loading.booksOfWeek}
+        error={error.booksOfWeek}
+      />
+      
+      {/* Main Content Area with Categories and Popular Books */}
+      <div className="px-4 py-8">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-xl font-bold mb-6 flex items-center text-gray-800">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+            Books by Genre
+          </h2>
           
-          {/* Book Cards */}
-          {loading.popular ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {[1, 2, 3, 4].map(i => (
-                <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden">
-                  <div className="p-5 border-b border-gray-100 flex">
-                    <div className="w-24 h-36 bg-gray-200 rounded animate-pulse"></div>
-                    <div className="ml-5 flex-grow">
-                      <div className="h-4 bg-gray-200 rounded animate-pulse mb-2 w-3/4"></div>
-                      <div className="h-3 bg-gray-200 rounded animate-pulse mb-4 w-1/2"></div>
-                      <div className="space-y-2">
-                        <div className="h-3 bg-gray-200 rounded animate-pulse w-full"></div>
-                        <div className="h-3 bg-gray-200 rounded animate-pulse w-full"></div>
-                        <div className="h-3 bg-gray-200 rounded animate-pulse w-4/5"></div>
+          {/* Category Selection */}
+          <CategoryTabs />
+          
+          {/* Popular Books Grid */}
+          <div className="popular-books bg-white rounded-lg shadow-sm p-6">
+            <h3 className="font-medium text-lg mb-6 text-gray-800">
+              {activeCategory === 'All Genres' ? 'Popular Books' : `Popular in ${activeCategory}`}
+            </h3>
+            
+            {/* Book Cards */}
+            {loading.popular ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {[1, 2, 3, 4].map(i => (
+                  <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
+                    <div className="p-5 border-b border-gray-100 flex">
+                      <div className="w-24 h-36 bg-gray-200 rounded"></div>
+                      <div className="ml-5 flex-grow">
+                        <div className="h-4 bg-gray-200 rounded mb-2 w-3/4"></div>
+                        <div className="h-3 bg-gray-200 rounded mb-4 w-1/2"></div>
+                        <div className="space-y-2">
+                          <div className="h-3 bg-gray-200 rounded w-full"></div>
+                          <div className="h-3 bg-gray-200 rounded w-full"></div>
+                          <div className="h-3 bg-gray-200 rounded w-4/5"></div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          ) : error.popular ? (
-            <ErrorPlaceholder message={error.popular} type="popular books" />
-          ) : popularBooks.length > 0 ? (
-            <div className="book-cards grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {popularBooks.map(book => (
-                <BookCard key={book.id} book={book} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center text-gray-500 py-8">
-              No books available for this category
-            </div>
-          )}
+                ))}
+              </div>
+            ) : error.popular ? (
+              <div className="bg-red-50 text-red-700 p-4 rounded-lg">
+                <p className="text-center">{error.popular}</p>
+              </div>
+            ) : popularBooks.length > 0 ? (
+              <div className="book-cards grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {popularBooks.map(book => (
+                  <BookCard key={book.id} book={book} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center text-gray-500 py-8">
+                No books available for this category
+              </div>
+            )}
+          </div>
         </div>
       </div>
       
