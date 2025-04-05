@@ -1,6 +1,13 @@
 import { useState, useEffect } from 'react';
 import { bookAPI } from '../services/api';
 
+
+// Import at the top of your file (if not already there)
+import { useAuth } from '../contexts/AuthContext';
+
+// Then inside the Home component, add this near the top:
+const { isAuthenticated } = useAuth();
+
 // Add scrollbar hiding and animations
 const scrollbarHideStyle = `
   .scrollbar-hide::-webkit-scrollbar {
