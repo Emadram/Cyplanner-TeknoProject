@@ -1512,9 +1512,12 @@ const getTimeAgo = (date) => {
     <div className="book-store bg-gray-100 min-h-screen">
       {/* Add custom style for scrollbar hiding and animations */}
       <style dangerouslySetInnerHTML={{ __html: scrollbarHideStyle }} />
-
+  
       {/* Hero Section with Featured Book */}
       <HeroSection />
+      
+      {/* Action Cards Header */}
+      <ActionHeader />
       
       {/* Favorite Books - Only shown when user is authenticated */}
       {isAuthenticated && (
@@ -1530,6 +1533,9 @@ const getTimeAgo = (date) => {
           error={error.booksOfWeek}
         />
       )}
+      
+      {/* Popular Categories Section */}
+      <PopularCategoriesSection />
       
       {/* Main Content Area with Categories and Popular Books */}
       <div className="px-4 py-8">
@@ -1588,6 +1594,12 @@ const getTimeAgo = (date) => {
           </div>
         </div>
       </div>
+      
+      {/* Campus Stats Section */}
+      <CampusStatsSection />
+      
+      {/* Student Testimonials */}
+      <TestimonialsSection />
       
       {/* Book Details Modal */}
       {selectedBook && (
