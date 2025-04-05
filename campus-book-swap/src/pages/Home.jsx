@@ -808,7 +808,7 @@ const Home = () => {
           
           <div className="mt-10 text-center">
             <p className="text-lg mb-6 max-w-xl mx-auto text-blue-100">
-              Join thousands of students saving money by swapping, borrowing, and buying books directly from other students.
+              Join thousands of students saving money by swapping, borrowing, and buying books directly from other students or library.
             </p>
             <button className="px-6 py-3 bg-white text-blue-700 rounded-full font-medium hover:bg-blue-50 transition-colors shadow-md">
               Join CampusBookSwap Today
