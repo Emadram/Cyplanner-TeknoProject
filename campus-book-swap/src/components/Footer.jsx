@@ -8,7 +8,7 @@ const Footer = () => {
           <div>
             <h3 className="font-serif text-lg font-bold text-gray-800 mb-4">BookSwap</h3>
             <p className="text-gray-600 text-sm">
-              The platform to exchange, sell, and borrow books from students across EMU campus.
+              The platform to exchange, sell, and borrow books from students/library across EMU campus.
             </p>
           </div>
           
