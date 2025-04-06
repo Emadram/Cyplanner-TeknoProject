@@ -791,6 +791,137 @@ const Home = () => {
       }
     ];
     
+    const LibraryServicesSection = () => {
+      return (
+        <div className="py-16 bg-gray-50">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-800 mb-4">Library Services & Reading Spaces</h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Beyond just books, CampusBookShop offers comfortable reading spaces and
+                essential academic services to enhance your campus experience.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Reading Rooms */}
+              <div className="bg-white rounded-xl shadow-sm overflow-hidden group hover:shadow-md transition-shadow">
+                <div className="relative h-48 overflow-hidden">
+                  <img 
+                    src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8bGlicmFyeXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60" 
+                    alt="Reading Room" 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                  <div className="absolute bottom-0 left-0 p-4">
+                    <h3 className="text-white font-bold text-xl">Quiet Reading Rooms</h3>
+                    <p className="text-blue-100 text-sm">Open 7am-11pm Daily</p>
+                  </div>
+                </div>
+                <div className="p-6">
+                  <p className="text-gray-600 text-sm mb-4">
+                    Our dedicated reading spaces offer a peaceful environment for studying,
+                    research, and quiet reading. With comfortable seating, proper lighting,
+                    and power outlets at every table.
+                  </p>
+                  <a href="#" className="text-blue-600 text-sm font-medium hover:text-blue-700 flex items-center">
+                    Reserve a Spot
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+              
+              {/* Study Groups */}
+              <div className="bg-white rounded-xl shadow-sm overflow-hidden group hover:shadow-md transition-shadow">
+                <div className="relative h-48 overflow-hidden">
+                  <img 
+                    src="https://images.unsplash.com/photo-1577896851231-70ef18881754?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8c3R1ZHklMjBncm91cHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60" 
+                    alt="Study Group" 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                  <div className="absolute bottom-0 left-0 p-4">
+                    <h3 className="text-white font-bold text-xl">Collaboration Spaces</h3>
+                    <p className="text-blue-100 text-sm">Bookable Study Rooms</p>
+                  </div>
+                </div>
+                <div className="p-6">
+                  <p className="text-gray-600 text-sm mb-4">
+                    Need to work on a group project or host a study session? Our collaboration
+                    spaces are equipped with whiteboards, displays, and conference tables to
+                    facilitate productive group work.
+                  </p>
+                  <a href="#" className="text-blue-600 text-sm font-medium hover:text-blue-700 flex items-center">
+                    Book a Room
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+              
+              {/* Printing & Services */}
+              <div className="bg-white rounded-xl shadow-sm overflow-hidden group hover:shadow-md transition-shadow">
+                <div className="relative h-48 overflow-hidden">
+                  <img 
+                    src="https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJpbnRlcnxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60" 
+                    alt="Printing Services" 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                  <div className="absolute bottom-0 left-0 p-4">
+                    <h3 className="text-white font-bold text-xl">Printing & Tech Support</h3>
+                    <p className="text-blue-100 text-sm">Self-Service & Assistance Available</p>
+                  </div>
+                </div>
+                <div className="p-6">
+                  <p className="text-gray-600 text-sm mb-4">
+                    Access high-quality printing, scanning, and copying services at affordable
+                    rates. Our tech support team is also available to help with research
+                    database access and software questions.
+                  </p>
+                  <a href="#" className="text-blue-600 text-sm font-medium hover:text-blue-700 flex items-center">
+                    View Services & Pricing
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+            
+            {/* Additional Info & Hours */}
+            <div className="bg-white rounded-xl shadow-sm mt-8 p-8 text-center">
+              <h3 className="text-xl font-bold text-gray-800 mb-4">Library Hours & Locations</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                <div>
+                  <h4 className="font-semibold text-gray-700 mb-2">Main Campus Library</h4>
+                  <p className="text-gray-600 text-sm">7:00 AM - 11:00 PM (Mon-Fri)</p>
+                  <p className="text-gray-600 text-sm">9:00 AM - 9:00 PM (Sat-Sun)</p>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-700 mb-2">Science Building Branch</h4>
+                  <p className="text-gray-600 text-sm">8:00 AM - 10:00 PM (Mon-Fri)</p>
+                  <p className="text-gray-600 text-sm">10:00 AM - 6:00 PM (Sat)</p>
+                  <p className="text-gray-600 text-sm">Closed (Sun)</p>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-700 mb-2">Downtown Exchange</h4>
+                  <p className="text-gray-600 text-sm">10:00 AM - 7:00 PM (Mon-Sat)</p>
+                  <p className="text-gray-600 text-sm">12:00 PM - 5:00 PM (Sun)</p>
+                </div>
+              </div>
+              <Link to="/about" className="inline-block mt-6 px-6 py-2 bg-blue-600 text-white rounded font-medium hover:bg-blue-700 transition-colors">
+                More About Our Facilities
+              </Link>
+            </div>
+          </div>
+        </div>
+      );
+    };
+    
     return (
       <div className="py-12 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
