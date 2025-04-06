@@ -30,9 +30,25 @@ const BooksPage = () => {
         ];
         setCategories(processedCategories);
         
+        // Check if we're on the textbooks route
+        const isTextbooksRoute = window.location.pathname.includes('/textbooks');
+        
         // Fetch books based on category or all books
         let booksData;
-        if (categoryName && categoryName !== 'all') {
+        
+        if (isTextbooksRoute) {
+          // Find the textbooks category if it exists
+          const textbooksCategory = processedCategories.find(cat => 
+            cat.name.toLowerCase() === 'textbooks'
+          );
+          
+          if (textbooksCategory && textbooksCategory.id !== 'all') {
+            booksData = await bookAPI.getBooksByCategory(textbooksCategory.id);
+          } else {
+            // Fallback to all books if no textbooks category found
+            booksData = await bookAPI.getPopularBooks();
+          }
+        } else if (categoryName && categoryName !== 'all') {
           // Find category ID if we're browsing by URL slug
           const category = processedCategories.find(cat => 
             cat.name.toLowerCase().replace(/\s+/g, '-') === categoryName
