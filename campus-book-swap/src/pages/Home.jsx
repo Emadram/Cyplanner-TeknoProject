@@ -921,7 +921,171 @@ const Home = () => {
         </div>
       );
     };
-    
+
+    const FeaturedCollectionsSection = () => {
+      // We'll use the existing book data from booksOfWeek, featuredBooks, etc.
+      // as sample data for our collections
+      
+      // Skip if data is loading
+      if (loading.booksOfWeek || loading.popular || loading.featured) {
+        return (
+          <div className="py-16 bg-white">
+            <div className="max-w-6xl mx-auto px-4">
+              <div className="animate-pulse text-center mb-12">
+                <div className="h-8 bg-gray-200 rounded w-1/3 mx-auto mb-4"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="animate-pulse">
+                    <div className="h-6 bg-gray-200 rounded w-1/2 mb-4"></div>
+                    <div className="grid grid-cols-2 gap-4">
+                      {[1, 2, 3, 4].map(j => (
+                        <div key={j} className="h-48 bg-gray-200 rounded"></div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      }
+      
+      // Helper function to get a subset of books
+      const getBookSubset = (sourceBooks, count = 4) => {
+        if (!sourceBooks || sourceBooks.length === 0) {
+          return [];
+        }
+        
+        // Get a random subset or as many as available
+        const availableCount = Math.min(count, sourceBooks.length);
+        return [...sourceBooks].slice(0, availableCount);
+      };
+      
+      // Create three collections from our existing data
+      const collections = [
+        {
+          title: "Faculty Recommendations",
+          description: "Top picks from our professors this semester",
+          books: getBookSubset(featuredBooks)
+        },
+        {
+          title: "New Arrivals",
+          description: "Just added to our collection",
+          books: getBookSubset(booksOfWeek)
+        },
+        {
+          title: "Student Book Club Picks",
+          description: "Join the discussion at our weekly meetups",
+          books: getBookSubset(popularBooks)
+        }
+      ];
+      
+      return (
+        <div className="py-16 bg-white">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-800 mb-4">Featured Collections</h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Explore our carefully curated collections featuring everything from academic essentials
+                to leisure reading recommendations.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+              {collections.map((collection, idx) => (
+                <div key={idx} className="space-y-6">
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-800 mb-1">{collection.title}</h3>
+                    <p className="text-gray-500 text-sm">{collection.description}</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    {collection.books.map((book, bookIdx) => (
+                      <Link to={`/book/${book.id}`} key={bookIdx} className="group">
+                        <div className="relative h-56 overflow-hidden rounded-lg shadow-sm transition duration-300 group-hover:shadow-md">
+                          {/* Book Cover */}
+                          {book.cover ? (
+                            <img 
+                              src={book.cover} 
+                              alt={book.title} 
+                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
+                              onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = 'https://via.placeholder.com/150?text=No+Cover';
+                              }}
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center p-4 transition-transform duration-300 group-hover:scale-105">
+                              <span className="text-white text-center font-serif">{book.title}</span>
+                            </div>
+                          )}
+                          
+                          {/* Hover Overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3">
+                            <h4 className="text-white font-medium text-sm line-clamp-2">{book.title}</h4>
+                            <p className="text-blue-100 text-xs">{book.author}</p>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                  
+                  <div className="text-center">
+                    <Link 
+                      to="/books" 
+                      className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium"
+                    >
+                      View All in Collection
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {/* Library Card Promotion */}
+            <div className="mt-16 bg-blue-50 rounded-xl p-8 flex flex-col md:flex-row items-center gap-8">
+              <div className="w-full md:w-2/3">
+                <h3 className="text-xl font-bold text-gray-800 mb-2">Get Your Library Card</h3>
+                <p className="text-gray-600 mb-6">
+                  Library cards are free for all students, faculty, and staff. Sign up to unlock
+                  all our services, extended borrowing privileges, and access to our digital collections.
+                </p>
+                <Link to="/signup" className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                  Sign Up Today
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </Link>
+              </div>
+              <div className="w-full md:w-1/3">
+                <div className="bg-white p-6 rounded-xl shadow-md transform rotate-3 relative">
+                  <div className="absolute top-0 right-0 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg">CAMPUS ID</div>
+                  <div className="mb-4 pb-2 border-b border-gray-200">
+                    <div className="text-xs text-gray-500 mb-1">CARD HOLDER</div>
+                    <div className="font-bold text-gray-800">CAMPUS BOOKSHOP MEMBER</div>
+                  </div>
+                  <div className="mb-4">
+                    <div className="text-xs text-gray-500 mb-1">MEMBER SINCE</div>
+                    <div className="font-bold text-gray-800">{new Date().toLocaleDateString()}</div>
+                  </div>
+                  <div className="mt-4 flex justify-between items-center">
+                    <div className="h-10 w-16 bg-blue-600 rounded"></div>
+                    <div className="text-xs text-gray-500"># STUDENT-XXXX</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
     return (
       <div className="py-12 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
