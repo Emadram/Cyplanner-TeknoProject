@@ -142,7 +142,7 @@ import { useAuth } from '../contexts/AuthContext';
                       className="w-12 h-12 rounded-full mr-4 object-cover border-2 border-white shadow-sm"
                       onError={(e) => {
                         e.target.onerror = null;
-                        e.target.src = 'https://via.placeholder.com/150';
+                        e.target.src = null;
                       }}
                     />
                     <div>
@@ -537,7 +537,7 @@ const Home = () => {
             return {
               id: like.id,
               name: likeData.username || 'User',
-              img: avatarUrl || 'https://via.placeholder.com/150'
+              img: avatarUrl || null
             };
           });
         }
@@ -1124,7 +1124,7 @@ const Home = () => {
                     className="w-12 h-12 rounded-full mr-4 object-cover border-2 border-white shadow-sm"
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.src = 'https://via.placeholder.com/150';
+                      e.target.src = null;
                     }}
                   />
                   <div>
@@ -1185,7 +1185,7 @@ const Home = () => {
             className="w-full h-40 object-cover transition duration-300 group-hover:scale-105"
             onError={(e) => {
               e.target.onerror = null;
-              e.target.src = 'https://via.placeholder.com/150';
+              e.target.src = null;
             }}
           />
         ) : (
@@ -1281,7 +1281,7 @@ const BookCard = ({ book }) => {
               className="book-card-img w-24 h-36 object-cover transition duration-300 group-hover:scale-110" 
               onError={(e) => {
                 e.target.onerror = null;
-                e.target.src = 'https://via.placeholder.com/150';
+                e.target.src = null;
               }}
             />
           ) : (
@@ -1364,7 +1364,7 @@ const BookCard = ({ book }) => {
                   className="like-img w-7 h-7 rounded-full border-2 border-white object-cover shadow-sm"
                   onError={(e) => {
                     e.target.onerror = null;
-                    e.target.src = 'https://via.placeholder.com/150';
+                    e.target.src = null;
                   }}
                 />
               </div>
@@ -1516,7 +1516,7 @@ const BookCard = ({ book }) => {
                       className="w-40 h-56 object-cover rounded-xl shadow-md"
                       onError={(e) => {
                         e.target.onerror = null;
-                        e.target.src = 'https://via.placeholder.com/150';
+                        e.target.src = null;
                       }}
                     />
                   ) : (
@@ -1737,7 +1737,7 @@ const BookCard = ({ book }) => {
                                 className="w-8 h-8 rounded-full border-2 border-white object-cover shadow-sm"
                                 onError={(e) => {
                                   e.target.onerror = null;
-                                  e.target.src = 'https://via.placeholder.com/150';
+                                  e.target.src = null;
                                 }}
                               />
                               <div className="ml-3">
