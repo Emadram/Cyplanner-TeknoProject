@@ -21,7 +21,9 @@ const Footer = () => {
             </p>
             
             {/* Newsletter Subscription */}
-            <div className="mt-6 mb-4 rounded-lg p-4">
+            <div className="mt-6 mb-4">
+              <h4 className="text-white font-medium text-lg mb-3">Newsletter</h4>
+              <p className="text-gray-400 text-sm mb-3">Get weekly book recommendations</p>
               <div className="flex">
                 <input 
                   type="email" 
@@ -29,7 +31,7 @@ const Footer = () => {
                   className="flex-1 py-2 px-3 rounded-l-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300 text-gray-900"
                 />
                 <button className="bg-blue-600 px-4 py-2 rounded-r-lg font-medium hover:bg-blue-700 transition-colors text-white">
-                  Subscribe
+                  Join
                 </button>
               </div>
             </div>
