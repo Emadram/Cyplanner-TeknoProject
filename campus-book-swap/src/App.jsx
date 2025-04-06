@@ -67,8 +67,8 @@ function App() {
             <Route path="book/:bookId" element={<BookPage />} />
             <Route path="books" element={<BookPage />} />
             <Route path="textbooks" element={<BookPage />} />
-            <Route path="categories" element={<BooksPage />} />
-            <Route path="category/:categoryName" element={<BooksPage />} />
+            <Route path="categories" element={<BookPage />} />
+            <Route path="category/:categoryName" element={<BookPage />} />
             
             {/* Protected Routes */}
             <Route path="dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
