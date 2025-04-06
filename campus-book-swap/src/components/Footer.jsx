@@ -21,18 +21,18 @@ const Footer = () => {
             </p>
             
             {/* Newsletter Subscription */}
-            <div className="mt-6 mb-4">
-              <h4 className="font-medium text-lg mb-3">Subscribe to Our Newsletter</h4>
-              <p className="text-gray-400 text-sm mb-3">
+            <div className="mt-6 mb-4 bg-white rounded-lg p-4">
+              <h4 className="font-medium text-lg text-gray-900 mb-3">Subscribe to Our Newsletter</h4>
+              <p className="text-gray-600 text-sm mb-3">
                 Get weekly book recommendations and exclusive discounts.
               </p>
               <div className="flex">
                 <input 
                   type="email" 
                   placeholder="Your email address" 
-                  className="flex-1 py-2 px-3 rounded-l-lg focus:outline-none text-gray-900"
+                  className="flex-1 py-2 px-3 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300 text-gray-900"
                 />
-                <button className="bg-blue-600 px-4 py-2 rounded-r-lg font-medium hover:bg-blue-700 transition-colors">
+                <button className="bg-blue-600 px-4 py-2 rounded-r-lg font-medium hover:bg-blue-700 transition-colors text-white">
                   Subscribe
                 </button>
               </div>
@@ -65,7 +65,6 @@ const Footer = () => {
               <li><Link to="/textbooks" className="text-gray-400 hover:text-white transition-colors">Textbooks</Link></li>
               <li><Link to="/categories" className="text-gray-400 hover:text-white transition-colors">Categories</Link></li>
               <li><Link to="/category/used-books" className="text-gray-400 hover:text-white transition-colors">Used Books</Link></li>
-              <li><Link to="/category/rare-books" className="text-gray-400 hover:text-white transition-colors">Rare & Collectible</Link></li>
             </ul>
           </div>
           
