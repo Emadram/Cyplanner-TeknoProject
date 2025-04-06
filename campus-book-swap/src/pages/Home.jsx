@@ -626,10 +626,10 @@ const Home = () => {
                 <div className="absolute bottom-0 right-8 w-40 h-56 bg-blue-600 rounded-lg shadow-xl transform rotate-3 z-20"></div>
                 <div className="absolute bottom-0 right-4 w-40 h-56 bg-indigo-500 rounded-lg shadow-xl transform -rotate-3 z-30"></div>
                 <div className="absolute bottom-0 right-0 w-40 h-56 bg-blue-400 rounded-lg shadow-2xl z-40 overflow-hidden">
-                  {featuredBooks.length > 0 && featuredBooks[0].cover ? (
+                  {featuredBooks && featuredBooks.length > 0 && featuredBooks[0].cover ? (
                     <img 
-                      src={featuredBooks[0].cover} 
-                      alt={featuredBooks[0].title} 
+                      src={featuredBooks[0].cover || "https://via.placeholder.com/160x224?text=Book+Cover"}
+                      alt={featuredBooks[0].title || "Featured Book"} 
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         e.target.onerror = null;
@@ -811,6 +811,10 @@ const Home = () => {
                     src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8bGlicmFyeXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60" 
                     alt="Reading Room" 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://via.placeholder.com/400x200?text=Reading+Room';
+                    }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
                   <div className="absolute bottom-0 left-0 p-4">
@@ -840,6 +844,10 @@ const Home = () => {
                     src="https://images.unsplash.com/photo-1577896851231-70ef18881754?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8c3R1ZHklMjBncm91cHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60" 
                     alt="Study Group" 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://via.placeholder.com/400x200?text=Study+Group';
+                    }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
                   <div className="absolute bottom-0 left-0 p-4">
@@ -869,6 +877,10 @@ const Home = () => {
                     src="https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJpbnRlcnxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60" 
                     alt="Printing Services" 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://via.placeholder.com/400x200?text=Printing+Services';
+                    }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
                   <div className="absolute bottom-0 left-0 p-4">
