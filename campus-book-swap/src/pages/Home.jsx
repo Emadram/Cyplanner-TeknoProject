@@ -1009,7 +1009,7 @@ const Home = () => {
                           {/* Book Cover */}
                           {book.cover ? (
                             <img 
-                              src={book.cover} 
+                              src={book.cover || 'https://via.placeholder.com/150?text=No+Cover'} 
                               alt={book.title} 
                               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
                               onError={(e) => {
