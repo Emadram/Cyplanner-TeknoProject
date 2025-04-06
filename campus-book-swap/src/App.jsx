@@ -8,7 +8,7 @@ import SignIn from './pages/SignIn';
 import NotFound from './pages/NotFound';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
-import BookPage from './pages/BookPage';
+import BooksPage from './pages/BooksPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 // Fetch data from Strapi API using authenticated requests when needed
