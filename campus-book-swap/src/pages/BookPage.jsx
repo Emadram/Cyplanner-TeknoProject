@@ -229,6 +229,11 @@ const BooksPage = () => {
   
   // Get current category name for display
   const getCurrentCategoryName = () => {
+    // Handle the special case of textbooks route
+    if (window.location.pathname.includes('/textbooks')) {
+      return 'Textbooks';
+    }
+    
     if (!categoryName || categoryName === 'all') {
       return 'All Books';
     }
