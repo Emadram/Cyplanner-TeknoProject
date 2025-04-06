@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { bookAPI } from '../services/api';
-
+import { useAuth } from '../contexts/AuthContext';
 
 const BookPage = () => {
   const { bookId } = useParams();
