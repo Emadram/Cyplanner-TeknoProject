@@ -104,7 +104,7 @@ const BooksPage = () => {
     };
     
     fetchData();
-  }, [categoryName]);
+  }, [categoryName, window.location.pathname]);
 
   // Helper function to get image URL from Strapi data
   const getStrapiMediaUrl = (imageData) => {
