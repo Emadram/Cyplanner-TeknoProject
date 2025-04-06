@@ -1022,12 +1022,12 @@ const Home = () => {
                           {/* Book Cover */}
                           {book.cover ? (
                             <img 
-                              src={book.cover || null} 
+                              src={book.cover || 'https://via.placeholder.com/150?text=No+Cover'} 
                               alt={book.title} 
                               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
                               onError={(e) => {
                                 e.target.onerror = null;
-                                e.target.src = null;
+                                e.target.src = 'https://via.placeholder.com/150?text=No+Cover';
                               }}
                             />
                           ) : (
@@ -1061,39 +1061,7 @@ const Home = () => {
               ))}
             </div>
             
-            {/* Library Card Promotion */}
-            <div className="mt-16 bg-blue-50 rounded-xl p-8 flex flex-col md:flex-row items-center gap-8">
-              <div className="w-full md:w-2/3">
-                <h3 className="text-xl font-bold text-gray-800 mb-2">Get Your Library Card</h3>
-                <p className="text-gray-600 mb-6">
-                  Library cards are free for all students, faculty, and staff. Sign up to unlock
-                  all our services, extended borrowing privileges, and access to our digital collections.
-                </p>
-                <Link to="/signup" className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
-                  Sign Up Today
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                  </svg>
-                </Link>
-              </div>
-              <div className="w-full md:w-1/3">
-                <div className="bg-white p-6 rounded-xl shadow-md transform rotate-3 relative">
-                  <div className="absolute top-0 right-0 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg">CAMPUS ID</div>
-                  <div className="mb-4 pb-2 border-b border-gray-200">
-                    <div className="text-xs text-gray-500 mb-1">CARD HOLDER</div>
-                    <div className="font-bold text-gray-800">CAMPUS BOOKSHOP MEMBER</div>
-                  </div>
-                  <div className="mb-4">
-                    <div className="text-xs text-gray-500 mb-1">MEMBER SINCE</div>
-                    <div className="font-bold text-gray-800">{new Date().toLocaleDateString()}</div>
-                  </div>
-                  <div className="mt-4 flex justify-between items-center">
-                    <div className="h-10 w-16 bg-blue-600 rounded"></div>
-                    <div className="text-xs text-gray-500"># STUDENT-XXXX</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+    
           </div>
         </div>
       );
