@@ -3,43 +3,43 @@ import { Link, useParams } from 'react-router-dom';
 import { bookAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 
-    const CampusStatsSection = () => {
-      return (
-        <div className="py-10 px-4 bg-blue-600 text-white">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-2xl font-bold mb-8 text-center">Campus BookSwap Stats</h2>
+    // const CampusStatsSection = () => {
+    //   return (
+    //     <div className="py-10 px-4 bg-blue-600 text-white">
+    //       <div className="max-w-6xl mx-auto">
+    //         <h2 className="text-2xl font-bold mb-8 text-center">Campus BookSwap Stats</h2>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-              <div className="stat-card">
-                <div className="text-3xl md:text-4xl font-bold mb-2">1,200+</div>
-                <div className="text-blue-100">Active Books</div>
-              </div>
-              <div className="stat-card">
-                <div className="text-3xl md:text-4xl font-bold mb-2">$14,500</div>
-                <div className="text-blue-100">Student Savings</div>
-              </div>
-              <div className="stat-card">
-                <div className="text-3xl md:text-4xl font-bold mb-2">520</div>
-                <div className="text-blue-100">Completed Swaps</div>
-              </div>
-              <div className="stat-card">
-                <div className="text-3xl md:text-4xl font-bold mb-2">345</div>
-                <div className="text-blue-100">Active Borrowers</div>
-              </div>
-            </div>
+    //         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+    //           <div className="stat-card">
+    //             <div className="text-3xl md:text-4xl font-bold mb-2">1,200+</div>
+    //             <div className="text-blue-100">Active Books</div>
+    //           </div>
+    //           <div className="stat-card">
+    //             <div className="text-3xl md:text-4xl font-bold mb-2">$14,500</div>
+    //             <div className="text-blue-100">Student Savings</div>
+    //           </div>
+    //           <div className="stat-card">
+    //             <div className="text-3xl md:text-4xl font-bold mb-2">520</div>
+    //             <div className="text-blue-100">Completed Swaps</div>
+    //           </div>
+    //           <div className="stat-card">
+    //             <div className="text-3xl md:text-4xl font-bold mb-2">345</div>
+    //             <div className="text-blue-100">Active Borrowers</div>
+    //           </div>
+    //         </div>
             
-            <div className="mt-10 text-center">
-              <p className="text-lg mb-6 max-w-xl mx-auto text-blue-100">
-                Join thousands of students saving money by swapping, borrowing, and buying books directly from other students.
-              </p>
-              <button className="px-6 py-3 bg-white text-blue-700 rounded-full font-medium hover:bg-blue-50 transition-colors shadow-md">
-                Join CampusBookSwap Today
-              </button>
-            </div>
-          </div>
-        </div>
-      );
-    };
+    //         <div className="mt-10 text-center">
+    //           <p className="text-lg mb-6 max-w-xl mx-auto text-blue-100">
+    //             Join thousands of students saving money by swapping, borrowing, and buying books directly from other students.
+    //           </p>
+    //           <button className="px-6 py-3 bg-white text-blue-700 rounded-full font-medium hover:bg-blue-50 transition-colors shadow-md">
+    //             Join CampusBookSwap Today
+    //           </button>
+    //         </div>
+    //       </div>
+    //     </div>
+    //   );
+    // };
 
     const PopularCategoriesSection = () => {
       const popularCategories = [
@@ -89,83 +89,83 @@ import { useAuth } from '../contexts/AuthContext';
         </div>
       );
     };
-    const TestimonialsSection = () => {
-      const testimonials = [
-        {
-          id: 1,
-          name: "Sarah Johnson",
-          major: "Computer Science",
-          year: "Junior",
-          text: "I saved over $300 last semester by swapping and borrowing textbooks on CampusBookSwap. The platform is super easy to use and I've met some great people from my major!",
-          avatar: "https://randomuser.me/api/portraits/women/44.jpg"
-        },
-        {
-          id: 2,
-          name: "Michael Chen",
-          major: "Business Administration",
-          year: "Senior",
-          text: "As a senior, I had a lot of books collecting dust. I've sold 12 books so far and made enough to cover my coffee budget for the entire semester!",
-          avatar: "https://randomuser.me/api/portraits/men/32.jpg"
-        },
-        {
-          id: 3,
-          name: "Leila Patel",
-          major: "Biology",
-          year: "Sophomore",
-          text: "The borrowing feature is perfect for those one-time courses. I borrowed three lab manuals last term and saved a ton of money on books I would have only used once.",
-          avatar: "https://randomuser.me/api/portraits/women/68.jpg"
-        }
-      ];
+    // const TestimonialsSection = () => {
+    //   const testimonials = [
+    //     {
+    //       id: 1,
+    //       name: "Sarah Johnson",
+    //       major: "Computer Science",
+    //       year: "Junior",
+    //       text: "I saved over $300 last semester by swapping and borrowing textbooks on CampusBookSwap. The platform is super easy to use and I've met some great people from my major!",
+    //       avatar: "https://randomuser.me/api/portraits/women/44.jpg"
+    //     },
+    //     {
+    //       id: 2,
+    //       name: "Michael Chen",
+    //       major: "Business Administration",
+    //       year: "Senior",
+    //       text: "As a senior, I had a lot of books collecting dust. I've sold 12 books so far and made enough to cover my coffee budget for the entire semester!",
+    //       avatar: "https://randomuser.me/api/portraits/men/32.jpg"
+    //     },
+    //     {
+    //       id: 3,
+    //       name: "Leila Patel",
+    //       major: "Biology",
+    //       year: "Sophomore",
+    //       text: "The borrowing feature is perfect for those one-time courses. I borrowed three lab manuals last term and saved a ton of money on books I would have only used once.",
+    //       avatar: "https://randomuser.me/api/portraits/women/68.jpg"
+    //     }
+    //   ];
       
-      return (
-        <div className="py-12 px-4 bg-white">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-2xl font-bold mb-2 text-center text-gray-800">What Students Are Saying</h2>
-            <p className="text-gray-600 text-center mb-10 max-w-2xl mx-auto">
-              Join thousands of satisfied students who are saving money and helping each other succeed.
-            </p>
+    //   return (
+    //     <div className="py-12 px-4 bg-white">
+    //       <div className="max-w-6xl mx-auto">
+    //         <h2 className="text-2xl font-bold mb-2 text-center text-gray-800">What Students Are Saying</h2>
+    //         <p className="text-gray-600 text-center mb-10 max-w-2xl mx-auto">
+    //           Join thousands of satisfied students who are saving money and helping each other succeed.
+    //         </p>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {testimonials.map(testimonial => (
-                <div key={testimonial.id} className="bg-gray-50 rounded-xl p-6 shadow-sm relative">
-                  {/* Quote mark decorative element */}
-                  <div className="absolute top-4 right-4 text-5xl text-gray-200 font-serif">"</div>
+    //         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+    //           {testimonials.map(testimonial => (
+    //             <div key={testimonial.id} className="bg-gray-50 rounded-xl p-6 shadow-sm relative">
+    //               {/* Quote mark decorative element */}
+    //               <div className="absolute top-4 right-4 text-5xl text-gray-200 font-serif">"</div>
                   
-                  <p className="text-gray-700 mb-6 relative z-10">
-                    "{testimonial.text}"
-                  </p>
+    //               <p className="text-gray-700 mb-6 relative z-10">
+    //                 "{testimonial.text}"
+    //               </p>
                   
-                  <div className="flex items-center">
-                    <img 
-                      src={testimonial.avatar} 
-                      alt={testimonial.name}
-                      className="w-12 h-12 rounded-full mr-4 object-cover border-2 border-white shadow-sm"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = null;
-                      }}
-                    />
-                    <div>
-                      <h4 className="font-medium text-gray-800">{testimonial.name}</h4>
-                      <p className="text-sm text-gray-500">{testimonial.major}, {testimonial.year}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+    //               <div className="flex items-center">
+    //                 <img 
+    //                   src={testimonial.avatar} 
+    //                   alt={testimonial.name}
+    //                   className="w-12 h-12 rounded-full mr-4 object-cover border-2 border-white shadow-sm"
+    //                   onError={(e) => {
+    //                     e.target.onerror = null;
+    //                     e.target.src = null;
+    //                   }}
+    //                 />
+    //                 <div>
+    //                   <h4 className="font-medium text-gray-800">{testimonial.name}</h4>
+    //                   <p className="text-sm text-gray-500">{testimonial.major}, {testimonial.year}</p>
+    //                 </div>
+    //               </div>
+    //             </div>
+    //           ))}
+    //         </div>
             
-            <div className="mt-10 text-center">
-              <button className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                </svg>
-                Share Your Experience
-              </button>
-            </div>
-          </div>
-        </div>
-      );
-    };
+    //         <div className="mt-10 text-center">
+    //           <button className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+    //             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    //               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+    //             </svg>
+    //             Share Your Experience
+    //           </button>
+    //         </div>
+    //       </div>
+    //     </div>
+    //   );
+    // };
 const Home = () => {
   // Auth hook must be called at the top level of your function component
   const { isAuthenticated } = useAuth();
