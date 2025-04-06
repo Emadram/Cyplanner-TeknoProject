@@ -8,6 +8,7 @@ import SignIn from './pages/SignIn';
 import NotFound from './pages/NotFound';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
+import BookPage from './pages/BookPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 // Fetch data from Strapi API using authenticated requests when needed
@@ -61,10 +62,17 @@ function App() {
             <Route index element={<Home />} />
             <Route path="signup" element={<SignUp />} />
             <Route path="signin" element={<SignIn />} />
+            <Route path="book/:bookId" element={<BookPage />} />
+            <Route path="books" element={<Home />} />
+            <Route path="textbooks" element={<Home />} />
+            <Route path="categories" element={<Home />} />
+            <Route path="category/:categoryName" element={<Home />} />
             
             {/* Protected Routes */}
             <Route path="dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="orders" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="cart" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             
             {/* 404 Page */}
             <Route path="*" element={<NotFound />} />
