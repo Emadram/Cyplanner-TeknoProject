@@ -65,8 +65,8 @@ function App() {
             
             {/* Book routes */}
             <Route path="book/:bookId" element={<BookPage />} />
-            <Route path="books" element={<BooksPage />} />
-            <Route path="textbooks" element={<BooksPage />} />
+            <Route path="books" element={<BookPage />} />
+            <Route path="textbooks" element={<BookPage />} />
             <Route path="categories" element={<BooksPage />} />
             <Route path="category/:categoryName" element={<BooksPage />} />
             
