@@ -11,7 +11,8 @@ const BooksPage = () => {
   const [filters, setFilters] = useState({
     sort: 'newest',
     condition: 'all',
-    priceRange: 'all'
+    priceRange: 'all',
+    bookType: 'all' // New filter for book type (Sale, Swap, Borrow)
   });
 
   useEffect(() => {
@@ -73,6 +74,11 @@ const BooksPage = () => {
             coverUrl = getStrapiMediaUrl(bookData.cover);
           }
           
+          // Determine book transaction type (For Sale, For Swap, For Borrowing)
+          // For demonstration, using a deterministic approach based on ID
+          const bookTypes = ['For Sale', 'For Swap', 'For Borrowing'];
+          const bookType = bookTypes[book.id % bookTypes.length];
+          
           // Map the book data
           return {
             id: book.id,
@@ -87,10 +93,12 @@ const BooksPage = () => {
             course: bookData.course,
             seller: bookData.seller || "Campus BookShop",
             cover: coverUrl,
-            price: Math.floor(Math.random() * 25) + 5 + 0.99,
+            // Only set price for "For Sale" books
+            price: bookType === 'For Sale' ? Math.floor(Math.random() * 25) + 5 + 0.99 : null,
             categoryId: bookData.category?.data?.id || null,
             inStock: Math.floor(Math.random() * 10) + 1,
-            isNew: Math.random() > 0.5
+            isNew: Math.random() > 0.5,
+            bookType: bookType // Add the book type
           };
         });
         
@@ -211,13 +219,19 @@ const BooksPage = () => {
           return false;
         }
         
-        // Filter by price range
-        if (filters.priceRange !== 'all') {
+        // Filter by price range - only apply to "For Sale" books
+        if (filters.priceRange !== 'all' && book.bookType === 'For Sale') {
           const price = book.price;
+          if (!price) return false;
           if (filters.priceRange === 'under10' && price >= 10) return false;
           if (filters.priceRange === '10to20' && (price < 10 || price > 20)) return false;
           if (filters.priceRange === '20to30' && (price < 20 || price > 30)) return false;
           if (filters.priceRange === 'over30' && price <= 30) return false;
+        }
+        
+        // Filter by book type
+        if (filters.bookType !== 'all' && book.bookType !== filters.bookType) {
+          return false;
         }
         
         return true;
@@ -226,8 +240,16 @@ const BooksPage = () => {
         // Sort books based on selected option
         switch (filters.sort) {
           case 'priceLow':
+            // Handle null prices (books that are not for sale)
+            if (a.price === null && b.price === null) return 0;
+            if (a.price === null) return 1;
+            if (b.price === null) return -1;
             return a.price - b.price;
           case 'priceHigh':
+            // Handle null prices (books that are not for sale)
+            if (a.price === null && b.price === null) return 0;
+            if (a.price === null) return 1;
+            if (b.price === null) return -1;
             return b.price - a.price;
           case 'rating':
             return b.rating - a.rating;
@@ -267,6 +289,32 @@ const BooksPage = () => {
       ...prev,
       [filterType]: value
     }));
+  };
+
+  // Style map for book type badges
+  const typeStyles = {
+    'For Sale': 'bg-green-100 text-green-800 border-green-200',
+    'For Swap': 'bg-blue-100 text-blue-800 border-blue-200',
+    'For Borrowing': 'bg-purple-100 text-purple-800 border-purple-200'
+  };
+  
+  // Icons for book types
+  const typeIcons = {
+    'For Sale': (
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+    'For Swap': (
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+      </svg>
+    ),
+    'For Borrowing': (
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+      </svg>
+    )
   };
 
   return (
@@ -321,6 +369,53 @@ const BooksPage = () => {
                       </Link>
                     </div>
                   ))}
+                </div>
+              </div>
+              
+              {/* Book Type Filter - NEW */}
+              <div className="mb-6">
+                <h3 className="font-medium text-gray-700 mb-2">Book Type</h3>
+                <div className="space-y-2">
+                  <label className="flex items-center text-sm">
+                    <input 
+                      type="radio" 
+                      name="bookType" 
+                      checked={filters.bookType === 'all'}
+                      onChange={() => handleFilterChange('bookType', 'all')}
+                      className="mr-2"
+                    />
+                    <span className="text-gray-600">All Types</span>
+                  </label>
+                  <label className="flex items-center text-sm">
+                    <input 
+                      type="radio" 
+                      name="bookType" 
+                      checked={filters.bookType === 'For Sale'}
+                      onChange={() => handleFilterChange('bookType', 'For Sale')}
+                      className="mr-2"
+                    />
+                    <span className="text-gray-600">For Sale</span>
+                  </label>
+                  <label className="flex items-center text-sm">
+                    <input 
+                      type="radio" 
+                      name="bookType" 
+                      checked={filters.bookType === 'For Swap'}
+                      onChange={() => handleFilterChange('bookType', 'For Swap')}
+                      className="mr-2"
+                    />
+                    <span className="text-gray-600">For Swap</span>
+                  </label>
+                  <label className="flex items-center text-sm">
+                    <input 
+                      type="radio" 
+                      name="bookType" 
+                      checked={filters.bookType === 'For Borrowing'}
+                      onChange={() => handleFilterChange('bookType', 'For Borrowing')}
+                      className="mr-2"
+                    />
+                    <span className="text-gray-600">For Borrowing</span>
+                  </label>
                 </div>
               </div>
               
@@ -381,69 +476,72 @@ const BooksPage = () => {
                 </div>
               </div>
               
-              {/* Price Range Filter */}
-              <div className="mb-6">
-                <h3 className="font-medium text-gray-700 mb-2">Price Range</h3>
-                <div className="space-y-2">
-                  <label className="flex items-center text-sm">
-                    <input 
-                      type="radio" 
-                      name="priceRange" 
-                      checked={filters.priceRange === 'all'}
-                      onChange={() => handleFilterChange('priceRange', 'all')}
-                      className="mr-2"
-                    />
-                    <span className="text-gray-600">All Prices</span>
-                  </label>
-                  <label className="flex items-center text-sm">
-                    <input 
-                      type="radio" 
-                      name="priceRange" 
-                      checked={filters.priceRange === 'under10'}
-                      onChange={() => handleFilterChange('priceRange', 'under10')}
-                      className="mr-2"
-                    />
-                    <span className="text-gray-600">Under $10</span>
-                  </label>
-                  <label className="flex items-center text-sm">
-                    <input 
-                      type="radio" 
-                      name="priceRange" 
-                      checked={filters.priceRange === '10to20'}
-                      onChange={() => handleFilterChange('priceRange', '10to20')}
-                      className="mr-2"
-                    />
-                    <span className="text-gray-600">$10 to $20</span>
-                  </label>
-                  <label className="flex items-center text-sm">
-                    <input 
-                      type="radio" 
-                      name="priceRange" 
-                      checked={filters.priceRange === '20to30'}
-                      onChange={() => handleFilterChange('priceRange', '20to30')}
-                      className="mr-2"
-                    />
-                    <span className="text-gray-600">$20 to $30</span>
-                  </label>
-                  <label className="flex items-center text-sm">
-                    <input 
-                      type="radio" 
-                      name="priceRange" 
-                      checked={filters.priceRange === 'over30'}
-                      onChange={() => handleFilterChange('priceRange', 'over30')}
-                      className="mr-2"
-                    />
-                    <span className="text-gray-600">Over $30</span>
-                  </label>
+              {/* Price Range Filter - Only show if "For Sale" books are not filtered out */}
+              {(filters.bookType === 'all' || filters.bookType === 'For Sale') && (
+                <div className="mb-6">
+                  <h3 className="font-medium text-gray-700 mb-2">Price Range</h3>
+                  <div className="space-y-2">
+                    <label className="flex items-center text-sm">
+                      <input 
+                        type="radio" 
+                        name="priceRange" 
+                        checked={filters.priceRange === 'all'}
+                        onChange={() => handleFilterChange('priceRange', 'all')}
+                        className="mr-2"
+                      />
+                      <span className="text-gray-600">All Prices</span>
+                    </label>
+                    <label className="flex items-center text-sm">
+                      <input 
+                        type="radio" 
+                        name="priceRange" 
+                        checked={filters.priceRange === 'under10'}
+                        onChange={() => handleFilterChange('priceRange', 'under10')}
+                        className="mr-2"
+                      />
+                      <span className="text-gray-600">Under $10</span>
+                    </label>
+                    <label className="flex items-center text-sm">
+                      <input 
+                        type="radio" 
+                        name="priceRange" 
+                        checked={filters.priceRange === '10to20'}
+                        onChange={() => handleFilterChange('priceRange', '10to20')}
+                        className="mr-2"
+                      />
+                      <span className="text-gray-600">$10 to $20</span>
+                    </label>
+                    <label className="flex items-center text-sm">
+                      <input 
+                        type="radio" 
+                        name="priceRange" 
+                        checked={filters.priceRange === '20to30'}
+                        onChange={() => handleFilterChange('priceRange', '20to30')}
+                        className="mr-2"
+                      />
+                      <span className="text-gray-600">$20 to $30</span>
+                    </label>
+                    <label className="flex items-center text-sm">
+                      <input 
+                        type="radio" 
+                        name="priceRange" 
+                        checked={filters.priceRange === 'over30'}
+                        onChange={() => handleFilterChange('priceRange', 'over30')}
+                        className="mr-2"
+                      />
+                      <span className="text-gray-600">Over $30</span>
+                    </label>
+                  </div>
                 </div>
-              </div>
+              )}
               
               {/* Reset Filters Button */}
               <button 
                 onClick={() => setFilters({
                   sort: 'newest',
                   condition: 'all',
-                  priceRange: 'all'
+                  priceRange: 'all',
+                  bookType: 'all'
                 })}
                 className="w-full py-2 px-4 bg-gray-200 text-gray-700 rounded font-medium hover:bg-gray-300 transition-colors"
               >
@@ -510,7 +608,8 @@ const BooksPage = () => {
                   onClick={() => setFilters({
                     sort: 'newest',
                     condition: 'all',
-                    priceRange: 'all'
+                    priceRange: 'all',
+                    bookType: 'all'
                   })}
                   className="px-4 py-2 bg-blue-600 text-white rounded font-medium hover:bg-blue-700 transition-colors"
                 >
@@ -521,7 +620,13 @@ const BooksPage = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredBooks.map(book => (
                   <Link to={`/book/${book.id}`} key={book.id} className="group">
-                    <div className="bg-white rounded-lg shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md h-full flex flex-col">
+                    <div className="bg-white rounded-lg shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md h-full flex flex-col relative">
+                      {/* Book Type Badge */}
+                      <div className={`absolute top-3 left-3 z-10 px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${typeStyles[book.bookType]} border`}>
+                        {typeIcons[book.bookType]}
+                        {book.bookType}
+                      </div>
+                      
                       <div className="relative aspect-w-2 aspect-h-3 bg-gray-100">
                         {book.isNew && (
                           <div className="absolute top-0 right-0 bg-blue-600 text-white text-xs font-bold px-2 py-1 m-2 rounded-sm z-10">
@@ -564,7 +669,21 @@ const BooksPage = () => {
                         </div>
                         
                         <div className="mt-auto">
-                          <p className="text-blue-600 font-medium">${book.price.toFixed(2)}</p>
+                          {/* Only show price for "For Sale" books */}
+                          {book.bookType === 'For Sale' && book.price !== null && (
+                            <p className="text-blue-600 font-medium">${book.price.toFixed(2)}</p>
+                          )}
+                          
+                          {/* For Swap books */}
+                          {book.bookType === 'For Swap' && (
+                            <p className="text-blue-600 font-medium">Swap</p>
+                          )}
+                          
+                          {/* For Borrowing books */}
+                          {book.bookType === 'For Borrowing' && (
+                            <p className="text-blue-600 font-medium">Borrow</p>
+                          )}
+                          
                           <p className="text-xs text-gray-500 mt-1">
                             {book.condition} • {book.inStock > 0 ? `${book.inStock} in stock` : 'Out of stock'}
                           </p>
@@ -573,10 +692,32 @@ const BooksPage = () => {
                       
                       <div className="p-4 bg-gray-50 border-t border-gray-100">
                         <button className="w-full py-2 px-4 bg-blue-600 text-white rounded font-medium hover:bg-blue-700 transition-colors text-sm flex items-center justify-center gap-1">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                          </svg>
-                          Add to Cart
+                          {book.bookType === 'For Sale' && (
+                            <>
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                              </svg>
+                              Add to Cart
+                            </>
+                          )}
+                          
+                          {book.bookType === 'For Swap' && (
+                            <>
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                              </svg>
+                              Propose Swap
+                            </>
+                          )}
+                          
+                          {book.bookType === 'For Borrowing' && (
+                            <>
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                              Borrow Now
+                            </>
+                          )}
                         </button>
                       </div>
                     </div>

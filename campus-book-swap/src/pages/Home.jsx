@@ -3,175 +3,11 @@ import { Link, useParams } from 'react-router-dom';
 import { bookAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 
-    // const CampusStatsSection = () => {
-    //   return (
-    //     <div className="py-10 px-4 bg-blue-600 text-white">
-    //       <div className="max-w-6xl mx-auto">
-    //         <h2 className="text-2xl font-bold mb-8 text-center">Campus BookSwap Stats</h2>
-            
-    //         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-    //           <div className="stat-card">
-    //             <div className="text-3xl md:text-4xl font-bold mb-2">1,200+</div>
-    //             <div className="text-blue-100">Active Books</div>
-    //           </div>
-    //           <div className="stat-card">
-    //             <div className="text-3xl md:text-4xl font-bold mb-2">$14,500</div>
-    //             <div className="text-blue-100">Student Savings</div>
-    //           </div>
-    //           <div className="stat-card">
-    //             <div className="text-3xl md:text-4xl font-bold mb-2">520</div>
-    //             <div className="text-blue-100">Completed Swaps</div>
-    //           </div>
-    //           <div className="stat-card">
-    //             <div className="text-3xl md:text-4xl font-bold mb-2">345</div>
-    //             <div className="text-blue-100">Active Borrowers</div>
-    //           </div>
-    //         </div>
-            
-    //         <div className="mt-10 text-center">
-    //           <p className="text-lg mb-6 max-w-xl mx-auto text-blue-100">
-    //             Join thousands of students saving money by swapping, borrowing, and buying books directly from other students.
-    //           </p>
-    //           <button className="px-6 py-3 bg-white text-blue-700 rounded-full font-medium hover:bg-blue-50 transition-colors shadow-md">
-    //             Join CampusBookSwap Today
-    //           </button>
-    //         </div>
-    //       </div>
-    //     </div>
-    //   );
-    // };
-
-    const PopularCategoriesSection = () => {
-      const popularCategories = [
-        { name: 'Computer Science', icon: 'laptop-code', bookCount: 284, color: 'bg-blue-100 text-blue-600' },
-        { name: 'Business', icon: 'briefcase', bookCount: 205, color: 'bg-yellow-100 text-yellow-600' },
-        { name: 'Mathematics', icon: 'square-root-alt', bookCount: 176, color: 'bg-purple-100 text-purple-600' },
-        { name: 'Engineering', icon: 'tools', bookCount: 153, color: 'bg-red-100 text-red-600' },
-        { name: 'Biology', icon: 'dna', bookCount: 142, color: 'bg-green-100 text-green-600' },
-        { name: 'Psychology', icon: 'brain', bookCount: 124, color: 'bg-indigo-100 text-indigo-600' },
-        { name: 'Literature', icon: 'book-open', bookCount: 115, color: 'bg-pink-100 text-pink-600' },
-        { name: 'Chemistry', icon: 'flask', bookCount: 98, color: 'bg-teal-100 text-teal-600' }
-      ];
-      
-      // Helper function to render FA-like icons (simplified, you'd use real icons in production)
-      const renderIcon = (icon) => {
-        return (
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-          </svg>
-        );
-      };
-      
-      return (
-        <div className="py-10 px-4 bg-gray-50">
-          <div className="max-w-6xl mx-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-gray-800">Popular Course Categories</h2>
-              <a href="#" className="text-blue-600 text-sm font-medium hover:text-blue-800">
-                View All Categories →
-              </a>
-            </div>
-            
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {popularCategories.map(category => (
-                <div key={category.name} className="category-card bg-white rounded-xl p-4 shadow-sm transition-all hover:shadow-md cursor-pointer">
-                  <div className="flex items-center mb-3">
-                    <div className={`rounded-full p-2 ${category.color}`}>
-                      {renderIcon(category.icon)}
-                    </div>
-                    <h3 className="font-medium ml-3 text-gray-800">{category.name}</h3>
-                  </div>
-                  <p className="text-sm text-gray-500">{category.bookCount} books available</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      );
-    };
-    // const TestimonialsSection = () => {
-    //   const testimonials = [
-    //     {
-    //       id: 1,
-    //       name: "Sarah Johnson",
-    //       major: "Computer Science",
-    //       year: "Junior",
-    //       text: "I saved over $300 last semester by swapping and borrowing textbooks on CampusBookSwap. The platform is super easy to use and I've met some great people from my major!",
-    //       avatar: "https://randomuser.me/api/portraits/women/44.jpg"
-    //     },
-    //     {
-    //       id: 2,
-    //       name: "Michael Chen",
-    //       major: "Business Administration",
-    //       year: "Senior",
-    //       text: "As a senior, I had a lot of books collecting dust. I've sold 12 books so far and made enough to cover my coffee budget for the entire semester!",
-    //       avatar: "https://randomuser.me/api/portraits/men/32.jpg"
-    //     },
-    //     {
-    //       id: 3,
-    //       name: "Leila Patel",
-    //       major: "Biology",
-    //       year: "Sophomore",
-    //       text: "The borrowing feature is perfect for those one-time courses. I borrowed three lab manuals last term and saved a ton of money on books I would have only used once.",
-    //       avatar: "https://randomuser.me/api/portraits/women/68.jpg"
-    //     }
-    //   ];
-      
-    //   return (
-    //     <div className="py-12 px-4 bg-white">
-    //       <div className="max-w-6xl mx-auto">
-    //         <h2 className="text-2xl font-bold mb-2 text-center text-gray-800">What Students Are Saying</h2>
-    //         <p className="text-gray-600 text-center mb-10 max-w-2xl mx-auto">
-    //           Join thousands of satisfied students who are saving money and helping each other succeed.
-    //         </p>
-            
-    //         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-    //           {testimonials.map(testimonial => (
-    //             <div key={testimonial.id} className="bg-gray-50 rounded-xl p-6 shadow-sm relative">
-    //               {/* Quote mark decorative element */}
-    //               <div className="absolute top-4 right-4 text-5xl text-gray-200 font-serif">"</div>
-                  
-    //               <p className="text-gray-700 mb-6 relative z-10">
-    //                 "{testimonial.text}"
-    //               </p>
-                  
-    //               <div className="flex items-center">
-    //                 <img 
-    //                   src={testimonial.avatar} 
-    //                   alt={testimonial.name}
-    //                   className="w-12 h-12 rounded-full mr-4 object-cover border-2 border-white shadow-sm"
-    //                   onError={(e) => {
-    //                     e.target.onerror = null;
-    //                     e.target.src = null;
-    //                   }}
-    //                 />
-    //                 <div>
-    //                   <h4 className="font-medium text-gray-800">{testimonial.name}</h4>
-    //                   <p className="text-sm text-gray-500">{testimonial.major}, {testimonial.year}</p>
-    //                 </div>
-    //               </div>
-    //             </div>
-    //           ))}
-    //         </div>
-            
-    //         <div className="mt-10 text-center">
-    //           <button className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-    //             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    //               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-    //             </svg>
-    //             Share Your Experience
-    //           </button>
-    //         </div>
-    //       </div>
-    //     </div>
-    //   );
-    // };
 const Home = () => {
   // Auth hook must be called at the top level of your function component
   const { isAuthenticated } = useAuth();
   
   // State variables for data
-  const [activeCategory, setActiveCategory] = useState('All Genres');
   const [selectedBook, setSelectedBook] = useState(null);
   const [currentSlide, setCurrentSlide] = useState(0);
   
@@ -180,15 +16,13 @@ const Home = () => {
   const [popularBooks, setPopularBooks] = useState([]);
   const [booksOfWeek, setBooksOfWeek] = useState([]);
   const [booksOfYear, setBooksOfYear] = useState([]);
-  const [categories, setCategories] = useState([]);
   
   // Loading states
   const [loading, setLoading] = useState({
     featured: true,
     popular: true,
     booksOfWeek: true,
-    booksOfYear: true,
-    categories: true
+    booksOfYear: true
   });
   
   // Error states
@@ -196,8 +30,7 @@ const Home = () => {
     featured: null,
     popular: null,
     booksOfWeek: null,
-    booksOfYear: null,
-    categories: null
+    booksOfYear: null
   });
 
   // Add scrollbar hiding and animations
@@ -339,27 +172,6 @@ const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch categories
-        setLoading(prev => ({ ...prev, categories: true }));
-        const categoriesData = await bookAPI.getCategories();
-        // Add "All Genres" option first
-        const processedCategories = [
-          { id: 'all', name: 'All Genres' },
-          ...categoriesData.data.map(cat => ({
-            id: cat.id,
-            // Support both old Strapi v4 format and new flat structure
-            name: cat.Type || (cat.attributes ? cat.attributes.name : cat.name)
-          }))
-        ];
-        setCategories(processedCategories);
-        setLoading(prev => ({ ...prev, categories: false }));
-      } catch (err) {
-        console.error('Error fetching categories:', err);
-        setError(prev => ({ ...prev, categories: err.message }));
-        setLoading(prev => ({ ...prev, categories: false }));
-      }
-
-      try {
         // Fetch featured books
         setLoading(prev => ({ ...prev, featured: true }));
         const featuredData = await bookAPI.getFeaturedBooks();
@@ -410,38 +222,6 @@ const Home = () => {
 
     fetchData();
   }, []);
-
-  // Fetch books when category changes
-  useEffect(() => {
-    const fetchBooksByCategory = async () => {
-      // Skip if "All Genres" is selected or categories aren't loaded yet
-      if (activeCategory === 'All Genres' || categories.length <= 1) {
-        return;
-      }
-
-      try {
-        setLoading(prev => ({ ...prev, popular: true }));
-        const categoryId = categories.find(cat => cat.name === activeCategory)?.id;
-        
-        if (categoryId && categoryId !== 'all') {
-          const booksData = await bookAPI.getBooksByCategory(categoryId);
-          setPopularBooks(mapBooksData(booksData.data));
-        } else {
-          // Fallback to popular books if category not found
-          const popularData = await bookAPI.getPopularBooks();
-          setPopularBooks(mapBooksData(popularData.data));
-        }
-        
-        setLoading(prev => ({ ...prev, popular: false }));
-      } catch (err) {
-        console.error('Error fetching books by category:', err);
-        setError(prev => ({ ...prev, popular: err.message }));
-        setLoading(prev => ({ ...prev, popular: false }));
-      }
-    };
-
-    fetchBooksByCategory();
-  }, [activeCategory, categories]);
 
   // Auto slide effect for featured books
   useEffect(() => {
@@ -665,7 +445,7 @@ const Home = () => {
       <div className="bg-white shadow-md rounded-xl mx-4 -mt-6 relative z-20 mb-8">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between py-4">
-            <div className="flex flex-wrap justify-center gap-4 w-full md:w-auto">
+            <div className="flex flex-wrap justify-center gap-4 w-full">
               <div className="action-card p-4 bg-blue-50 rounded-lg flex items-center w-full sm:w-40 transition-all hover:bg-blue-100">
                 <div className="rounded-full bg-blue-100 p-3 mr-3">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -702,27 +482,60 @@ const Home = () => {
                 </div>
               </div>
             </div>
-            
-            <div className="mt-4 md:mt-0">
-              <div className="relative">
-                <input 
-                  type="text" 
-                  placeholder="Search by course, book title, or ISBN..." 
-                  className="px-4 py-2 pl-10 pr-4 rounded-full bg-gray-100 border border-gray-200 w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-                <div className="absolute left-3 top-2.5 text-gray-400">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
     );
   };
   
+  const PopularCategoriesSection = () => {
+    const popularCategories = [
+      { name: 'Computer Science', icon: 'laptop-code', bookCount: 284, color: 'bg-blue-100 text-blue-600' },
+      { name: 'Business', icon: 'briefcase', bookCount: 205, color: 'bg-yellow-100 text-yellow-600' },
+      { name: 'Mathematics', icon: 'square-root-alt', bookCount: 176, color: 'bg-purple-100 text-purple-600' },
+      { name: 'Engineering', icon: 'tools', bookCount: 153, color: 'bg-red-100 text-red-600' },
+      { name: 'Biology', icon: 'dna', bookCount: 142, color: 'bg-green-100 text-green-600' },
+      { name: 'Psychology', icon: 'brain', bookCount: 124, color: 'bg-indigo-100 text-indigo-600' },
+      { name: 'Literature', icon: 'book-open', bookCount: 115, color: 'bg-pink-100 text-pink-600' },
+      { name: 'Chemistry', icon: 'flask', bookCount: 98, color: 'bg-teal-100 text-teal-600' }
+    ];
+    
+    // Helper function to render FA-like icons (simplified, you'd use real icons in production)
+    const renderIcon = (icon) => {
+      return (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+      );
+    };
+    
+    return (
+      <div className="py-10 px-4 bg-gray-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-bold text-gray-800">Popular Course Categories</h2>
+            <a href="#" className="text-blue-600 text-sm font-medium hover:text-blue-800">
+              View All Categories →
+            </a>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {popularCategories.map(category => (
+              <div key={category.name} className="category-card bg-white rounded-xl p-4 shadow-sm transition-all hover:shadow-md cursor-pointer">
+                <div className="flex items-center mb-3">
+                  <div className={`rounded-full p-2 ${category.color}`}>
+                    {renderIcon(category.icon)}
+                  </div>
+                  <h3 className="font-medium ml-3 text-gray-800">{category.name}</h3>
+                </div>
+                <p className="text-sm text-gray-500">{category.bookCount} books available</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
   
   // Campus Stats Component
   const CampusStatsSection = () => {
@@ -792,281 +605,6 @@ const Home = () => {
       }
     ];
     
-    const LibraryServicesSection = () => {
-      return (
-        <div className="py-16 bg-gray-50">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-800 mb-4">Library Services & Reading Spaces</h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                Beyond just books, CampusBookShop offers comfortable reading spaces and
-                essential academic services to enhance your campus experience.
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Reading Rooms */}
-              <div className="bg-white rounded-xl shadow-sm overflow-hidden group hover:shadow-md transition-shadow">
-                <div className="relative h-48 overflow-hidden">
-                  <img 
-                    src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8bGlicmFyeXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60" 
-                    alt="Reading Room" 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = 'https://via.placeholder.com/400x200?text=Reading+Room';
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                  <div className="absolute bottom-0 left-0 p-4">
-                    <h3 className="text-white font-bold text-xl">Quiet Reading Rooms</h3>
-                    <p className="text-blue-100 text-sm">Open 7am-11pm Daily</p>
-                  </div>
-                </div>
-                <div className="p-6">
-                  <p className="text-gray-600 text-sm mb-4">
-                    Our dedicated reading spaces offer a peaceful environment for studying,
-                    research, and quiet reading. With comfortable seating, proper lighting,
-                    and power outlets at every table.
-                  </p>
-                  <a href="#" className="text-blue-600 text-sm font-medium hover:text-blue-700 flex items-center">
-                    Reserve a Spot
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </a>
-                </div>
-              </div>
-              
-              {/* Study Groups */}
-              <div className="bg-white rounded-xl shadow-sm overflow-hidden group hover:shadow-md transition-shadow">
-                <div className="relative h-48 overflow-hidden">
-                  <img 
-                    src="https://images.unsplash.com/photo-1577896851231-70ef18881754?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8c3R1ZHklMjBncm91cHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60" 
-                    alt="Study Group" 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = 'https://via.placeholder.com/400x200?text=Study+Group';
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                  <div className="absolute bottom-0 left-0 p-4">
-                    <h3 className="text-white font-bold text-xl">Collaboration Spaces</h3>
-                    <p className="text-blue-100 text-sm">Bookable Study Rooms</p>
-                  </div>
-                </div>
-                <div className="p-6">
-                  <p className="text-gray-600 text-sm mb-4">
-                    Need to work on a group project or host a study session? Our collaboration
-                    spaces are equipped with whiteboards, displays, and conference tables to
-                    facilitate productive group work.
-                  </p>
-                  <a href="#" className="text-blue-600 text-sm font-medium hover:text-blue-700 flex items-center">
-                    Book a Room
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </a>
-                </div>
-              </div>
-              
-              {/* Printing & Services */}
-              <div className="bg-white rounded-xl shadow-sm overflow-hidden group hover:shadow-md transition-shadow">
-                <div className="relative h-48 overflow-hidden">
-                  <img 
-                    src="https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJpbnRlcnxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60" 
-                    alt="Printing Services" 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = 'https://via.placeholder.com/400x200?text=Printing+Services';
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                  <div className="absolute bottom-0 left-0 p-4">
-                    <h3 className="text-white font-bold text-xl">Printing & Tech Support</h3>
-                    <p className="text-blue-100 text-sm">Self-Service & Assistance Available</p>
-                  </div>
-                </div>
-                <div className="p-6">
-                  <p className="text-gray-600 text-sm mb-4">
-                    Access high-quality printing, scanning, and copying services at affordable
-                    rates. Our tech support team is also available to help with research
-                    database access and software questions.
-                  </p>
-                  <a href="#" className="text-blue-600 text-sm font-medium hover:text-blue-700 flex items-center">
-                    View Services & Pricing
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </a>
-                </div>
-              </div>
-            </div>
-            
-            {/* Additional Info & Hours */}
-            <div className="bg-white rounded-xl shadow-sm mt-8 p-8 text-center">
-              <h3 className="text-xl font-bold text-gray-800 mb-4">Library Hours & Locations</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-                <div>
-                  <h4 className="font-semibold text-gray-700 mb-2">Main Campus Library</h4>
-                  <p className="text-gray-600 text-sm">7:00 AM - 11:00 PM (Mon-Fri)</p>
-                  <p className="text-gray-600 text-sm">9:00 AM - 9:00 PM (Sat-Sun)</p>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-gray-700 mb-2">Science Building Branch</h4>
-                  <p className="text-gray-600 text-sm">8:00 AM - 10:00 PM (Mon-Fri)</p>
-                  <p className="text-gray-600 text-sm">10:00 AM - 6:00 PM (Sat)</p>
-                  <p className="text-gray-600 text-sm">Closed (Sun)</p>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-gray-700 mb-2">Downtown Exchange</h4>
-                  <p className="text-gray-600 text-sm">10:00 AM - 7:00 PM (Mon-Sat)</p>
-                  <p className="text-gray-600 text-sm">12:00 PM - 5:00 PM (Sun)</p>
-                </div>
-              </div>
-              <Link to="/about" className="inline-block mt-6 px-6 py-2 bg-blue-600 text-white rounded font-medium hover:bg-blue-700 transition-colors">
-                More About Our Facilities
-              </Link>
-            </div>
-          </div>
-        </div>
-      );
-    };
-
-    const FeaturedCollectionsSection = () => {
-      // We'll use the existing book data from booksOfWeek, featuredBooks, etc.
-      // as sample data for our collections
-      
-      // Skip if data is loading
-      if (loading.booksOfWeek || loading.popular || loading.featured) {
-        return (
-          <div className="py-16 bg-white">
-            <div className="max-w-6xl mx-auto px-4">
-              <div className="animate-pulse text-center mb-12">
-                <div className="h-8 bg-gray-200 rounded w-1/3 mx-auto mb-4"></div>
-                <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="animate-pulse">
-                    <div className="h-6 bg-gray-200 rounded w-1/2 mb-4"></div>
-                    <div className="grid grid-cols-2 gap-4">
-                      {[1, 2, 3, 4].map(j => (
-                        <div key={j} className="h-48 bg-gray-200 rounded"></div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-      }
-      
-      // Helper function to get a subset of books
-      const getBookSubset = (sourceBooks, count = 4) => {
-        if (!sourceBooks || sourceBooks.length === 0) {
-          return [];
-        }
-        
-        // Get a random subset or as many as available
-        const availableCount = Math.min(count, sourceBooks.length);
-        return [...sourceBooks].slice(0, availableCount);
-      };
-      
-      // Create three collections from our existing data
-      const collections = [
-        {
-          title: "Faculty Recommendations",
-          description: "Top picks from our professors this semester",
-          books: getBookSubset(featuredBooks)
-        },
-        {
-          title: "New Arrivals",
-          description: "Just added to our collection",
-          books: getBookSubset(booksOfWeek)
-        },
-        {
-          title: "Student Book Club Picks",
-          description: "Join the discussion at our weekly meetups",
-          books: getBookSubset(popularBooks)
-        }
-      ];
-      
-      return (
-        <div className="py-16 bg-white">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-800 mb-4">Featured Collections</h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                Explore our carefully curated collections featuring everything from academic essentials
-                to leisure reading recommendations.
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-              {collections.map((collection, idx) => (
-                <div key={idx} className="space-y-6">
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-800 mb-1">{collection.title}</h3>
-                    <p className="text-gray-500 text-sm">{collection.description}</p>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    {collection.books.map((book, bookIdx) => (
-                      <Link to={`/book/${book.id}`} key={bookIdx} className="group">
-                        <div className="relative h-56 overflow-hidden rounded-lg shadow-sm transition duration-300 group-hover:shadow-md">
-                          {/* Book Cover */}
-                          {book.cover ? (
-                            <img 
-                              src={book.cover || 'https://via.placeholder.com/150?text=No+Cover'} 
-                              alt={book.title} 
-                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
-                              onError={(e) => {
-                                e.target.onerror = null;
-                                e.target.src = 'https://via.placeholder.com/150?text=No+Cover';
-                              }}
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center p-4 transition-transform duration-300 group-hover:scale-105">
-                              <span className="text-white text-center font-serif">{book.title}</span>
-                            </div>
-                          )}
-                          
-                          {/* Hover Overlay */}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3">
-                            <h4 className="text-white font-medium text-sm line-clamp-2">{book.title}</h4>
-                            <p className="text-blue-100 text-xs">{book.author}</p>
-                          </div>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                  
-                  <div className="text-center">
-                    <Link 
-                      to="/books" 
-                      className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium"
-                    >
-                      View All in Collection
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                      </svg>
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
-            
-    
-          </div>
-        </div>
-      );
-    };
-
     return (
       <div className="py-12 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
@@ -1183,171 +721,169 @@ const Home = () => {
     </div>
   );
 
-  // COMPONENT: Book Card for Popular Books
-// Replace the BookCard component with this enhanced version
-const BookCard = ({ book }) => {
-  // Determine the book's status (random for demo purposes)
-  const statuses = ['For Sale', 'For Swap', 'For Borrowing'];
-  const statusIndex = book.id % 3; // Just for demo
-  const status = statuses[statusIndex];
-  
-  // Set status styles
-  const statusStyles = {
-    'For Sale': 'bg-green-100 text-green-800 border-green-200',
-    'For Swap': 'bg-blue-100 text-blue-800 border-blue-200',
-    'For Borrowing': 'bg-purple-100 text-purple-800 border-purple-200'
-  };
-  
-  // Set icon based on status
-  const statusIcons = {
-    'For Sale': (
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    ),
-    'For Swap': (
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-      </svg>
-    ),
-    'For Borrowing': (
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
-      </svg>
-    )
-  };
-  
-  // Generate random price (for demo purposes)
-  const price = status === 'For Sale' ? `$${(10 + book.id % 30).toFixed(2)}` : null;
-  
-  // Generate a course code (for demo purposes)
-  const courseCode = `${['CS', 'MATH', 'BIO', 'CHEM', 'ENG'][book.id % 5]}${101 + (book.id % 400)}`;
-  
-  // Add a timestamp (for demo purposes)
-  const postedDate = new Date();
-  postedDate.setDate(postedDate.getDate() - (book.id % 30));
-  const timeAgo = getTimeAgo(postedDate);
-  
-  return (
-    <div 
-      className="book-card bg-white rounded-xl shadow-sm overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:translate-y-[-4px] cursor-pointer group" 
-      onClick={() => setSelectedBook(book)}
-    >
-      {/* Status badge */}
-      <div className={`absolute top-3 left-3 z-10 px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${statusStyles[status]} border`}>
-        {statusIcons[status]}
-        {status}
-      </div>
-      
-      <div className="content-wrapper flex p-5 border-b border-gray-100 relative">
-        {/* Book cover with improved hover effects */}
-        <div className="relative overflow-hidden rounded-xl shadow-md">
-          {book.cover ? (
-            <img 
-              src={book.cover} 
-              alt={book.title} 
-              className="book-card-img w-24 h-36 object-cover transition duration-300 group-hover:scale-110" 
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = null;
-              }}
-            />
-          ) : (
-            <div className="bg-gradient-to-br from-blue-500 to-cyan-400 w-24 h-36 flex items-center justify-center transition duration-300 group-hover:scale-110 rounded-xl">
-              <span className="text-white font-bold text-xl">{book.title?.substring(0, 1)}</span>
-            </div>
-          )}
-          
-          {/* Condition indicator */}
-          <div className="absolute bottom-0 right-0 bg-white rounded-tl-lg px-2 py-1 text-xs font-semibold text-gray-700 shadow-sm">
-            {book.condition || 'Good'}
-          </div>
-          
-          {/* Rating badge */}
-          {book.rating && (
-            <div className="absolute top-0 right-0 bg-yellow-400 text-xs font-bold px-1.5 py-0.5 rounded-bl text-gray-800">
-              {book.rating.toFixed(1)}
-            </div>
-          )}
+  // Book Card for Popular Books
+  const BookCard = ({ book }) => {
+    // Determine the book's status (random for demo purposes)
+    const statuses = ['For Sale', 'For Swap', 'For Borrowing'];
+    const statusIndex = book.id % 3; // Just for demo
+    const status = statuses[statusIndex];
+    
+    // Set status styles
+    const statusStyles = {
+      'For Sale': 'bg-green-100 text-green-800 border-green-200',
+      'For Swap': 'bg-blue-100 text-blue-800 border-blue-200',
+      'For Borrowing': 'bg-purple-100 text-purple-800 border-purple-200'
+    };
+    
+    // Set icon based on status
+    const statusIcons = {
+      'For Sale': (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      ),
+      'For Swap': (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+        </svg>
+      ),
+      'For Borrowing': (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+        </svg>
+      )
+    };
+    
+    // Generate random price (for demo purposes)
+    const price = status === 'For Sale' ? `$${(10 + book.id % 30).toFixed(2)}` : null;
+    
+    // Generate a course code (for demo purposes)
+    const courseCode = `${['CS', 'MATH', 'BIO', 'CHEM', 'ENG'][book.id % 5]}${101 + (book.id % 400)}`;
+    
+    // Add a timestamp (for demo purposes)
+    const postedDate = new Date();
+    postedDate.setDate(postedDate.getDate() - (book.id % 30));
+    const timeAgo = getTimeAgo(postedDate);
+    
+    return (
+      <div 
+        className="book-card bg-white rounded-xl shadow-sm overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:translate-y-[-4px] cursor-pointer group" 
+        onClick={() => setSelectedBook(book)}
+      >
+        {/* Status badge */}
+        <div className={`absolute top-3 left-3 z-10 px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${statusStyles[status]} border`}>
+          {statusIcons[status]}
+          {status}
         </div>
         
-        <div className="card-content ml-5 flex-grow overflow-hidden">
-          <h3 className="book-name font-medium text-gray-800 mb-1 truncate group-hover:text-blue-600 transition-colors">{book.title}</h3>
-          <p className="book-by text-gray-500 text-sm mb-2">by {book.author}</p>
+        <div className="content-wrapper flex p-5 border-b border-gray-100 relative">
+          {/* Book cover with improved hover effects */}
+          <div className="relative overflow-hidden rounded-xl shadow-md">
+            {book.cover ? (
+              <img 
+                src={book.cover} 
+                alt={book.title} 
+                className="book-card-img w-24 h-36 object-cover transition duration-300 group-hover:scale-110" 
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = null;
+                }}
+              />
+            ) : (
+              <div className="bg-gradient-to-br from-blue-500 to-cyan-400 w-24 h-36 flex items-center justify-center transition duration-300 group-hover:scale-110 rounded-xl">
+                <span className="text-white font-bold text-xl">{book.title?.substring(0, 1)}</span>
+              </div>
+            )}
+            
+            {/* Condition indicator */}
+            <div className="absolute bottom-0 right-0 bg-white rounded-tl-lg px-2 py-1 text-xs font-semibold text-gray-700 shadow-sm">
+              {book.condition || 'Good'}
+            </div>
+            
+            {/* Rating badge */}
+            {book.rating && (
+              <div className="absolute top-0 right-0 bg-yellow-400 text-xs font-bold px-1.5 py-0.5 rounded-bl text-gray-800">
+                {book.rating.toFixed(1)}
+              </div>
+            )}
+          </div>
           
-          {/* Rating stars with better spacing */}
-          <div className="flex items-center mb-2">
-            <div className="flex">
-              {[1, 2, 3, 4, 5].map(star => (
-                <span key={star} className={`text-sm ${star <= Math.floor(book.rating || 0) ? "text-yellow-400" : "text-gray-300"}`}>★</span>
+          <div className="card-content ml-5 flex-grow overflow-hidden">
+            <h3 className="book-name font-medium text-gray-800 mb-1 truncate group-hover:text-blue-600 transition-colors">{book.title}</h3>
+            <p className="book-by text-gray-500 text-sm mb-2">by {book.author}</p>
+            
+            {/* Rating stars with better spacing */}
+            <div className="flex items-center mb-2">
+              <div className="flex">
+                {[1, 2, 3, 4, 5].map(star => (
+                  <span key={star} className={`text-sm ${star <= Math.floor(book.rating || 0) ? "text-yellow-400" : "text-gray-300"}`}>★</span>
+                ))}
+              </div>
+              <span className="text-gray-400 text-xs ml-2">{book.voters || 0} voters</span>
+            </div>
+            
+            {/* Book details with improved visual separation */}
+            <div className="book-details space-y-1 mb-2">
+              {status === 'For Sale' && (
+                <p className="text-sm font-semibold text-green-700">{price}</p>
+              )}
+              <p className="text-sm"><span className="font-medium text-gray-700">Course:</span> <span className="text-gray-600">{courseCode}</span></p>
+              <p className="text-sm"><span className="font-medium text-gray-700">Subject:</span> <span className="text-gray-600">{book.subject || "General"}</span></p>
+              <p className="text-xs text-gray-400 mt-2">Posted {timeAgo}</p>
+            </div>
+          </div>
+        </div>
+        
+        {/* Action buttons */}
+        <div className="flex border-t border-gray-100 divide-x divide-gray-100">
+          <button className="flex-1 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors flex items-center justify-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            Contact
+          </button>
+          <button className="flex-1 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors flex items-center justify-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+            Save
+          </button>
+          <button className="flex-1 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 transition-colors flex items-center justify-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            View
+          </button>
+        </div>
+        
+        {/* Likes section with improved appearance */}
+        {book.likes?.length > 0 && (
+          <div className="likes flex items-center p-3 bg-gray-50 group-hover:bg-blue-50 transition-colors">
+            <div className="flex -space-x-2">
+              {book.likes.slice(0, 3).map(like => (
+                <div key={like.id} className="like-profile">
+                  <img 
+                    src={like.img} 
+                    alt={like.name} 
+                    className="like-img w-7 h-7 rounded-full border-2 border-white object-cover shadow-sm"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = null;
+                    }}
+                  />
+                </div>
               ))}
             </div>
-            <span className="text-gray-400 text-xs ml-2">{book.voters || 0} voters</span>
+            <div className="like-name text-gray-500 text-xs ml-3">
+              <span className="font-semibold">{book.likes[0]?.name}</span>
+              {book.likes.length > 1 && <span> and <span className="font-semibold">{book.likes.length - 1} other {book.likes.length > 2 ? 'people' : 'person'}</span> liked this</span>}
+            </div>
           </div>
-          
-          {/* Book details with improved visual separation */}
-          <div className="book-details space-y-1 mb-2">
-            {status === 'For Sale' && (
-              <p className="text-sm font-semibold text-green-700">{price}</p>
-            )}
-            <p className="text-sm"><span className="font-medium text-gray-700">Course:</span> <span className="text-gray-600">{courseCode}</span></p>
-            <p className="text-sm"><span className="font-medium text-gray-700">Subject:</span> <span className="text-gray-600">{book.subject || "General"}</span></p>
-            <p className="text-xs text-gray-400 mt-2">Posted {timeAgo}</p>
-          </div>
-        </div>
+        )}
       </div>
-      
-      {/* Action buttons */}
-      <div className="flex border-t border-gray-100 divide-x divide-gray-100">
-        <button className="flex-1 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors flex items-center justify-center gap-1">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-          </svg>
-          Contact
-        </button>
-        <button className="flex-1 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors flex items-center justify-center gap-1">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-          </svg>
-          Save
-        </button>
-        <button className="flex-1 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 transition-colors flex items-center justify-center gap-1">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-          </svg>
-          View
-        </button>
-      </div>
-      
-      {/* Likes section with improved appearance */}
-      {book.likes?.length > 0 && (
-        <div className="likes flex items-center p-3 bg-gray-50 group-hover:bg-blue-50 transition-colors">
-          <div className="flex -space-x-2">
-            {book.likes.slice(0, 3).map(like => (
-              <div key={like.id} className="like-profile">
-                <img 
-                  src={like.img} 
-                  alt={like.name} 
-                  className="like-img w-7 h-7 rounded-full border-2 border-white object-cover shadow-sm"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = null;
-                  }}
-                />
-              </div>
-            ))}
-          </div>
-          <div className="like-name text-gray-500 text-xs ml-3">
-            <span className="font-semibold">{book.likes[0]?.name}</span>
-            {book.likes.length > 1 && <span> and <span className="font-semibold">{book.likes.length - 1} other {book.likes.length > 2 ? 'people' : 'person'}</span> liked this</span>}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
+    );
+  };
 
   // COMPONENT: Book Detail Modal
   const BookDetails = ({ book, onClose }) => {
@@ -1810,36 +1346,73 @@ const BookCard = ({ book }) => {
     );
   };
 
-  // COMPONENT: Category Tabs
-  const CategoryTabs = () => {
-    if (loading.categories) {
+  // Popular Books Section
+  const PopularBooksSection = () => {
+    if (loading.popular) {
       return (
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-          <div className="flex space-x-4 overflow-x-auto animate-pulse">
-            {[1, 2, 3, 4, 5].map(i => (
-              <div key={i} className="h-8 w-24 bg-gray-200 rounded-full"></div>
-            ))}
+        <div className="py-8 px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center mb-6 animate-pulse">
+              <div className="h-6 bg-gray-200 rounded w-1/4"></div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[1, 2, 3, 4].map(i => (
+                <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
+                  <div className="p-5 border-b border-gray-100 flex">
+                    <div className="w-24 h-36 bg-gray-200 rounded"></div>
+                    <div className="ml-5 flex-grow">
+                      <div className="h-4 bg-gray-200 rounded mb-2 w-3/4"></div>
+                      <div className="h-3 bg-gray-200 rounded mb-4 w-1/2"></div>
+                      <div className="space-y-2">
+                        <div className="h-3 bg-gray-200 rounded w-full"></div>
+                        <div className="h-3 bg-gray-200 rounded w-full"></div>
+                        <div className="h-3 bg-gray-200 rounded w-4/5"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       );
     }
-    
+
+    if (error.popular) {
+      return (
+        <div className="py-8 px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="bg-red-50 text-red-700 p-4 rounded-lg">
+              <h3 className="font-medium mb-2">Popular Books</h3>
+              <p className="text-sm">{error.popular}</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return (
-      <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-        <div className="flex space-x-3 overflow-x-auto pb-2 scrollbar-hide">
-          {categories.map(category => (
-            <button
-              key={category.id}
-              className={`px-4 py-2 rounded-full whitespace-nowrap transition-all duration-200 ${
-                activeCategory === category.name
-                  ? 'bg-blue-600 text-white font-medium shadow-md'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-              onClick={() => setActiveCategory(category.name)}
+      <div className="py-8 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-2xl font-bold mb-6 text-gray-800">Popular Books</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {popularBooks.slice(0, 6).map(book => (
+              <BookCard key={book.id} book={book} />
+            ))}
+          </div>
+          
+          <div className="mt-8 text-center">
+            <Link
+              to="/books"
+              className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
-              {category.name}
-            </button>
-          ))}
+              View All Books
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -1872,66 +1445,24 @@ const BookCard = ({ book }) => {
         />
       )}
       
+      {/* Popular Books Section */}
+      <PopularBooksSection />
+      
       {/* Popular Categories Section */}
       <PopularCategoriesSection />
       
-      {/* Main Content Area with Categories and Popular Books */}
-      <div className="px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-xl font-bold mb-6 flex items-center text-gray-800">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-            </svg>
-            Books by Genre
-          </h2>
-          
-          {/* Category Selection */}
-          <CategoryTabs />
-          
-          {/* Popular Books Grid */}
-          <div className="popular-books bg-white rounded-lg shadow-sm p-6">
-            <h3 className="font-medium text-lg mb-6 text-gray-800">
-              {activeCategory === 'All Genres' ? 'Popular Books' : `Popular in ${activeCategory}`}
-            </h3>
-            
-            {/* Book Cards */}
-            {loading.popular ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {[1, 2, 3, 4].map(i => (
-                  <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
-                    <div className="p-5 border-b border-gray-100 flex">
-                      <div className="w-24 h-36 bg-gray-200 rounded"></div>
-                      <div className="ml-5 flex-grow">
-                        <div className="h-4 bg-gray-200 rounded mb-2 w-3/4"></div>
-                        <div className="h-3 bg-gray-200 rounded mb-4 w-1/2"></div>
-                        <div className="space-y-2">
-                          <div className="h-3 bg-gray-200 rounded w-full"></div>
-                          <div className="h-3 bg-gray-200 rounded w-full"></div>
-                          <div className="h-3 bg-gray-200 rounded w-4/5"></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : error.popular ? (
-              <div className="bg-red-50 text-red-700 p-4 rounded-lg">
-                <p className="text-center">{error.popular}</p>
-              </div>
-            ) : popularBooks.length > 0 ? (
-              <div className="book-cards grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {popularBooks.map(book => (
-                  <BookCard key={book.id} book={book} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center text-gray-500 py-8">
-                No books available for this category
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+      {/* Books of the Week Row */}
+      <FeaturedBooksRow 
+        books={booksOfWeek}
+        title="Books of the Week"
+        icon={
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+          </svg>
+        }
+        loading={loading.booksOfWeek}
+        error={error.booksOfWeek}
+      />
       
       {/* Campus Stats Section */}
       <CampusStatsSection />
