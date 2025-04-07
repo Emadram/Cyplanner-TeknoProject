@@ -3,6 +3,7 @@ import { useAuth } from './contexts/AuthContext';
 import NavBar from './components/Navbar';
 import Home from './pages/Home';
 import BookPage from './pages/BookPage';
+import BookDetail from './pages/BookDetail';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import Dashboard from './pages/Dashboard';
@@ -10,6 +11,8 @@ import Profile from './pages/Profile';
 import SellerChat from './pages/SellerChat';
 import Messages from './pages/Messages';
 import CartPage from './pages/CartPage';
+import CheckoutPage from './pages/CheckoutPage';
+import AboutPage from './pages/AboutPage';
 import NotFound from './pages/NotFound';
 import ProtectedRoute from './components/ProtectedRoute';
 import Footer from './components/Footer';
@@ -30,10 +33,13 @@ function App() {
       <NavBar />
       <div className="flex-grow">
         <Routes>
+          {/* Public routes */}
           <Route path="/" element={<Home />} />
           <Route path="/books" element={<BookPage />} />
+          <Route path="/book/:id" element={<BookDetail />} />
           <Route path="/category/:categoryName" element={<BookPage />} />
           <Route path="/textbooks" element={<BookPage />} />
+          <Route path="/about" element={<AboutPage />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           
@@ -59,6 +65,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <CartPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/checkout" 
+            element={
+              <ProtectedRoute>
+                <CheckoutPage />
               </ProtectedRoute>
             } 
           />
