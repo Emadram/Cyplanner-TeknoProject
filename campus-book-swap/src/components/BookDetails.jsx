@@ -370,4 +370,4 @@ const BookDetails = ({ book, onClose }) => {
   );
 };
 
-export default BookDetails;
+export default BookDetails; 
