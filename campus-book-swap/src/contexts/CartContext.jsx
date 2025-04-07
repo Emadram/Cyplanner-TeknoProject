@@ -41,7 +41,8 @@ export const CartProvider = ({ children }) => {
           author: "John Smith",
           price: 24.99,
           quantity: 1,
-          cover: "https://via.placeholder.com/150x225?text=CS+Intro"
+          cover: null,
+          transactionType: "buy" // Added transaction type
         },
         {
           id: 2,
@@ -50,7 +51,20 @@ export const CartProvider = ({ children }) => {
           author: "Sarah Johnson",
           price: 19.95,
           quantity: 2,
-          cover: "https://via.placeholder.com/150x225?text=Calculus"
+          cover: null,
+          transactionType: "buy" // Added transaction type
+        },
+        {
+          id: 3,
+          bookId: 3,
+          title: "Introduction to Psychology",
+          author: "Michael Brown",
+          borrowDuration: "2 weeks", // Borrow-specific field
+          depositAmount: 15.00, // Borrow-specific field
+          dueDate: "2025-05-01", // Borrow-specific field
+          quantity: 1,
+          cover: null,
+          transactionType: "borrow" // Added transaction type
         }
       ];
       
@@ -67,7 +81,7 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const addToCart = async (book) => {
+  const addToCart = async (book, transactionType = "buy", borrowDetails = null) => {
     if (!isAuthenticated) {
       // Return an error if user is not logged in
       return { success: false, error: 'Please sign in to add items to your cart' };
@@ -75,8 +89,10 @@ export const CartProvider = ({ children }) => {
     
     setLoading(true);
     try {
-      // Check if the item already exists in cart
-      const existingItem = cartItems.find(item => item.bookId === book.id);
+      // Check if the item already exists in cart with the same transaction type
+      const existingItem = cartItems.find(item => 
+        item.bookId === book.id && item.transactionType === transactionType
+      );
       
       if (existingItem) {
         // Update quantity if item exists
@@ -105,8 +121,18 @@ export const CartProvider = ({ children }) => {
           price: book.price || 19.99, // Fallback price if not provided
           title: book.title,
           author: book.author,
-          cover: book.cover
+          cover: book.cover,
+          transactionType: transactionType // Add transaction type
         };
+        
+        // Add borrowing-specific details if applicable
+        if (transactionType === "borrow" && borrowDetails) {
+          Object.assign(newItem, {
+            borrowDuration: borrowDetails.duration || "2 weeks",
+            depositAmount: borrowDetails.deposit || 15.00,
+            dueDate: borrowDetails.dueDate || new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // Default 2 weeks
+          });
+        }
         
         /* In a real app, you'd make an API call:
         const response = await authAxios.post(
@@ -190,6 +216,44 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  const updateBorrowDetails = async (itemId, borrowDetails) => {
+    if (!isAuthenticated) return;
+    
+    setLoading(true);
+    try {
+      // Find the current item
+      const currentItem = cartItems.find(item => item.id === itemId);
+      if (!currentItem || currentItem.transactionType !== "borrow") return;
+      
+      /* In a real app, you'd make an API call:
+      await authAxios.put(
+        `${import.meta.env.VITE_API_URL}/api/cart-items/${itemId}`, 
+        { borrowDetails }
+      );
+      */
+      
+      // Update local cart state
+      const updatedItems = cartItems.map(item => 
+        item.id === itemId ? { 
+          ...item, 
+          borrowDuration: borrowDetails.duration || item.borrowDuration,
+          depositAmount: borrowDetails.deposit || item.depositAmount,
+          dueDate: borrowDetails.dueDate || item.dueDate
+        } : item
+      );
+      
+      setCartItems(updatedItems);
+      setError(null);
+      return { success: true };
+    } catch (err) {
+      console.error('Error updating borrow details:', err);
+      setError('Failed to update borrowing details.');
+      return { success: false, error: 'Failed to update borrowing details' };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const clearCart = async () => {
     if (!isAuthenticated) return;
     
@@ -211,6 +275,22 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  // Get counts by transaction type
+  const getTransactionTypeCounts = () => {
+    const counts = {
+      buy: 0,
+      borrow: 0,
+      swap: 0
+    };
+    
+    cartItems.forEach(item => {
+      const type = item.transactionType || 'buy';
+      counts[type] += item.quantity;
+    });
+    
+    return counts;
+  };
+
   return (
     <CartContext.Provider 
       value={{ 
@@ -220,9 +300,11 @@ export const CartProvider = ({ children }) => {
         error, 
         addToCart, 
         removeFromCart, 
-        updateCartItemQuantity, 
+        updateCartItemQuantity,
+        updateBorrowDetails,
         clearCart,
-        fetchCartItems
+        fetchCartItems,
+        getTransactionTypeCounts
       }}
     >
       {children}
