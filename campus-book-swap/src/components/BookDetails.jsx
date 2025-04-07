@@ -1,14 +1,51 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
+import { bookAPI } from '../services/api';
 
-const BookDetails = ({ book, onClose }) => {
-  // State for active tab
-  const [activeTab, setActiveTab] = useState('details');
+const BookDetail = () => {
+  const { id } = useParams();
   const { isAuthenticated } = useAuth();
   const { addToCart } = useCart();
   const navigate = useNavigate();
+  
+  const [book, setBook] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState('details');
+  
+  useEffect(() => {
+    const fetchBookDetails = async () => {
+      try {
+        setLoading(true);
+        const response = await bookAPI.getBookById(id);
+        
+        // Process book data
+        const bookData = response.data.data;
+        const processedBook = {
+          id: bookData.id,
+          ...bookData.attributes,
+          // Convert bookType if it exists or assign a default
+          bookType: bookData.attributes.bookType || 'For Sale',
+          // Process cover image if it exists
+          cover: bookData.attributes.cover?.data ? 
+            `${import.meta.env.VITE_API_URL}${bookData.attributes.cover.data.attributes.url}` : 
+            null,
+        };
+        
+        setBook(processedBook);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching book:', err);
+        setError('Failed to load book details. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchBookDetails();
+  }, [id]);
   
   // Status styles
   const statusStyles = {
@@ -17,14 +54,11 @@ const BookDetails = ({ book, onClose }) => {
     'For Borrowing': 'bg-purple-100 text-purple-800'
   };
   
-  // Generate random price (for demo purposes)
-  const price = book.bookType === 'For Sale' ? book.price : null;
-  
   // Generate a course code (for demo purposes)
-  const courseCode = `${['CS', 'MATH', 'BIO', 'CHEM', 'ENG'][book.id % 5]}${101 + (book.id % 400)}`;
+  const courseCode = book ? `${['CS', 'MATH', 'BIO', 'CHEM', 'ENG'][book.id % 5]}${101 + (book.id % 400)}` : '';
   
   // Generate seller details (for demo purposes)
-  const seller = {
+  const seller = book ? {
     id: book.id % 100 + 1, // Random ID for demo
     name: book.seller || 'John Doe',
     rating: (3 + (book.id % 3)) + (book.id % 10) / 10,
@@ -32,7 +66,7 @@ const BookDetails = ({ book, onClose }) => {
     responseTime: '< 1 hour',
     joinedDate: 'Jan 2023',
     location: 'North Campus Library'
-  };
+  } : {};
   
   // Borrowing details (for demo)
   const borrowingDetails = {
@@ -71,7 +105,6 @@ const BookDetails = ({ book, onClose }) => {
       
       if (result.success) {
         alert("Book added to cart!");
-        onClose();
       } else {
         alert(result.error || "Failed to add book to cart.");
       }
@@ -81,40 +114,70 @@ const BookDetails = ({ book, onClose }) => {
     } else if (book.bookType === 'For Borrowing' && actionType === 'primary') {
       // Handle borrowing process
       alert("Borrowing request sent to seller!");
-      onClose();
     } else {
       // Handle secondary actions
       alert("Feature coming soon!");
     }
   };
   
+  if (loading) {
+    return (
+      <div className="container mx-auto p-4">
+        <div className="flex justify-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      </div>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="container mx-auto p-4">
+        <div className="bg-red-50 text-red-700 p-4 rounded-lg mb-6">
+          <h2 className="font-bold mb-2">Error</h2>
+          <p>{error}</p>
+          <Link to="/books" className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded">
+            Back to Books
+          </Link>
+        </div>
+      </div>
+    );
+  }
+  
+  if (!book) {
+    return (
+      <div className="container mx-auto p-4">
+        <div className="bg-yellow-50 text-yellow-700 p-4 rounded-lg mb-6">
+          <h2 className="font-bold mb-2">Book Not Found</h2>
+          <p>The book you're looking for doesn't exist or has been removed.</p>
+          <Link to="/books" className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded">
+            Browse Books
+          </Link>
+        </div>
+      </div>
+    );
+  }
+  
   return (
-    <div 
-      className="fixed inset-0 bg-transparent backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all duration-300"
-      onClick={onClose} // Close when clicking the backdrop
-    >
-      <div 
-        className="bg-white rounded-2xl max-w-4xl w-full p-0 max-h-[90vh] overflow-hidden shadow-2xl animate-fadeIn"
-        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the card
-      >
-        {/* Header with book title and close button */}
+    <div className="container mx-auto p-4">
+      {/* Breadcrumb */}
+      <div className="mb-6 text-sm">
+        <Link to="/" className="text-blue-600 hover:text-blue-800">Home</Link>
+        <span className="mx-2">/</span>
+        <Link to="/books" className="text-blue-600 hover:text-blue-800">Books</Link>
+        <span className="mx-2">/</span>
+        <span className="text-gray-600">{book.title}</span>
+      </div>
+      
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="p-6 border-b border-gray-100">
           <div className="flex justify-between items-center">
             <div className="flex items-center">
-              <h2 className="text-xl font-bold text-gray-800">{book.title}</h2>
+              <h1 className="text-2xl font-bold text-gray-800">{book.title}</h1>
               <div className={`ml-3 px-3 py-1 rounded-full text-xs font-medium ${statusStyles[book.bookType]}`}>
                 {book.bookType}
               </div>
             </div>
-            <button 
-              onClick={onClose} 
-              className="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none rounded-full p-1 hover:bg-gray-100"
-              aria-label="Close"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
           </div>
         </div>
         
@@ -153,15 +216,18 @@ const BookDetails = ({ book, onClose }) => {
                   <img 
                     src={book.cover} 
                     alt={book.title} 
-                    className="w-40 h-56 object-cover rounded-xl shadow-md"
+                    className="w-64 h-80 object-cover rounded-xl shadow-md"
                     onError={(e) => {
                       e.target.onerror = null;
                       e.target.src = 'https://via.placeholder.com/160x224?text=Book+Cover';
                     }}
                   />
                 ) : (
-                  <div className="bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl shadow-md w-40 h-56 flex items-center justify-center">
-                    <span className="text-white font-bold text-xl">{book.title?.substring(0, 1)}</span>
+                  <div className="bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl shadow-md w-64 h-80 flex items-center justify-center">
+                    <div className="text-white text-center px-4">
+                      <div className="text-sm uppercase tracking-wide">Book cover</div>
+                      <div className="text-xl font-bold mt-2">{book.title.charAt(0)}</div>
+                    </div>
                   </div>
                 )}
                 
@@ -190,7 +256,7 @@ const BookDetails = ({ book, onClose }) => {
             <div className="border-t border-gray-200 pt-4 mt-4">
               {book.bookType === 'For Sale' && book.price !== null && (
                 <div className="text-center mb-4">
-                  <span className="text-2xl font-bold text-green-600">${book.price.toFixed(2)}</span>
+                  <span className="text-2xl font-bold text-green-600">${book.price?.toFixed(2) || '19.99'}</span>
                 </div>
               )}
               
@@ -221,7 +287,7 @@ const BookDetails = ({ book, onClose }) => {
           </div>
           
           {/* Right column - tab content */}
-          <div className="w-full md:w-2/3 p-6 max-h-[calc(90vh-120px)] overflow-y-auto">
+          <div className="w-full md:w-2/3 p-6">
             {/* Book Details Tab */}
             {activeTab === 'details' && (
               <div>
@@ -346,7 +412,7 @@ const BookDetails = ({ book, onClose }) => {
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {/* Sample other books */}
                     {[1, 2, 3].map(i => (
-                      <div key={i} className="bg-gray-50 p-3 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                      <Link to={`/book/${book.id + i}`} key={i} className="bg-gray-50 p-3 rounded-lg hover:bg-gray-100 transition-colors">
                         <div className="flex items-center">
                           <div className="w-12 h-16 bg-gray-200 rounded"></div>
                           <div className="ml-3">
@@ -357,7 +423,7 @@ const BookDetails = ({ book, onClose }) => {
                             )}
                           </div>
                         </div>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 </div>
@@ -366,8 +432,36 @@ const BookDetails = ({ book, onClose }) => {
           </div>
         </div>
       </div>
+      
+      {/* Related Books Section */}
+      <div className="mt-12">
+        <h2 className="text-xl font-bold mb-6">Related Books</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          {[...Array(5)].map((_, i) => (
+            <Link to={`/book/${book.id + i + 1}`} key={i} className="group">
+              <div className="bg-white rounded-lg shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md">
+                <div className="h-48 bg-gray-200 relative overflow-hidden">
+                  <div className="bg-gradient-to-br from-blue-500 to-indigo-600 w-full h-full flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
+                    <span className="text-white font-bold text-xl">{String.fromCharCode(65 + i)}</span>
+                  </div>
+                </div>
+                <div className="p-3">
+                  <h3 className="font-medium text-gray-800 mb-1 group-hover:text-blue-600 transition-colors">Similar Book Title {i+1}</h3>
+                  <p className="text-xs text-gray-500">Another Author</p>
+                  <div className="flex justify-between items-center mt-2">
+                    <div className="flex text-yellow-400 text-xs">
+                      <span>★★★★</span><span className="text-gray-300">★</span>
+                    </div>
+                    <span className="text-xs text-blue-600 font-medium">${(19.99 + i).toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
 
-export default BookDetails; 
+export default BookDetail;
