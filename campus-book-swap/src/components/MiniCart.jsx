@@ -1,10 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
-import CartItem from './CartItem';
 
 const MiniCart = ({ onClose }) => {
-  const { cartItems, cartCount, loading, error, clearCart } = useCart();
+  const { cartItems, cartCount, removeFromCart, loading, error, clearCart } = useCart();
   
   // Calculate the total price
   const cartTotal = cartItems.reduce((total, item) => {
@@ -65,11 +64,44 @@ const MiniCart = ({ onClose }) => {
       
       <div className="max-h-60 overflow-y-auto mb-4">
         {cartItems.map(item => (
-          <CartItem key={item.id} item={item} />
+          <div key={item.id} className="flex items-center py-2 border-b border-gray-200">
+            <div className="w-12 h-16 bg-gray-200 rounded overflow-hidden flex-shrink-0">
+              {item.cover ? (
+                <img 
+                  src={item.cover} 
+                  alt={item.title}
+                  className="w-full h-full object-cover" 
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'https://via.placeholder.com/150x225?text=No+Cover';
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-300 flex items-center justify-center">
+                  <span className="text-gray-500 text-xs">No cover</span>
+                </div>
+              )}
+            </div>
+            
+            <div className="ml-3 flex-grow">
+              <p className="text-sm font-medium line-clamp-1">{item.title}</p>
+              <p className="text-xs text-gray-500">{item.quantity} × ${item.price.toFixed(2)}</p>
+            </div>
+            
+            <button 
+              onClick={() => removeFromCart(item.id)}
+              className="ml-2 text-gray-400 hover:text-red-500"
+              aria-label="Remove item"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         ))}
       </div>
       
-      <div className="flex justify-between items-center py-2 border-t border-b border-gray-200 mb-4">
+      <div className="flex justify-between items-center py-2 border-t border-gray-200 mb-4">
         <span className="text-gray-700 font-medium">Subtotal</span>
         <span className="text-blue-600 font-bold">${cartTotal.toFixed(2)}</span>
       </div>
@@ -83,7 +115,7 @@ const MiniCart = ({ onClose }) => {
           View Cart
         </Link>
         <Link 
-          to="/checkout" 
+          to="/cart" 
           className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg text-center font-medium hover:bg-green-700 transition-colors text-sm"
           onClick={onClose}
         >
