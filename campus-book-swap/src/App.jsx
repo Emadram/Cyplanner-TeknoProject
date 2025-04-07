@@ -1,87 +1,90 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import MainLayout from './layouts/MainLayout';
+import { Routes, Route } from 'react-router-dom';
+import { useAuth } from './contexts/AuthContext';
+import NavBar from './components/NavBar';
 import Home from './pages/Home';
-import SignUp from './pages/SignUp';
+import BookPage from './pages/BookPage';
 import SignIn from './pages/SignIn';
-import NotFound from './pages/NotFound';
+import SignUp from './pages/SignUp';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
-import BookPage from './pages/BookPage';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import SellerChat from './pages/SellerChat';
+import Messages from './pages/Messages';
+import CartPage from './pages/CartPage';
+import NotFound from './pages/NotFound';
+import ProtectedRoute from './components/ProtectedRoute';
+import Footer from './components/Footer';
 
-// Fetch data from Strapi API using authenticated requests when needed
-const fetchStrapiData = async (endpoint) => {
-  try {
-    // Get the token from localStorage
-    const token = localStorage.getItem('token');
-    const headers = token ? { Authorization: `Bearer ${token}` } : {};
-    
-    const response = await axios.get(
-      `${import.meta.env.VITE_API_URL}/api/${endpoint}`, 
-      { headers }
-    );
-    
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching data from Strapi:', error);
-    return null;
-  }
-};
+function App() {
+  const { isLoading } = useAuth();
 
-// Enhanced Protected Route Component
-const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAuth();
-  
-  // Show loading spinner while auth state is being determined
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex items-center justify-center h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
   }
-  
-  return isAuthenticated ? children : <Navigate to="/signin" replace />;
-};
-
-function App() {
-  const [data, setData] = useState(null);
-
-  useEffect(() => {
-    fetchStrapiData('books').then(setData);
-  }, []);
 
   return (
-    <AuthProvider>
-      <BrowserRouter>
+    <div className="min-h-screen flex flex-col">
+      <NavBar />
+      <div className="flex-grow">
         <Routes>
-          <Route path="/" element={<MainLayout />}>
-            {/* Public Routes - no redirection */}
-            <Route index element={<Home />} />
-            <Route path="signup" element={<SignUp />} />
-            <Route path="signin" element={<SignIn />} />
-            
-            {/* Book routes */}
-            <Route path="book/:bookId" element={<BookPage />} />
-            <Route path="books" element={<BookPage />} />
-            <Route path="textbooks" element={<BookPage />} />
-            <Route path="categories" element={<BookPage />} />
-            <Route path="category/:categoryName" element={<BookPage />} />
-            
-            {/* Protected Routes */}
-            <Route path="dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-            <Route path="orders" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-            <Route path="cart" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-            
-            {/* 404 Page */}
-            <Route path="*" element={<NotFound />} />
-          </Route>
+          <Route path="/" element={<Home />} />
+          <Route path="/books" element={<BookPage />} />
+          <Route path="/category/:categoryName" element={<BookPage />} />
+          <Route path="/textbooks" element={<BookPage />} />
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/signup" element={<SignUp />} />
+          
+          {/* Protected routes that require authentication */}
+          <Route 
+            path="/dashboard" 
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/cart" 
+            element={
+              <ProtectedRoute>
+                <CartPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/messages" 
+            element={
+              <ProtectedRoute>
+                <Messages />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/chat/:sellerId/:bookId" 
+            element={
+              <ProtectedRoute>
+                <SellerChat />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* 404 Page */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+      </div>
+      <Footer />
+    </div>
   );
 }
 
