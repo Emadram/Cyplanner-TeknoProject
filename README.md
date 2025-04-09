@@ -9,8 +9,6 @@
 
 A modern, responsive web application that serves as a marketplace for students to buy, sell, borrow, and swap textbooks and other books.
 
-![CampusBookSwap Preview](https://via.placeholder.com/1200x600?text=CampusBookSwap+Preview)
-
 ## 🚀 Features
 
 - **Multiple Transaction Types**: Support for selling, swapping, and borrowing books
