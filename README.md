@@ -1,5 +1,12 @@
 # 📚 CampusBookSwap
 
+[![React](https://img.shields.io/badge/React-19.1.0-61DAFB?logo=react&logoColor=white)](https://reactjs.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0.17-38B2AC?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![DaisyUI](https://img.shields.io/badge/DaisyUI-5.0.9-5A0EF8?logo=daisyui&logoColor=white)](https://daisyui.com/)
+[![Vite](https://img.shields.io/badge/Vite-6.2.0-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Supabase](https://img.shields.io/badge/Supabase-2.49.4-3ECF8E?logo=supabase&logoColor=white)](https://supabase.io/)
+[![Firebase](https://img.shields.io/badge/Firebase-Hosting-FFCA28?logo=firebase&logoColor=white)](https://firebase.google.com/)
+
 A modern, responsive web application that serves as a marketplace for students to buy, sell, borrow, and swap textbooks and other books.
 
 ![CampusBookSwap Preview](https://via.placeholder.com/1200x600?text=CampusBookSwap+Preview)
@@ -20,10 +27,11 @@ A modern, responsive web application that serves as a marketplace for students t
 
 - **Frontend**: React.js with Vite
 - **Routing**: React Router
-- **Styling**: Tailwind CSS
+- **Styling**: Tailwind CSS with DaisyUI
 - **State Management**: React Context API
-- **Backend Integration**: REST API integration
-- **Authentication**: JWT-based authentication
+- **Backend**: Supabase for database and authentication
+- **Hosting**: Firebase Hosting
+- **Authentication**: JWT-based authentication via Supabase
 
 ## 📋 Prerequisites
 
