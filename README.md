@@ -4,7 +4,7 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0.17-38B2AC?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![DaisyUI](https://img.shields.io/badge/DaisyUI-5.0.9-5A0EF8?logo=daisyui&logoColor=white)](https://daisyui.com/)
 [![Vite](https://img.shields.io/badge/Vite-6.2.0-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Supabase](https://img.shields.io/badge/Supabase-2.49.4-3ECF8E?logo=supabase&logoColor=white)](https://supabase.io/)
+[![Strapi](https://img.shields.io/badge/Strapi-4.15.0-2F2E8B?logo=strapi&logoColor=white)](https://strapi.io/)
 [![Firebase](https://img.shields.io/badge/Firebase-Hosting-FFCA28?logo=firebase&logoColor=white)](https://firebase.google.com/)
 
 A modern, responsive web application that serves as a marketplace for students to buy, sell, borrow, and swap textbooks and other books.
@@ -29,9 +29,9 @@ A modern, responsive web application that serves as a marketplace for students t
 - **Routing**: React Router
 - **Styling**: Tailwind CSS with DaisyUI
 - **State Management**: React Context API
-- **Backend**: Supabase for database and authentication
+- **Backend**: Strapi CMS for content management and API
 - **Hosting**: Firebase Hosting
-- **Authentication**: JWT-based authentication via Supabase
+- **Authentication**: JWT-based authentication via Strapi
 
 ## 📋 Prerequisites
 
