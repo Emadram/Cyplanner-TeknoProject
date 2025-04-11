@@ -17,6 +17,7 @@ import NotFound from './pages/NotFound';
 import ProtectedRoute from './components/ProtectedRoute';
 import Footer from './components/Footer';
 
+{/* App Area */}
 function App() {
   const { isLoading } = useAuth();
 
