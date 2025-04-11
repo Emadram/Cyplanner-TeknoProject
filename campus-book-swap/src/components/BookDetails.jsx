@@ -652,7 +652,11 @@ const BookDetail = () => {
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {/* Sample other books */}
                     {[1, 2, 3].map(i => (
-                      <Link to={`/book/${book.id + i}`} key={i} className="bg-gray-50 p-3 rounded-lg hover:bg-gray-100 transition-colors">
+  <Link 
+    to={`/book/${book.id + i}`} 
+    key={i} 
+    className="bg-gray-50 p-3 rounded-lg hover:bg-gray-100 transition-colors"
+  >
                         <div className="flex items-center">
                           <div className="w-12 h-16 bg-gray-200 rounded"></div>
                           <div className="ml-3">
