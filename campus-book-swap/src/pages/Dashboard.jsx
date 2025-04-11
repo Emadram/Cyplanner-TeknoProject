@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
-import BookForm from '../components/BookForm';
+import BookForm from '../components/BookFrom';
 
 const Dashboard = () => {
   const { user, authAxios, isAuthenticated } = useAuth();
