@@ -1278,6 +1278,9 @@ const BooksPage = () => {
       </div>
     </div>
   );
+  {selectedBook && (
+    <BookDetails book={selectedBook} onClose={() => setSelectedBook(null)} />
+  )}
 };
 
 export default BooksPage;
