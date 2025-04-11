@@ -1,0 +1,30 @@
+{
+  "/Users/forlary/Desktop/CMSE322Prj/campus-book-swap/src/components": {
+    "color": "purple",
+    "badge": "★"
+  },
+  "/Users/forlary/Desktop/CMSE322Prj/campus-book-swap/src/components/AboutPage.jsx": {
+    "parent": "/Users/forlary/Desktop/CMSE322Prj/campus-book-swap/src/components"
+  },
+  "/Users/forlary/Desktop/CMSE322Prj/campus-book-swap/src/components/BookDetails.jsx": {
+    "parent": "/Users/forlary/Desktop/CMSE322Prj/campus-book-swap/src/components"
+  },
+  "/Users/forlary/Desktop/CMSE322Prj/campus-book-swap/src/components/BookFrom.jsx": {
+    "parent": "/Users/forlary/Desktop/CMSE322Prj/campus-book-swap/src/components"
+  },
+  "/Users/forlary/Desktop/CMSE322Prj/campus-book-swap/src/components/CartItem.jsx": {
+    "parent": "/Users/forlary/Desktop/CMSE322Prj/campus-book-swap/src/components"
+  },
+  "/Users/forlary/Desktop/CMSE322Prj/campus-book-swap/src/components/Footer.jsx": {
+    "parent": "/Users/forlary/Desktop/CMSE322Prj/campus-book-swap/src/components"
+  },
+  "/Users/forlary/Desktop/CMSE322Prj/campus-book-swap/src/components/MiniCart.jsx": {
+    "parent": "/Users/forlary/Desktop/CMSE322Prj/campus-book-swap/src/components"
+  },
+  "/Users/forlary/Desktop/CMSE322Prj/campus-book-swap/src/components/ProtectedRoute.jsx": {
+    "parent": "/Users/forlary/Desktop/CMSE322Prj/campus-book-swap/src/components"
+  },
+  "/Users/forlary/Desktop/CMSE322Prj/campus-book-swap/src/components/ShoppingCart.jsx": {
+    "parent": "/Users/forlary/Desktop/CMSE322Prj/campus-book-swap/src/components"
+  }
+}
