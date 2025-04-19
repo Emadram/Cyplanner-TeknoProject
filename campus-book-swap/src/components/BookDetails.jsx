@@ -443,18 +443,16 @@ const BookDetail = () => {
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {/* Sample other books */}
                     {[1, 2, 3].map(i => (
-  <Link 
-    to={`/book/${book.id + i}`} 
-    key={i} 
-    className="bg-gray-50 p-3 rounded-lg hover:bg-gray-100 transition-colors"
-  >
+                      <Link to={`/book/${book.id + i}`} key={i} className="bg-gray-50 p-3 rounded-lg hover:bg-gray-100 transition-colors">
                         <div className="flex items-center">
                           <div className="w-12 h-16 bg-gray-200 rounded"></div>
                           <div className="ml-3">
                             <h5 className="text-sm font-medium line-clamp-1">Another Book Title</h5>
                             <p className="text-xs text-gray-500">{book.bookType}</p>
                             {book.bookType === 'For Sale' && (
-                              <p className="text-xs font-medium text-green-600">${(book.price + i).toFixed(2)}</p>
+                              <p className="text-xs font-medium text-green-600">
+                                ${(typeof book.price === 'number' ? book.price + i : 19.99 + i).toFixed(2)}
+                              </p>
                             )}
                           </div>
                         </div>
