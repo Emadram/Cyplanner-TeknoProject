@@ -50,20 +50,7 @@ export const CartProvider = ({ children }) => {
           author: "Sarah Johnson",
           price: 19.95,
           quantity: 2,
-          cover: null,
-          transactionType: "buy" // Added transaction type
-        },
-        {
-          id: 3,
-          bookId: 3,
-          title: "Introduction to Psychology",
-          author: "Michael Brown",
-          borrowDuration: "2 weeks", // Borrow-specific field
-          depositAmount: 15.00, // Borrow-specific field
-          dueDate: "2025-05-01", // Borrow-specific field
-          quantity: 1,
-          cover: null,
-          transactionType: "borrow" // Added transaction type
+          cover: "https://via.placeholder.com/150x225?text=Calculus"
         }
       ];
       
