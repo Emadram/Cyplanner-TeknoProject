@@ -178,21 +178,15 @@ const BookDetail = () => {
       </div>
     );
   }
-  
-  // Determine primary and secondary action labels based on book type
-  const actions = {
-    'For Sale': {
-      primary: 'Add to Cart',
-      secondary: 'Make Offer'
-    },
-    'For Swap': {
-      primary: 'Propose Swap',
-      secondary: 'View Wishlist'
-    },
-    'For Borrowing': {
-      primary: 'Borrow Now',
-      secondary: 'Reserve'
+
+  // Safe way to display book rating
+  const displayRating = (rating) => {
+    if (typeof rating === 'number') {
+      return rating.toFixed(1);
+    } else if (typeof rating === 'string') {
+      return rating;
     }
+    return "N/A";
   };
   
   return (
