@@ -409,12 +409,12 @@ const Home = () => {
                 <div className="absolute bottom-0 right-0 w-40 h-56 bg-blue-400 rounded-lg shadow-2xl z-40 overflow-hidden">
                   {featuredBooks && featuredBooks.length > 0 && featuredBooks[0].cover ? (
                     <img 
-                      src={featuredBooks[0].cover || "https://via.placeholder.com/160x224?text=Book+Cover"}
+                      src={featuredBooks[0].cover || null}
                       alt={featuredBooks[0].title || "Featured Book"} 
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         e.target.onerror = null;
-                        e.target.src = 'https://via.placeholder.com/160x224?text=Book+Cover';
+                        e.target.src = null;
                       }}
                     />
                   ) : (
@@ -708,9 +708,9 @@ const Home = () => {
         
         {/* Rating badge */}
         {book.rating && (
-          <div className="absolute top-2 right-2 bg-yellow-400 text-xs font-bold px-1.5 py-0.5 rounded text-gray-800 shadow-sm">
-            {book.rating.toFixed(1)}
-          </div>
+          <div className="absolute top-0 right-0 bg-yellow-400 text-xs font-bold px-1.5 py-0.5 rounded-bl text-gray-800">
+  {typeof book.rating === 'number' ? book.rating.toFixed(1) : book.rating}
+</div>
         )}
       </div>
       
@@ -1050,7 +1050,7 @@ const Home = () => {
               <div className="flex justify-center items-center mb-4">
                 <div className="flex">
                   {[1, 2, 3, 4, 5].map(star => (
-                    <span key={star} className={star <= Math.floor(book.rating || 0) ? "text-yellow-400" : "text-gray-300"}>★</span>
+                    <span className="text-gray-500 text-xs ml-2">{typeof book.rating === 'number' ? book.rating.toFixed(1) : book.rating} ({book.voters} voters)</span>
                   ))}
                 </div>
                 <span className="text-gray-500 text-xs ml-2">{book.voters || 0} voters</span>
