@@ -248,6 +248,10 @@ const BookDetail = () => {
                     src={book.cover} 
                     alt={book.title} 
                     className="w-64 h-80 object-cover rounded-xl shadow-md"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://via.placeholder.com/160x224?text=Book+Cover';
+                    }}
                   />
                 ) : (
                   <div className="bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl shadow-md w-64 h-80 flex items-center justify-center">
