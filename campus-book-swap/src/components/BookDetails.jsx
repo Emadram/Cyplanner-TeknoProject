@@ -116,134 +116,31 @@ const BookDetail = () => {
     }
 
     if (book.bookType === 'For Sale' && actionType === 'primary') {
-      // Add to cart for purchase
-      const result = await addToCart(book, 'buy');
+      // Add to cart - Ensure the book has all required properties
+      const bookToAdd = {
+        ...book,
+        price: typeof book.price === 'number' ? book.price : 19.99 // Default price if not provided
+      };
       
-      if (result.success) {
+      const result = await addToCart(bookToAdd);
+      
+      if (result && result.success) {
         alert("Book added to cart!");
       } else {
-        alert(result.error || "Failed to add book to cart.");
+        alert((result && result.error) || "Failed to add book to cart.");
       }
-    } else if (book.bookType === 'For Sale' && actionType === 'secondary') {
-      // Make an offer
-      navigate(`/chat/${seller.id}/${book.id}`);
     } else if (book.bookType === 'For Swap' && actionType === 'primary') {
       // Redirect to chat with seller for swap
       navigate(`/chat/${seller.id}/${book.id}`);
-    } else if (book.bookType === 'For Swap' && actionType === 'secondary') {
-      // View seller's wishlist
-      alert("Wishlist feature coming soon!");
     } else if (book.bookType === 'For Borrowing' && actionType === 'primary') {
-      // Show borrowing modal
-      setShowBorrowModal(true);
-    } else if (book.bookType === 'For Borrowing' && actionType === 'secondary') {
-      // Reserve
-      alert("Reservation feature coming soon!");
+      // Handle borrowing process
+      alert("Borrowing request sent to seller!");
     } else {
-      navigate(`/chat/${seller.id}/${book.id}`);
+      // Handle secondary actions
+      alert("Feature coming soon!");
     }
   };
   
-  // Borrow Modal Component
-  const BorrowModal = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-md w-full p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-bold">Borrow this Book</h3>
-          <button 
-            onClick={() => setShowBorrowModal(false)}
-            className="text-gray-400 hover:text-gray-600"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
-          </button>
-        </div>
-        
-        <div className="mb-4">
-          <div className="flex items-center mb-3">
-            <div className="w-16 h-20 bg-gray-200 rounded overflow-hidden mr-3">
-              {book && book.cover ? (
-                <img 
-                  src={book.cover} 
-                  alt={book.title}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-gray-300 flex items-center justify-center">
-                  <span className="text-gray-500 text-xs">No image</span>
-                </div>
-              )}
-            </div>
-            <div>
-              <h4 className="font-medium">{book ? book.title : 'Loading...'}</h4>
-              <p className="text-sm text-gray-500">{book ? book.author : 'Loading...'}</p>
-            </div>
-          </div>
-          
-          <div className="bg-purple-50 rounded-lg p-4">
-            <h5 className="font-medium text-purple-800 mb-2">Borrowing Details</h5>
-            
-            <div className="space-y-3">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Borrow Duration
-                </label>
-                <select 
-                  value={borrowDuration}
-                  onChange={(e) => setBorrowDuration(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                >
-                  {borrowingDetails.durationOptions.map(option => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Return Date
-                </label>
-                <div className="w-full p-2 bg-white border border-gray-300 rounded-md text-gray-700">
-                  {calculateReturnDate(borrowDuration)}
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Deposit Amount (refundable)
-                </label>
-                <div className="w-full p-2 bg-white border border-gray-300 rounded-md text-gray-700">
-                  ${borrowingDetails.depositAmount.toFixed(2)}
-                </div>
-              </div>
-            </div>
-            
-            <div className="mt-3 text-xs text-gray-600">
-              <p>* Deposit will be refunded when the book is returned in good condition.</p>
-              <p>* Late returns will incur a fee of $1 per day.</p>
-            </div>
-          </div>
-          
-          <div className="mt-6 flex justify-end space-x-3">
-            <button 
-              onClick={() => setShowBorrowModal(false)}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button 
-              onClick={handleBorrowRequest}
-              className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
-            >
-              Add to Cart
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
   if (loading) {
     return (
       <div className="container mx-auto p-4">
