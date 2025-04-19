@@ -87,91 +87,27 @@ const BookDetail = () => {
   // Borrowing details (for demo)
   const borrowingDetails = {
     durationOptions: ['1 week', '2 weeks', '1 month'],
-    depositAmount: 15.00, 
-    defaultDuration: '2 weeks'
+    deposit: '$20.00',
+    availableFrom: 'May 15, 2023'
   };
   
-  // Calculate return date based on duration
-  const calculateReturnDate = (duration) => {
-    const date = new Date();
-    switch(duration) {
-      case '1 week':
-        date.setDate(date.getDate() + 7);
-        break;
-      case '1 month':
-        date.setDate(date.getDate() + 30);
-        break;
-      case '2 weeks':
-      default:
-        date.setDate(date.getDate() + 14);
-        break;
-    }
-    return date.toISOString().split('T')[0];
-  };
-  
-  // Handle borrow request
-  const handleBorrowRequest = async () => {
-    if (!isAuthenticated) {
-      alert("Please sign in to borrow books.");
-      navigate('/signin?redirectTo=' + encodeURIComponent(window.location.pathname));
-      return;
-    }
-    
-    if (!book) return;
-    
-    try {
-      const returnDate = calculateReturnDate(borrowDuration);
-      
-      // Create a borrow request in the API
-      await authAxios.post(`${import.meta.env.VITE_API_URL}/api/borrow-requests`, {
-        data: {
-          borrowerId: user.id,
-          lenderId: book.userId || seller.id, // In a real app, this would be the actual user ID
-          bookId: book.id,
-          duration: borrowDuration,
-          returnDate: returnDate,
-          depositAmount: borrowingDetails.depositAmount,
-          status: 'pending',
-          timestamp: new Date().toISOString()
-        }
-      });
-      
-      // Send a message to the lender
-      const chatId = `${user.id}_${book.userId || seller.id}_${book.id}`;
-      await authAxios.post(`${import.meta.env.VITE_API_URL}/api/messages`, {
-        data: {
-          chatId,
-          senderId: user.id,
-          receiverId: book.userId || seller.id,
-          bookId: book.id,
-          text: `Hello, I'd like to borrow "${book.title}" for ${borrowDuration}. I'll return it by ${returnDate}.`,
-          timestamp: new Date().toISOString(),
-          messageType: 'borrow_request'
-        }
-      });
-      
-      // Add to cart with transaction type "borrow"
-      const result = await addToCart(book, 'borrow', {
-        duration: borrowDuration,
-        deposit: borrowingDetails.depositAmount,
-        dueDate: returnDate
-      });
-      
-      if (result.success) {
-        alert("Book added to your cart for borrowing!");
-        navigate('/cart');
-      } else {
-        throw new Error(result.error || "Failed to add book to cart.");
-      }
-      
-      setShowBorrowModal(false);
-    } catch (err) {
-      console.error('Error processing borrow request:', err);
-      alert("There was an error processing your borrow request. Please try again.");
+  // Actions based on book type
+  const actions = {
+    'For Sale': {
+      primary: 'Add to Cart',
+      secondary: 'Make Offer'
+    },
+    'For Swap': {
+      primary: 'Propose Swap',
+      secondary: 'View Wishlist'
+    },
+    'For Borrowing': {
+      primary: 'Borrow Now',
+      secondary: 'Reserve'
     }
   };
 
-  // Actions based on book type
+  // Handle action button click
   const handleActionClick = async (actionType) => {
     if (!isAuthenticated) {
       alert("Please sign in to continue.");
