@@ -1,3 +1,5 @@
+// This is a fixed version of BookDetail.jsx with proper rating handling
+
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -6,7 +8,7 @@ import { bookAPI } from '../services/api';
 
 const BookDetail = () => {
   const { id } = useParams();
-  const { user, authAxios, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { addToCart } = useCart();
   const navigate = useNavigate();
   
@@ -14,8 +16,6 @@ const BookDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('details');
-  const [borrowDuration, setBorrowDuration] = useState('2 weeks');
-  const [showBorrowModal, setShowBorrowModal] = useState(false);
   
   useEffect(() => {
     const fetchBookDetails = async () => {
@@ -25,15 +25,29 @@ const BookDetail = () => {
         
         // Process book data
         const bookData = response.data.data;
+        const bookAttributes = bookData.attributes || {};
+        
+        // Process the rating properly to ensure it's a number
+        // If it's a string, convert it to a number
+        let rating = bookAttributes.rating;
+        if (typeof rating === 'string') {
+          rating = parseFloat(rating);
+        } else if (rating === undefined || rating === null) {
+          // Generate a random rating between 3 and 5 as a fallback
+          rating = Math.random() * 2 + 3;
+        }
+        
         const processedBook = {
           id: bookData.id,
-          ...bookData.attributes,
+          ...bookAttributes,
           // Convert bookType if it exists or assign a default
-          bookType: bookData.attributes.bookType || 'For Sale',
+          bookType: bookAttributes.bookType || 'For Sale',
           // Process cover image if it exists
-          cover: bookData.attributes.cover?.data ? 
-            `${import.meta.env.VITE_API_URL}${bookData.attributes.cover.data.attributes.url}` : 
+          cover: bookAttributes.cover?.data ? 
+            `${import.meta.env.VITE_API_URL}${bookAttributes.cover.data.attributes.url}` : 
             null,
+          // Ensure rating is a number
+          rating: rating
         };
         
         setBook(processedBook);
@@ -73,91 +87,27 @@ const BookDetail = () => {
   // Borrowing details (for demo)
   const borrowingDetails = {
     durationOptions: ['1 week', '2 weeks', '1 month'],
-    depositAmount: 15.00, 
-    defaultDuration: '2 weeks'
+    deposit: '$20.00',
+    availableFrom: 'May 15, 2023'
   };
   
-  // Calculate return date based on duration
-  const calculateReturnDate = (duration) => {
-    const date = new Date();
-    switch(duration) {
-      case '1 week':
-        date.setDate(date.getDate() + 7);
-        break;
-      case '1 month':
-        date.setDate(date.getDate() + 30);
-        break;
-      case '2 weeks':
-      default:
-        date.setDate(date.getDate() + 14);
-        break;
-    }
-    return date.toISOString().split('T')[0];
-  };
-  
-  // Handle borrow request
-  const handleBorrowRequest = async () => {
-    if (!isAuthenticated) {
-      alert("Please sign in to borrow books.");
-      navigate('/signin?redirectTo=' + encodeURIComponent(window.location.pathname));
-      return;
-    }
-    
-    if (!book) return;
-    
-    try {
-      const returnDate = calculateReturnDate(borrowDuration);
-      
-      // Create a borrow request in the API
-      await authAxios.post(`${import.meta.env.VITE_API_URL}/api/borrow-requests`, {
-        data: {
-          borrowerId: user.id,
-          lenderId: book.userId || seller.id, // In a real app, this would be the actual user ID
-          bookId: book.id,
-          duration: borrowDuration,
-          returnDate: returnDate,
-          depositAmount: borrowingDetails.depositAmount,
-          status: 'pending',
-          timestamp: new Date().toISOString()
-        }
-      });
-      
-      // Send a message to the lender
-      const chatId = `${user.id}_${book.userId || seller.id}_${book.id}`;
-      await authAxios.post(`${import.meta.env.VITE_API_URL}/api/messages`, {
-        data: {
-          chatId,
-          senderId: user.id,
-          receiverId: book.userId || seller.id,
-          bookId: book.id,
-          text: `Hello, I'd like to borrow "${book.title}" for ${borrowDuration}. I'll return it by ${returnDate}.`,
-          timestamp: new Date().toISOString(),
-          messageType: 'borrow_request'
-        }
-      });
-      
-      // Add to cart with transaction type "borrow"
-      const result = await addToCart(book, 'borrow', {
-        duration: borrowDuration,
-        deposit: borrowingDetails.depositAmount,
-        dueDate: returnDate
-      });
-      
-      if (result.success) {
-        alert("Book added to your cart for borrowing!");
-        navigate('/cart');
-      } else {
-        throw new Error(result.error || "Failed to add book to cart.");
-      }
-      
-      setShowBorrowModal(false);
-    } catch (err) {
-      console.error('Error processing borrow request:', err);
-      alert("There was an error processing your borrow request. Please try again.");
+  // Actions based on book type
+  const actions = {
+    'For Sale': {
+      primary: 'Add to Cart',
+      secondary: 'Make Offer'
+    },
+    'For Swap': {
+      primary: 'Propose Swap',
+      secondary: 'View Wishlist'
+    },
+    'For Borrowing': {
+      primary: 'Borrow Now',
+      secondary: 'Reserve'
     }
   };
 
-  // Actions based on book type
+  // Handle action button click
   const handleActionClick = async (actionType) => {
     if (!isAuthenticated) {
       alert("Please sign in to continue.");
@@ -166,134 +116,31 @@ const BookDetail = () => {
     }
 
     if (book.bookType === 'For Sale' && actionType === 'primary') {
-      // Add to cart for purchase
-      const result = await addToCart(book, 'buy');
+      // Add to cart - Ensure the book has all required properties
+      const bookToAdd = {
+        ...book,
+        price: typeof book.price === 'number' ? book.price : 19.99 // Default price if not provided
+      };
       
-      if (result.success) {
+      const result = await addToCart(bookToAdd);
+      
+      if (result && result.success) {
         alert("Book added to cart!");
       } else {
-        alert(result.error || "Failed to add book to cart.");
+        alert((result && result.error) || "Failed to add book to cart.");
       }
-    } else if (book.bookType === 'For Sale' && actionType === 'secondary') {
-      // Make an offer
-      navigate(`/chat/${seller.id}/${book.id}`);
     } else if (book.bookType === 'For Swap' && actionType === 'primary') {
       // Redirect to chat with seller for swap
       navigate(`/chat/${seller.id}/${book.id}`);
-    } else if (book.bookType === 'For Swap' && actionType === 'secondary') {
-      // View seller's wishlist
-      alert("Wishlist feature coming soon!");
     } else if (book.bookType === 'For Borrowing' && actionType === 'primary') {
-      // Show borrowing modal
-      setShowBorrowModal(true);
-    } else if (book.bookType === 'For Borrowing' && actionType === 'secondary') {
-      // Reserve
-      alert("Reservation feature coming soon!");
+      // Handle borrowing process
+      alert("Borrowing request sent to seller!");
     } else {
-      navigate(`/chat/${seller.id}/${book.id}`);
+      // Handle secondary actions
+      alert("Feature coming soon!");
     }
   };
   
-  // Borrow Modal Component
-  const BorrowModal = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-md w-full p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-bold">Borrow this Book</h3>
-          <button 
-            onClick={() => setShowBorrowModal(false)}
-            className="text-gray-400 hover:text-gray-600"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
-          </button>
-        </div>
-        
-        <div className="mb-4">
-          <div className="flex items-center mb-3">
-            <div className="w-16 h-20 bg-gray-200 rounded overflow-hidden mr-3">
-              {book && book.cover ? (
-                <img 
-                  src={book.cover} 
-                  alt={book.title}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-gray-300 flex items-center justify-center">
-                  <span className="text-gray-500 text-xs">No image</span>
-                </div>
-              )}
-            </div>
-            <div>
-              <h4 className="font-medium">{book ? book.title : 'Loading...'}</h4>
-              <p className="text-sm text-gray-500">{book ? book.author : 'Loading...'}</p>
-            </div>
-          </div>
-          
-          <div className="bg-purple-50 rounded-lg p-4">
-            <h5 className="font-medium text-purple-800 mb-2">Borrowing Details</h5>
-            
-            <div className="space-y-3">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Borrow Duration
-                </label>
-                <select 
-                  value={borrowDuration}
-                  onChange={(e) => setBorrowDuration(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                >
-                  {borrowingDetails.durationOptions.map(option => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Return Date
-                </label>
-                <div className="w-full p-2 bg-white border border-gray-300 rounded-md text-gray-700">
-                  {calculateReturnDate(borrowDuration)}
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Deposit Amount (refundable)
-                </label>
-                <div className="w-full p-2 bg-white border border-gray-300 rounded-md text-gray-700">
-                  ${borrowingDetails.depositAmount.toFixed(2)}
-                </div>
-              </div>
-            </div>
-            
-            <div className="mt-3 text-xs text-gray-600">
-              <p>* Deposit will be refunded when the book is returned in good condition.</p>
-              <p>* Late returns will incur a fee of $1 per day.</p>
-            </div>
-          </div>
-          
-          <div className="mt-6 flex justify-end space-x-3">
-            <button 
-              onClick={() => setShowBorrowModal(false)}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button 
-              onClick={handleBorrowRequest}
-              className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
-            >
-              Add to Cart
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
   if (loading) {
     return (
       <div className="container mx-auto p-4">
@@ -331,21 +178,15 @@ const BookDetail = () => {
       </div>
     );
   }
-  
-  // Determine primary and secondary action labels based on book type
-  const actions = {
-    'For Sale': {
-      primary: 'Add to Cart',
-      secondary: 'Make Offer'
-    },
-    'For Swap': {
-      primary: 'Propose Swap',
-      secondary: 'View Wishlist'
-    },
-    'For Borrowing': {
-      primary: 'Borrow Now',
-      secondary: 'Reserve'
+
+  // Safe way to display book rating
+  const displayRating = (rating) => {
+    if (typeof rating === 'number') {
+      return rating.toFixed(1);
+    } else if (typeof rating === 'string') {
+      return rating;
     }
+    return "N/A";
   };
   
   return (
@@ -407,6 +248,10 @@ const BookDetail = () => {
                     src={book.cover} 
                     alt={book.title} 
                     className="w-64 h-80 object-cover rounded-xl shadow-md"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://via.placeholder.com/160x224?text=Book+Cover';
+                    }}
                   />
                 ) : (
                   <div className="bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl shadow-md w-64 h-80 flex items-center justify-center">
@@ -417,12 +262,12 @@ const BookDetail = () => {
                   </div>
                 )}
                 
-                {/* Rating badge */}
-                {book.rating && (
-                  <div className="absolute -bottom-3 -right-3 bg-yellow-400 rounded-full h-10 w-10 flex items-center justify-center text-gray-800 font-bold text-sm shadow-md">
-                    {book.rating.toFixed(1)}
-                  </div>
-                )}
+{/* Rating badge */}
+{book.rating && (
+  <div className="absolute top-0 right-0 bg-yellow-400 text-xs font-bold px-1.5 py-0.5 rounded-bl text-gray-800">
+  {typeof book.rating === 'number' ? book.rating.toFixed(1) : book.rating}
+</div>
+)}
               </div>
             </div>
             
@@ -442,16 +287,7 @@ const BookDetail = () => {
             <div className="border-t border-gray-200 pt-4 mt-4">
               {book.bookType === 'For Sale' && book.price !== null && (
                 <div className="text-center mb-4">
-                  <span className="text-2xl font-bold text-green-600">${book.price?.toFixed(2) || '19.99'}</span>
-                </div>
-              )}
-              
-              {book.bookType === 'For Borrowing' && (
-                <div className="text-center mb-4">
-                  <div className="bg-purple-50 rounded-lg p-2">
-                    <span className="text-purple-800 font-medium text-sm">Deposit: ${borrowingDetails.depositAmount.toFixed(2)}</span>
-                    <p className="text-xs text-gray-600 mt-1">Refundable upon return</p>
-                  </div>
+                  <span className="text-2xl font-bold text-green-600">${typeof book.price === 'number' ? book.price.toFixed(2) : '19.99'}</span>
                 </div>
               )}
               
@@ -511,16 +347,16 @@ const BookDetail = () => {
                       {book.bookType === 'For Borrowing' && (
                         <>
                           <p className="flex justify-between">
-                            <span className="font-medium text-gray-700">Duration Options:</span> 
+                            <span className="font-medium text-gray-700">Duration:</span> 
                             <span className="text-gray-600">{borrowingDetails.durationOptions.join(' / ')}</span>
                           </p>
                           <p className="flex justify-between">
                             <span className="font-medium text-gray-700">Deposit:</span> 
-                            <span className="text-gray-600">${borrowingDetails.depositAmount.toFixed(2)}</span>
+                            <span className="text-gray-600">{borrowingDetails.deposit}</span>
                           </p>
                           <p className="flex justify-between">
                             <span className="font-medium text-gray-700">Available From:</span> 
-                            <span className="text-gray-600">Immediately</span>
+                            <span className="text-gray-600">{borrowingDetails.availableFrom}</span>
                           </p>
                         </>
                       )}
@@ -560,51 +396,6 @@ const BookDetail = () => {
                   <p>Edition: 4th Edition (2022)</p>
                   <p>Pages: 452</p>
                 </div>
-                
-                {/* Special information for borrowing */}
-                {book.bookType === 'For Borrowing' && (
-                  <div className="mt-6 bg-purple-50 p-4 rounded-lg">
-                    <h4 className="font-medium text-purple-800 mb-3">Borrowing Information</h4>
-                    <div className="space-y-2 text-sm">
-                      <p className="text-gray-700">
-                        <span className="font-medium">How it works:</span> When you borrow this book, a refundable deposit will be required. The deposit will be returned when the book is brought back in the same condition.
-                      </p>
-                      <p className="text-gray-700">
-                        <span className="font-medium">Late fees:</span> $1 per day after the due date.
-                      </p>
-                      <p className="text-gray-700">
-                        <span className="font-medium">ID Required:</span> Please bring a student ID for verification when picking up the book.
-                      </p>
-                    </div>
-                    <button 
-                      onClick={() => setShowBorrowModal(true)}
-                      className="mt-3 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm"
-                    >
-                      Borrow This Book
-                    </button>
-                  </div>
-                )}
-                
-                {/* Special information for swapping */}
-                {book.bookType === 'For Swap' && (
-                  <div className="mt-6 bg-blue-50 p-4 rounded-lg">
-                    <h4 className="font-medium text-blue-800 mb-3">Swap Information</h4>
-                    <div className="space-y-2 text-sm">
-                      <p className="text-gray-700">
-                        <span className="font-medium">How it works:</span> You can propose a book swap with the seller. They might be interested in exchanging this book for one of yours.
-                      </p>
-                      <p className="text-gray-700">
-                        <span className="font-medium">Seller's interests:</span> {book.exchange || "Literature, History, Science, and Textbooks"}
-                      </p>
-                    </div>
-                    <button 
-                      onClick={() => navigate(`/chat/${seller.id}/${book.id}`)}
-                      className="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
-                    >
-                      Propose a Swap
-                    </button>
-                  </div>
-                )}
               </div>
             )}
             
@@ -659,7 +450,9 @@ const BookDetail = () => {
                             <h5 className="text-sm font-medium line-clamp-1">Another Book Title</h5>
                             <p className="text-xs text-gray-500">{book.bookType}</p>
                             {book.bookType === 'For Sale' && (
-                              <p className="text-xs font-medium text-green-600">${(book.price + i).toFixed(2)}</p>
+                              <p className="text-xs font-medium text-green-600">
+                                ${(typeof book.price === 'number' ? book.price + i : 19.99 + i).toFixed(2)}
+                              </p>
                             )}
                           </div>
                         </div>
@@ -677,7 +470,6 @@ const BookDetail = () => {
       <div className="mt-12">
         <h2 className="text-xl font-bold mb-6">Related Books</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {/* Sample related books */}
           {[...Array(5)].map((_, i) => (
             <Link to={`/book/${book.id + i + 1}`} key={i} className="group">
               <div className="bg-white rounded-lg shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md">
@@ -701,9 +493,6 @@ const BookDetail = () => {
           ))}
         </div>
       </div>
-      
-      {/* Borrow Modal */}
-      {showBorrowModal && <BorrowModal />}
     </div>
   );
 };

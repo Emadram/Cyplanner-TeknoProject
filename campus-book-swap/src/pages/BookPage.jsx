@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { bookAPI } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
+import { useCart } from '../contexts/CartContext';
 
 const BooksPage = () => {
   const { categoryName } = useParams();
@@ -8,6 +10,7 @@ const BooksPage = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
   const [filters, setFilters] = useState({
     sort: 'newest',
     condition: 'all',
@@ -16,7 +19,33 @@ const BooksPage = () => {
   });
   const [selectedBook, setSelectedBook] = useState(null);
 
-  // 2. Add the BookDetails popup component 
+  // Style map for book type badges
+  const typeStyles = {
+    'For Sale': 'bg-green-100 text-green-800 border-green-200',
+    'For Swap': 'bg-blue-100 text-blue-800 border-blue-200',
+    'For Borrowing': 'bg-purple-100 text-purple-800 border-purple-200'
+  };
+  
+  // Icons for book types
+  const typeIcons = {
+    'For Sale': (
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+    'For Swap': (
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+      </svg>
+    ),
+    'For Borrowing': (
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+      </svg>
+    )
+  };
+
+  // 2. BookDetails popup component 
   const BookDetails = ({ book, onClose }) => {
     // State for active tab
     const [activeTab, setActiveTab] = useState('details');
@@ -181,9 +210,7 @@ const BooksPage = () => {
                   
                   {/* Rating badge */}
                   {book.rating && (
-                    <div className="absolute -bottom-3 -right-3 bg-yellow-400 rounded-full h-10 w-10 flex items-center justify-center text-gray-800 font-bold text-sm shadow-md">
-                      {book.rating.toFixed(1)}
-                    </div>
+                    <span className="text-gray-500 text-xs ml-2">{typeof book.rating === 'number' ? book.rating.toFixed(1) : book.rating} ({book.voters} voters)</span>
                   )}
                 </div>
               </div>
@@ -383,225 +410,63 @@ const BooksPage = () => {
       </div>
     );
   };
-  
-  // 3. Update the book card click handler in the books list
-  // Change the Link component to a div with onClick event in the books list grid:
-  
-  {/* Books List */}
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    {filteredBooks.map(book => (
-      <div 
-        key={book.id}
-        onClick={() => setSelectedBook(book)} 
-        className="group cursor-pointer"
-      >
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md h-full flex flex-col relative">
-          {/* Book Type Badge */}
-          <div className={`absolute top-3 left-3 z-10 px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${typeStyles[book.bookType]} border`}>
-            {typeIcons[book.bookType]}
-            {book.bookType}
-          </div>
-          
-          <div className="relative aspect-w-2 aspect-h-3 bg-gray-100">
-            {book.isNew && (
-              <div className="absolute top-0 right-0 bg-blue-600 text-white text-xs font-bold px-2 py-1 m-2 rounded-sm z-10">
-                NEW
-              </div>
-            )}
-            
-            {book.cover ? (
-              <img 
-                src={book.cover} 
-                alt={book.title} 
-                className="w-full h-64 object-cover object-center transition-transform duration-300 group-hover:scale-105" 
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = 'https://via.placeholder.com/300x450?text=No+Cover';
-                }}
-              />
-            ) : (
-              <div className="bg-gradient-to-br from-blue-500 to-indigo-600 w-full h-64 flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
-                <div className="text-white text-center font-serif px-4">
-                  <div className="text-lg font-medium">{book.title}</div>
-                </div>
-              </div>
-            )}
-          </div>
-          
-          <div className="p-4 flex-grow flex flex-col">
-            <h3 className="font-medium text-gray-800 mb-1 group-hover:text-blue-600 transition-colors line-clamp-2">
-              {book.title}
-            </h3>
-            <p className="text-sm text-gray-500 mb-2">{book.author}</p>
-            
-            <div className="flex items-center mb-2">
-              <div className="flex text-yellow-400 mr-1">
-                {[1, 2, 3, 4, 5].map(star => (
-                  <span key={star} className={star <= Math.floor(book.rating) ? "text-yellow-400" : "text-gray-300"}>★</span>
-                ))}
-              </div>
-              <span className="text-xs text-gray-500">({book.voters})</span>
-            </div>
-            
-            <div className="mt-auto">
-              {/* Only show price for "For Sale" books */}
-              {book.bookType === 'For Sale' && book.price !== null && (
-                <p className="text-blue-600 font-medium">${book.price.toFixed(2)}</p>
-              )}
-              
-              {/* For Swap books */}
-              {book.bookType === 'For Swap' && (
-                <p className="text-blue-600 font-medium">Swap</p>
-              )}
-              
-              {/* For Borrowing books */}
-              {book.bookType === 'For Borrowing' && (
-                <p className="text-blue-600 font-medium">Borrow</p>
-              )}
-              
-              <p className="text-xs text-gray-500 mt-1">
-                {book.condition} • {book.inStock > 0 ? `${book.inStock} in stock` : 'Out of stock'}
-              </p>
-            </div>
-          </div>
-          
-          <div className="p-4 bg-gray-50 border-t border-gray-100">
-            <button className="w-full py-2 px-4 bg-blue-600 text-white rounded font-medium hover:bg-blue-700 transition-colors text-sm flex items-center justify-center gap-1">
-              {book.bookType === 'For Sale' && (
-                <>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                  Add to Cart
-                </>
-              )}
-              
-              {book.bookType === 'For Swap' && (
-                <>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                  </svg>
-                  Propose Swap
-                </>
-              )}
-              
-              {book.bookType === 'For Borrowing' && (
-                <>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  Borrow Now
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
-    ))}
-  </div>
-  
-  {/* Add the book details popup modal at the end of the render function */}
-  {selectedBook && (
-    <BookDetails book={selectedBook} onClose={() => setSelectedBook(null)} />
-  )}
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        // Fetch categories first
-        const categoriesData = await bookAPI.getCategories();
-        // Add "All" option
-        const processedCategories = [
-          { id: 'all', name: 'All Categories' },
-          ...categoriesData.data.map(cat => ({
-            id: cat.id,
-            name: cat.attributes?.name || cat.attributes?.Type || cat.name || cat.Type || `Category ${cat.id}`
-          }))
-        ];
-        setCategories(processedCategories);
-        
-        // Check if we're on the textbooks route
-        const isTextbooksRoute = window.location.pathname.includes('/textbooks');
-        
-        // Fetch books based on category or all books
-        let booksData;
-        
-        if (isTextbooksRoute) {
-          // Find the textbooks category if it exists
-          const textbooksCategory = processedCategories.find(cat => 
-            cat.name.toLowerCase() === 'textbooks'
-          );
-          
-          if (textbooksCategory && textbooksCategory.id !== 'all') {
-            booksData = await bookAPI.getBooksByCategory(textbooksCategory.id);
-          } else {
-            // Fallback to all books if no textbooks category found
-            booksData = await bookAPI.getPopularBooks();
-          }
-        } else if (categoryName && categoryName !== 'all') {
-          // Find category ID if we're browsing by URL slug
-          const category = processedCategories.find(cat => 
-            cat.name.toLowerCase().replace(/\s+/g, '-') === categoryName
-          );
-          
-          if (category && category.id !== 'all') {
-            booksData = await bookAPI.getBooksByCategory(category.id);
-          } else {
-            booksData = await bookAPI.getPopularBooks();
-          }
-        } else {
-          booksData = await bookAPI.getPopularBooks();
+
+  // Filter and sort books based on user selections
+  const getFilteredBooks = () => {
+    if (!books || books.length === 0) return [];
+    
+    return books
+      .filter(book => {
+        // Filter by condition
+        if (filters.condition !== 'all' && book.condition !== filters.condition) {
+          return false;
         }
         
-        // Process book data
-        const processedBooks = booksData.data.map(book => {
-          const bookData = book.attributes || book;
-          
-          // Process cover image
-          let coverUrl = null;
-          if (bookData.cover) {
-            coverUrl = getStrapiMediaUrl(bookData.cover);
-          }
-          
-          // Determine book transaction type (For Sale, For Swap, For Borrowing)
-          // For demonstration, using a deterministic approach based on ID
-          const bookTypes = ['For Sale', 'For Swap', 'For Borrowing'];
-          const bookType = bookTypes[book.id % bookTypes.length];
-          
-          // Map the book data
-          return {
-            id: book.id,
-            title: bookData.title,
-            author: bookData.author,
-            description: bookData.description,
-            rating: bookData.rating || (Math.random() * 2 + 3).toFixed(1),
-            voters: bookData.votersCount || Math.floor(Math.random() * 100) + 5,
-            condition: bookData.condition || "Good",
-            exchange: bookData.exchange,
-            subject: bookData.subject || "General",
-            course: bookData.course,
-            seller: bookData.seller || "Campus BookShop",
-            cover: coverUrl,
-            // Only set price for "For Sale" books
-            price: bookType === 'For Sale' ? Math.floor(Math.random() * 25) + 5 + 0.99 : null,
-            categoryId: bookData.category?.data?.id || null,
-            inStock: Math.floor(Math.random() * 10) + 1,
-            isNew: Math.random() > 0.5,
-            bookType: bookType // Add the book type
-          };
-        });
+        // Filter by price range - only apply to "For Sale" books
+        if (filters.priceRange !== 'all' && book.bookType === 'For Sale') {
+          const price = book.price;
+          if (!price) return false;
+          if (filters.priceRange === 'under10' && price >= 10) return false;
+          if (filters.priceRange === '10to20' && (price < 10 || price > 20)) return false;
+          if (filters.priceRange === '20to30' && (price < 20 || price > 30)) return false;
+          if (filters.priceRange === 'over30' && price <= 30) return false;
+        }
         
-        setBooks(processedBooks);
-      } catch (err) {
-        console.error("Error fetching data:", err);
-        setError("Failed to load books. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchData();
-  }, [categoryName, window.location.pathname]);
+        // Filter by book type
+        if (filters.bookType !== 'all' && book.bookType !== filters.bookType) {
+          return false;
+        }
+        
+        return true;
+      })
+      .sort((a, b) => {
+        // Sort books based on selected option
+        switch (filters.sort) {
+          case 'priceLow':
+            // Handle null prices (books that are not for sale)
+            if (a.price === null && b.price === null) return 0;
+            if (a.price === null) return 1;
+            if (b.price === null) return -1;
+            return a.price - b.price;
+          case 'priceHigh':
+            // Handle null prices (books that are not for sale)
+            if (a.price === null && b.price === null) return 0;
+            if (a.price === null) return 1;
+            if (b.price === null) return -1;
+            return b.price - a.price;
+          case 'rating':
+            return b.rating - a.rating;
+          case 'popular':
+            return b.voters - a.voters;
+          case 'newest':
+          default:
+            // For demo purposes, use ID as a proxy for "newest"
+            return b.id - a.id;
+        }
+      });
+  };
+
+  const filteredBooks = getFilteredBooks();
 
   // Helper function to get image URL from Strapi data
   const getStrapiMediaUrl = (imageData) => {
@@ -697,63 +562,6 @@ const BooksPage = () => {
     }
   };
 
-  // Filter and sort books based on user selections
-  const getFilteredBooks = () => {
-    if (!books || books.length === 0) return [];
-    
-    return books
-      .filter(book => {
-        // Filter by condition
-        if (filters.condition !== 'all' && book.condition !== filters.condition) {
-          return false;
-        }
-        
-        // Filter by price range - only apply to "For Sale" books
-        if (filters.priceRange !== 'all' && book.bookType === 'For Sale') {
-          const price = book.price;
-          if (!price) return false;
-          if (filters.priceRange === 'under10' && price >= 10) return false;
-          if (filters.priceRange === '10to20' && (price < 10 || price > 20)) return false;
-          if (filters.priceRange === '20to30' && (price < 20 || price > 30)) return false;
-          if (filters.priceRange === 'over30' && price <= 30) return false;
-        }
-        
-        // Filter by book type
-        if (filters.bookType !== 'all' && book.bookType !== filters.bookType) {
-          return false;
-        }
-        
-        return true;
-      })
-      .sort((a, b) => {
-        // Sort books based on selected option
-        switch (filters.sort) {
-          case 'priceLow':
-            // Handle null prices (books that are not for sale)
-            if (a.price === null && b.price === null) return 0;
-            if (a.price === null) return 1;
-            if (b.price === null) return -1;
-            return a.price - b.price;
-          case 'priceHigh':
-            // Handle null prices (books that are not for sale)
-            if (a.price === null && b.price === null) return 0;
-            if (a.price === null) return 1;
-            if (b.price === null) return -1;
-            return b.price - a.price;
-          case 'rating':
-            return b.rating - a.rating;
-          case 'popular':
-            return b.voters - a.voters;
-          case 'newest':
-          default:
-            // For demo purposes, use ID as a proxy for "newest"
-            return b.id - a.id;
-        }
-      });
-  };
-
-  const filteredBooks = getFilteredBooks();
-  
   // Get current category name for display
   const getCurrentCategoryName = () => {
     // Handle the special case of textbooks route
@@ -780,31 +588,104 @@ const BooksPage = () => {
     }));
   };
 
-  // Style map for book type badges
-  const typeStyles = {
-    'For Sale': 'bg-green-100 text-green-800 border-green-200',
-    'For Swap': 'bg-blue-100 text-blue-800 border-blue-200',
-    'For Borrowing': 'bg-purple-100 text-purple-800 border-purple-200'
-  };
-  
-  // Icons for book types
-  const typeIcons = {
-    'For Sale': (
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    ),
-    'For Swap': (
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-      </svg>
-    ),
-    'For Borrowing': (
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
-      </svg>
-    )
-  };
+  // Fetch data when component mounts or category changes
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        // Fetch categories first
+        const categoriesData = await bookAPI.getCategories();
+        // Add "All" option
+        const processedCategories = [
+          { id: 'all', name: 'All Categories' },
+          ...categoriesData.data.map(cat => ({
+            id: cat.id,
+            name: cat.attributes?.name || cat.attributes?.Type || cat.name || cat.Type || `Category ${cat.id}`
+          }))
+        ];
+        setCategories(processedCategories);
+        
+        // Check if we're on the textbooks route
+        const isTextbooksRoute = window.location.pathname.includes('/textbooks');
+        
+        // Fetch books based on category or all books
+        let booksData;
+        
+        if (isTextbooksRoute) {
+          // Find the textbooks category if it exists
+          const textbooksCategory = processedCategories.find(cat => 
+            cat.name.toLowerCase() === 'textbooks'
+          );
+          
+          if (textbooksCategory && textbooksCategory.id !== 'all') {
+            booksData = await bookAPI.getBooksByCategory(textbooksCategory.id);
+          } else {
+            // Fallback to all books if no textbooks category found
+            booksData = await bookAPI.getPopularBooks();
+          }
+        } else if (categoryName && categoryName !== 'all') {
+          // Find category ID if we're browsing by URL slug
+          const category = processedCategories.find(cat => 
+            cat.name.toLowerCase().replace(/\s+/g, '-') === categoryName
+          );
+          
+          if (category && category.id !== 'all') {
+            booksData = await bookAPI.getBooksByCategory(category.id);
+          } else {
+            booksData = await bookAPI.getPopularBooks();
+          }
+        } else {
+          booksData = await bookAPI.getPopularBooks();
+        }
+        
+        // Process book data
+        const processedBooks = booksData.data.map(book => {
+          const bookData = book.attributes || book;
+          
+          // Process cover image
+          let coverUrl = null;
+          if (bookData.cover) {
+            coverUrl = getStrapiMediaUrl(bookData.cover);
+          }
+          
+          // Determine book transaction type (For Sale, For Swap, For Borrowing)
+          const bookTypes = ['For Sale', 'For Swap', 'For Borrowing'];
+          const bookType = bookTypes[book.id % bookTypes.length];
+          
+          // Map the book data
+          return {
+            id: book.id,
+            title: bookData.title,
+            author: bookData.author,
+            description: bookData.description,
+            rating: bookData.rating || (Math.random() * 2 + 3).toFixed(1),
+            voters: bookData.votersCount || Math.floor(Math.random() * 100) + 5,
+            condition: bookData.condition || "Good",
+            exchange: bookData.exchange,
+            subject: bookData.subject || "General",
+            course: bookData.course,
+            seller: bookData.seller || "Campus BookShop",
+            cover: coverUrl,
+            // Only set price for "For Sale" books
+            price: bookType === 'For Sale' ? Math.floor(Math.random() * 25) + 5 + 0.99 : null,
+            categoryId: bookData.category?.data?.id || null,
+            inStock: Math.floor(Math.random() * 10) + 1,
+            isNew: Math.random() > 0.5,
+            bookType: bookType // Add the book type
+          };
+        });
+        
+        setBooks(processedBooks);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError("Failed to load books. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, [categoryName, window.location.pathname]);
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -1108,7 +989,11 @@ const BooksPage = () => {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredBooks.map(book => (
-                  <Link to={`/book/${book.id}`} key={book.id} className="group">
+                  <div 
+                    key={book.id}
+                    onClick={() => setSelectedBook(book)} 
+                    className="group cursor-pointer"
+                  >
                     <div className="bg-white rounded-lg shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md h-full flex flex-col relative">
                       {/* Book Type Badge */}
                       <div className={`absolute top-3 left-3 z-10 px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${typeStyles[book.bookType]} border`}>
@@ -1210,7 +1095,7 @@ const BooksPage = () => {
                         </button>
                       </div>
                     </div>
-                  </Link>
+                  </div>
                 ))}
               </div>
             )}
@@ -1271,6 +1156,11 @@ const BooksPage = () => {
           </div>
         </div>
       </div>
+      
+      {/* Book Details Popup */}
+      {selectedBook && (
+        <BookDetails book={selectedBook} onClose={() => setSelectedBook(null)} />
+      )}
     </div>
   );
 };

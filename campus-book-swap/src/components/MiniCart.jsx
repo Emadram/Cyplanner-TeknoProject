@@ -66,7 +66,7 @@ const MiniCart = ({ onClose }) => {
         {cartItems.map(item => (
           <div key={item.id} className="flex items-center py-2 border-b border-gray-200">
             <div className="w-12 h-16 bg-gray-200 rounded overflow-hidden flex-shrink-0">
-              {item.cover ? (
+              {item.cover && item.cover !== '' ? (
                 <img 
                   src={item.cover} 
                   alt={item.title}
@@ -115,7 +115,7 @@ const MiniCart = ({ onClose }) => {
           View Cart
         </Link>
         <Link 
-          to="/cart" 
+          to="/checkout" 
           className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg text-center font-medium hover:bg-green-700 transition-colors text-sm"
           onClick={onClose}
         >
