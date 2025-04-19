@@ -470,7 +470,6 @@ const BookDetail = () => {
       <div className="mt-12">
         <h2 className="text-xl font-bold mb-6">Related Books</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {/* Sample related books */}
           {[...Array(5)].map((_, i) => (
             <Link to={`/book/${book.id + i + 1}`} key={i} className="group">
               <div className="bg-white rounded-lg shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md">
