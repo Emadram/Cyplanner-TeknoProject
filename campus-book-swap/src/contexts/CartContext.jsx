@@ -41,8 +41,7 @@ export const CartProvider = ({ children }) => {
           author: "John Smith",
           price: 24.99,
           quantity: 1,
-          cover: null,
-          transactionType: "buy" // Added transaction type
+          cover: "https://via.placeholder.com/150x225?text=CS+Intro"
         },
         {
           id: 2,
