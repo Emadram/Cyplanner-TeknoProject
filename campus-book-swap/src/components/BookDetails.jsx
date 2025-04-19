@@ -262,12 +262,12 @@ const BookDetail = () => {
                   </div>
                 )}
                 
-                {/* Rating badge */}
-                {book.rating && (
-                  <div className="absolute -bottom-3 -right-3 bg-yellow-400 rounded-full h-10 w-10 flex items-center justify-center text-gray-800 font-bold text-sm shadow-md">
-                    {book.rating.toFixed(1)}
-                  </div>
-                )}
+{/* Rating badge */}
+{book.rating && (
+  <div className="absolute top-0 right-0 bg-yellow-400 text-xs font-bold px-1.5 py-0.5 rounded-bl text-gray-800">
+  {typeof book.rating === 'number' ? book.rating.toFixed(1) : book.rating}
+</div>
+)}
               </div>
             </div>
             
