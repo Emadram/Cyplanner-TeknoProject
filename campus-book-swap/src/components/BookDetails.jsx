@@ -1,3 +1,5 @@
+// This is a fixed version of BookDetail.jsx with proper rating handling
+
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -6,7 +8,7 @@ import { bookAPI } from '../services/api';
 
 const BookDetail = () => {
   const { id } = useParams();
-  const { user, authAxios, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { addToCart } = useCart();
   const navigate = useNavigate();
   
@@ -14,8 +16,6 @@ const BookDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('details');
-  const [borrowDuration, setBorrowDuration] = useState('2 weeks');
-  const [showBorrowModal, setShowBorrowModal] = useState(false);
   
   useEffect(() => {
     const fetchBookDetails = async () => {
