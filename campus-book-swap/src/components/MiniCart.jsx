@@ -115,7 +115,7 @@ const MiniCart = ({ onClose }) => {
           View Cart
         </Link>
         <Link 
-          to="/cart" 
+          to="/checkout" 
           className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg text-center font-medium hover:bg-green-700 transition-colors text-sm"
           onClick={onClose}
         >
