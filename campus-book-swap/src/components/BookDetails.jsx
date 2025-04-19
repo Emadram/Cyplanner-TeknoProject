@@ -287,16 +287,7 @@ const BookDetail = () => {
             <div className="border-t border-gray-200 pt-4 mt-4">
               {book.bookType === 'For Sale' && book.price !== null && (
                 <div className="text-center mb-4">
-                  <span className="text-2xl font-bold text-green-600">${book.price?.toFixed(2) || '19.99'}</span>
-                </div>
-              )}
-              
-              {book.bookType === 'For Borrowing' && (
-                <div className="text-center mb-4">
-                  <div className="bg-purple-50 rounded-lg p-2">
-                    <span className="text-purple-800 font-medium text-sm">Deposit: ${borrowingDetails.depositAmount.toFixed(2)}</span>
-                    <p className="text-xs text-gray-600 mt-1">Refundable upon return</p>
-                  </div>
+                  <span className="text-2xl font-bold text-green-600">${typeof book.price === 'number' ? book.price.toFixed(2) : '19.99'}</span>
                 </div>
               )}
               
