@@ -347,16 +347,16 @@ const BookDetail = () => {
                       {book.bookType === 'For Borrowing' && (
                         <>
                           <p className="flex justify-between">
-                            <span className="font-medium text-gray-700">Duration Options:</span> 
+                            <span className="font-medium text-gray-700">Duration:</span> 
                             <span className="text-gray-600">{borrowingDetails.durationOptions.join(' / ')}</span>
                           </p>
                           <p className="flex justify-between">
                             <span className="font-medium text-gray-700">Deposit:</span> 
-                            <span className="text-gray-600">${borrowingDetails.depositAmount.toFixed(2)}</span>
+                            <span className="text-gray-600">{borrowingDetails.deposit}</span>
                           </p>
                           <p className="flex justify-between">
                             <span className="font-medium text-gray-700">Available From:</span> 
-                            <span className="text-gray-600">Immediately</span>
+                            <span className="text-gray-600">{borrowingDetails.availableFrom}</span>
                           </p>
                         </>
                       )}
