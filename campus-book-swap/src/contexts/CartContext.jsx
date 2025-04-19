@@ -67,18 +67,23 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const addToCart = async (book, transactionType = "buy", borrowDetails = null) => {
+  const addToCart = async (book) => {
     if (!isAuthenticated) {
       // Return an error if user is not logged in
       return { success: false, error: 'Please sign in to add items to your cart' };
     }
     
+    // Ensure we have a valid book object with required properties
+    if (!book || !book.id) {
+      console.error('Invalid book object:', book);
+      return { success: false, error: 'Invalid book data' };
+    }
+    
     setLoading(true);
     try {
-      // Check if the item already exists in cart with the same transaction type
-      const existingItem = cartItems.find(item => 
-        item.bookId === book.id && item.transactionType === transactionType
-      );
+      console.log('Adding book to cart:', book);
+      // Check if the item already exists in cart
+      const existingItem = cartItems.find(item => item.bookId === book.id);
       
       if (existingItem) {
         // Update quantity if item exists
