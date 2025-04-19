@@ -493,9 +493,6 @@ const BookDetail = () => {
           ))}
         </div>
       </div>
-      
-      {/* Borrow Modal */}
-      {showBorrowModal && <BorrowModal />}
     </div>
   );
 };
