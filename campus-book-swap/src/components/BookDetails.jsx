@@ -396,51 +396,6 @@ const BookDetail = () => {
                   <p>Edition: 4th Edition (2022)</p>
                   <p>Pages: 452</p>
                 </div>
-                
-                {/* Special information for borrowing */}
-                {book.bookType === 'For Borrowing' && (
-                  <div className="mt-6 bg-purple-50 p-4 rounded-lg">
-                    <h4 className="font-medium text-purple-800 mb-3">Borrowing Information</h4>
-                    <div className="space-y-2 text-sm">
-                      <p className="text-gray-700">
-                        <span className="font-medium">How it works:</span> When you borrow this book, a refundable deposit will be required. The deposit will be returned when the book is brought back in the same condition.
-                      </p>
-                      <p className="text-gray-700">
-                        <span className="font-medium">Late fees:</span> $1 per day after the due date.
-                      </p>
-                      <p className="text-gray-700">
-                        <span className="font-medium">ID Required:</span> Please bring a student ID for verification when picking up the book.
-                      </p>
-                    </div>
-                    <button 
-                      onClick={() => setShowBorrowModal(true)}
-                      className="mt-3 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm"
-                    >
-                      Borrow This Book
-                    </button>
-                  </div>
-                )}
-                
-                {/* Special information for swapping */}
-                {book.bookType === 'For Swap' && (
-                  <div className="mt-6 bg-blue-50 p-4 rounded-lg">
-                    <h4 className="font-medium text-blue-800 mb-3">Swap Information</h4>
-                    <div className="space-y-2 text-sm">
-                      <p className="text-gray-700">
-                        <span className="font-medium">How it works:</span> You can propose a book swap with the seller. They might be interested in exchanging this book for one of yours.
-                      </p>
-                      <p className="text-gray-700">
-                        <span className="font-medium">Seller's interests:</span> {book.exchange || "Literature, History, Science, and Textbooks"}
-                      </p>
-                    </div>
-                    <button 
-                      onClick={() => navigate(`/chat/${seller.id}/${book.id}`)}
-                      className="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
-                    >
-                      Propose a Swap
-                    </button>
-                  </div>
-                )}
               </div>
             )}
             
