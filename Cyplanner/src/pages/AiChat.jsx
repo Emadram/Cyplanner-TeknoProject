@@ -73,7 +73,7 @@ const AiChat = () => {
     const initialGreeting = {
       id: 'greeting-1',
       sender: 'ai',
-      text: "Hi Emad! I'm your North Cyprus Travel Assistant. What kind of experience are you looking for?",
+      text: "Hello! I'm your North Cyprus Travel Assistant. What kind of experience are you looking for?",
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
     setMessages([initialGreeting]);
@@ -171,7 +171,7 @@ const AiChat = () => {
       ${eventsInfo}
       
       Important: 
-      1. Continue the conversation naturally as if this is a follow-up. DO NOT use greetings like "Hello" or "Hi" again.
+      1. Continue the conversation naturally as if this is a follow-up.
       2. Include relevant emoji in your responses to make them engaging
       3. Use markdown for headers, bullet points, and to highlight important information
       4. Make suggestions based on user interests and filters
@@ -186,7 +186,7 @@ const AiChat = () => {
       const data = await callGeminiAPI({ prompt });
       
       // Extract and process the response text
-      let responseText = "Sorry, I couldn't generate a response. Please try again.";
+      let responseText = "Sorry, I couldn't generate a response, Please try again.";
       
       if (data.candidates && data.candidates[0] && data.candidates[0].content) {
         responseText = data.candidates[0].content.parts[0].text;

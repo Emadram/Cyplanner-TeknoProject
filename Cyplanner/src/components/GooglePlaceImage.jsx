@@ -6,13 +6,11 @@ const GooglePlaceImage = ({ placeName, lat, lng, apiKey, onImageFound, fallbackI
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Function to fetch place details and photo reference
     const fetchPlaceImage = async () => {
       try {
         setIsLoading(true);
         setError(null);
 
-        // First, find the place using the Places API with nearby search
         const searchResponse = await fetch(
           `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=500&keyword=${encodeURIComponent(placeName)}&key=${apiKey}`
         );
@@ -23,9 +21,7 @@ const GooglePlaceImage = ({ placeName, lat, lng, apiKey, onImageFound, fallbackI
 
         const searchData = await searchResponse.json();
         
-        // Check if we found any places and if they have photos
         if (searchData.results.length === 0 || !searchData.results[0].photos) {
-          // If no results or no photos, use the fallback image
           setImageUrl(fallbackImage);
           setIsLoading(false);
           return;

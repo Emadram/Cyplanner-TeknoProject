@@ -25,7 +25,6 @@ const Navbar = () => {
               className="h-10 w-10 bg-sky-600 rounded-full"
             />
           </Link>
-          {/* You can replace the div above with your logo */}
         </div>
         
         {/* Desktop Navigation */}

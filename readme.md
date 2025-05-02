@@ -66,13 +66,19 @@ A modern web application to help travelers discover and plan their perfect trip 
    npm install
    ```
 
-3. **Create environment variables**:
-   Create a `.env` file in the root directory with the following variables:
-   ```
-   VITE_API_URL=your_backend_api_url
-   VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
-   VITE_GEMINI_API_KEY=your_gemini_api_key
-   ```
+3. **Set up API keys**:
+   You can either:
+   - Create a `.env` file in the root directory with the following variables:
+     ```
+     VITE_API_URL=your_backend_api_url
+     VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+     VITE_GEMINI_API_KEY=your_gemini_api_key
+     ```
+   OR
+   - Edit the API keys directly in `src/data/SharedData.js` file
+   - Set the backend URL in `src/services/api.js`
+
+   Note: For production, it's recommended to use environment variables instead of hardcoding API keys.
 
 4. **Start the development server**:
    ```bash
@@ -207,7 +213,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 This project was developed for [Teknofest 2025 - TRNC] and achieved:
 
-- 🥇 [semi-finalist]
+- [Semi-finalist]
 - ⭐ [81/85]
 
 ## 🙏 Acknowledgments
