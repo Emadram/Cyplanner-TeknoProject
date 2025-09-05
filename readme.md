@@ -10,7 +10,7 @@ A modern web application to help travelers discover and plan their perfect trip 
 
 ## 👥 SyntaxSquad(SST25)
 
-- [Emad Ramezani] - [Project Manager / Developer] - [[GitHub](https://github.com/Emadram)/[LinkedIn Profile Link](https://www.linkedin.com/in/emad-ramezani-747287207/)]
+- [Emad Ramezani] - [Project Manager / Lead Developer] - [[GitHub](https://github.com/Emadram)/[LinkedIn Profile Link](https://www.linkedin.com/in/emad-ramezani-747287207/)]
 - [Taniya Dibaee] - [UI/UX Designer] - [[GitHub](https://github.com/Taniya-Diba)/[LinkedIn Profile Link](https://www.linkedin.com/in/taniya-dibaee)]
 - [Parnia sedighparvar] - [Documenter] - [[GitHub](https://github.com/parnias8)/[LinkedIn Profile Link](https://www.linkedin.com/in/parnia-sedighparvar)]
 - [Sohrab Memari] - [Full-Stack Developer] - [[GitHub](https://github.com/Sohrab098)/[LinkedIn Profile Link](https://www.linkedin.com/in/sohrab-memari/)]
@@ -221,3 +221,4 @@ This project was developed for [Teknofest 2025 - TRNC] and achieved:
 - Google Maps API for location mapping
 - Google's Gemini AI for powering the travel assistant
 - All contributors who have helped improve this project
+
